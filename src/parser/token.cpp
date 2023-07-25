@@ -12,7 +12,9 @@ namespace cyaml
     Token::Token(): token_type_(Token_Type::NONE) {}
 
     Token::Token(Token_Type type, std::string value, uint32_t indent)
-        : token_type_(type), value_(value), indent_(indent)
+        : token_type_(type),
+          value_(value),
+          indent_(indent)
     {
     }
 
