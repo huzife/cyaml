@@ -1,0 +1,10 @@
+---
+- 123456
+- test
+-
+  string: >-
+    this
+    is
+    a
+    test
+    string

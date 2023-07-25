@@ -1,0 +1,4 @@
+(KEY, escape, 0)#
+(COLON, :, 6)#
+(SCALAR, this\ is a	 
+ string'", 8)#
