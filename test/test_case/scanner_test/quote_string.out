@@ -1,0 +1,6 @@
+(START, ---, 0)#
+(KEY, quote_str, 0)#
+(COLON, :, 9)#
+(SCALAR, this     is a test string, 11)#
+(KEY, next, 0)#
+(COLON, :, 4)#

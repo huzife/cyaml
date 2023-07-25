@@ -1,0 +1,11 @@
+---
+empty: |
+preserve: |
+  this
+  is
+  a
+  preserve
+  string
+fold: >-
+  this is a
+  fold string

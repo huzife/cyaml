@@ -1,0 +1,10 @@
+(START, ---, 0)#
+(SERIES_ENTRY, -, 0)#
+(SCALAR, 123456, 2)#
+(SERIES_ENTRY, -, 0)#
+(SCALAR, test, 2)#
+(SERIES_ENTRY, -, 0)#
+(KEY, string, 2)#
+(COLON, :, 8)#
+(FOLD, >-, 10)#
+(SCALAR, this is a test string, 4)#
