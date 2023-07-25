@@ -99,7 +99,7 @@ namespace cyaml
 
         // 解析出一个 key 或 '-'，更新对标量的缩进限制
         Token_Type type = next_token_.token_type();
-        if (type == Token_Type::SERIES_ENTRY || type == Token_Type::KEY) {
+        if (type == Token_Type::DASH || type == Token_Type::KEY) {
             min_indent_ = next_token_.indent() + 1;
         } else if (type == Token_Type::SCALAR) {
             min_indent_ = 0;
@@ -163,7 +163,7 @@ namespace cyaml
         switch (ch) {
         case '-':
             if (next_char_ != '-') {
-                token_type = Token_Type::SERIES_ENTRY;
+                token_type = Token_Type::DASH;
             } else {
                 // 读取后两个字符，判断是否匹配'---'
                 value_ += next_char();

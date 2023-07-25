@@ -10,7 +10,6 @@
 
 #include "parser/token.h"
 #include <istream>
-#include <stack>
 
 namespace cyaml
 {

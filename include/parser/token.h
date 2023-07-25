@@ -21,20 +21,20 @@ namespace cyaml
     enum class Token_Type
     {
         NONE,
-        START,        // ---
-        END,          // ...
-        SERIES_ENTRY, // -
-        COLON,        // :
-        LBRACE,       // {
-        RBRACE,       // }
-        LBRACKET,     // [
-        RBRACKET,     // ]
-        PRESERVE,     // |
-        FOLD,         // >
-        SQUOTE,       // '
-        DQUOTE,       // "
-        KEY,          // 对象 key
-        SCALAR        // 标量
+        START,    // ---
+        END,      // ...
+        DASH,     // -
+        COLON,    // :
+        LBRACE,   // {
+        RBRACE,   // }
+        LBRACKET, // [
+        RBRACKET, // ]
+        PRESERVE, // |
+        FOLD,     // >
+        SQUOTE,   // '
+        DQUOTE,   // "
+        KEY,      // 对象 key
+        SCALAR    // 标量
     };
 
     /**

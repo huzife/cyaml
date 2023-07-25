@@ -45,8 +45,8 @@ namespace cyaml
             return "START";
         case Token_Type::END:
             return "END";
-        case Token_Type::SERIES_ENTRY:
-            return "SERIES_ENTRY";
+        case Token_Type::DASH:
+            return "DASH";
         case Token_Type::COLON:
             return "COLON";
         case Token_Type::LBRACE:

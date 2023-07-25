@@ -1,15 +1,15 @@
 (START, ---, 0)#
 (KEY, json, 0)#
 (COLON, :, 4)#
-(SERIES_ENTRY, -, 2)#
+(DASH, -, 2)#
 (SCALAR, rigid, 4)#
-(SERIES_ENTRY, -, 2)#
+(DASH, -, 2)#
 (SCALAR, better for data interchange, 4)#
 (KEY, yaml, 0)#
 (COLON, :, 4)#
-(SERIES_ENTRY, -, 2)#
+(DASH, -, 2)#
 (SCALAR, slim and flexible, 4)#
-(SERIES_ENTRY, -, 2)#
+(DASH, -, 2)#
 (SCALAR, better for configuration, 4)#
 (KEY, object, 0)#
 (COLON, :, 6)#
@@ -18,14 +18,14 @@
 (SCALAR, value, 7)#
 (KEY, array, 2)#
 (COLON, :, 7)#
-(SERIES_ENTRY, -, 4)#
+(DASH, -, 4)#
 (KEY, null_value, 6)#
 (COLON, :, 16)#
-(SERIES_ENTRY, -, 4)#
+(DASH, -, 4)#
 (KEY, boolean, 6)#
 (COLON, :, 13)#
 (SCALAR, true, 15)#
-(SERIES_ENTRY, -, 4)#
+(DASH, -, 4)#
 (KEY, integer, 6)#
 (COLON, :, 13)#
 (SCALAR, 1, 15)#

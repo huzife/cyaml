@@ -1,4 +1,4 @@
-(SERIES_ENTRY, -, 0)#
+(DASH, -, 0)#
 (KEY, key1, 2)#
 (COLON, :, 6)#
 (SCALAR, string1, 8)#
@@ -8,5 +8,5 @@
 (KEY, key3, 2)#
 (COLON, :, 6)#
 (SCALAR, string5 string6, 16)#
-(SERIES_ENTRY, -, 0)#
+(DASH, -, 0)#
 (SCALAR, end, 2)#
