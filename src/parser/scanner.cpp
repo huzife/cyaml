@@ -26,7 +26,6 @@ namespace cyaml
 
     Token Scanner::lookahead()
     {
-        assert(next_token_.token_type() != Token_Type::NONE);
         return next_token_;
     }
 
@@ -42,7 +41,8 @@ namespace cyaml
         assert(!input_end_);
 
         char ret = next_char_;
-        next_char_ = input_stream_.get();
+        if (ret != -1)
+            next_char_ = input_stream_.get();
 
         switch (ret) {
         // 换行
@@ -85,6 +85,7 @@ namespace cyaml
         update_indent();
 
         if (next_char_ == -1) {
+            next_token_ = Token();
             scan_end_ = true;
         } else if (normal_) {
             normal_ = false;
@@ -157,6 +158,8 @@ namespace cyaml
     void Scanner::scan_operator()
     {
         Token_Type token_type;
+        bool is_operator_ = false;
+
         char ch = next_char();
         value_ += ch;
 
@@ -171,6 +174,7 @@ namespace cyaml
                 value_ += ch;
                 if (ch == '-') {
                     token_type = Token_Type::START;
+                    is_operator_ = true;
                 } else {
                     scan_scalar();
                     return;
@@ -194,7 +198,7 @@ namespace cyaml
             break;
         }
 
-        if (is_delimiter(next_char_))
+        if (is_operator_ || is_delimiter(next_char_))
             next_token_ = Token(token_type, value_, indent_);
         else
             scan_scalar();

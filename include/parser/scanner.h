@@ -1,7 +1,7 @@
 /**
  * @file        scanner.h
  * @brief       YAML 解析器词法分析部分 Scanner 类头文件
- * @details     主要包含 YAML 的 Scanner 类定义
+ * @details     主要包含 YAML 的 Scanner 类声明
  * @date        2023-7-20
  */
 

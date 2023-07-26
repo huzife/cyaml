@@ -1,7 +1,7 @@
 /**
  * @file        node.h
  * @brief       YAML 数据节点，用于存储 YAML 类型数据
- * @details     主要包含 YAML 的 Node 类定义
+ * @details     主要包含 YAML 的 Node 类声明
  * @date        2023-7-25
  */
 
@@ -15,12 +15,18 @@
 
 namespace cyaml
 {
+    class Node;
+    using Node_Ptr = std::shared_ptr<Node>;
+    using Mapping = std::unordered_map<std::string, Node_Ptr>;
+    using Sequence = std::vector<Node_Ptr>;
+
     /**
      * @enum    Data_Type
-     * @brief   定义节点的数据类型
+     * @brief   声明节点的数据类型
      */
     enum class Data_Type
     {
+        NULL_DATA,
         MAPPING,
         SEQUENCE,
         SCALAR
@@ -33,20 +39,24 @@ namespace cyaml
     class Node
     {
     public:
-        using Ptr = std::shared_ptr<Node>;
-
-    private:
         Data_Type type_;
-        std::unordered_map<std::string, Ptr> mapping_data_;
-        std::vector<Ptr> sequence_data_;
+        Mapping mapping_data_;
+        Sequence sequence_data_;
         std::string scalar_data_;
 
-    public:
         /**
-         * @brief   Node 类无参构造函数
-         * @retval  Node 对象，数据类型为 scalar null
+         * @brief   Node 类构造函数
+         * @param   Data_Type       该节点数据类型
+         * @retval  指定类型的节点
          */
-        Node();
+        Node(Data_Type type = Data_Type::NULL_DATA);
+
+        /**
+         * @brief   Scalar Node 构造函数
+         * @param   std::string     标量值
+         * @retval  标量节点
+         */
+        Node(std::string value);
     };
 
 } // namespace cyaml

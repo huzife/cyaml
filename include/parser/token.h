@@ -1,7 +1,7 @@
 /**
  * @file        token.h
  * @brief       YAML 解析器 Token 类头文件
- * @details     主要包含 YAML 的 Token 类定义
+ * @details     主要包含 YAML 的 Token 类声明
  * @date        2023-7-20
  */
 
@@ -16,7 +16,7 @@ namespace cyaml
 {
     /**
      * @enum    Token_Type
-     * @brief   定义了 Token 类型
+     * @brief   声明 Token 类型
      */
     enum class Token_Type
     {
@@ -39,7 +39,7 @@ namespace cyaml
 
     /**
      * @enum    String_Type
-     * @brief   定义了字符串类型
+     * @brief   声明字符串类型
      */
     enum class String_Type
     {
@@ -113,7 +113,7 @@ namespace cyaml
         int int_value() const
         {
             assert(token_type_ == Token_Type::SCALAR);
-            return std::strtoll(value_.c_str(), nullptr, 10);
+            return std::stoi(value_);
         }
 
         /**
@@ -124,7 +124,7 @@ namespace cyaml
         float real_value() const
         {
             assert(token_type_ == Token_Type::SCALAR);
-            return std::strtof(value_.c_str(), nullptr);
+            return std::stod(value_);
         }
 
         /**
