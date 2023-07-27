@@ -9,6 +9,7 @@
 #define CYAML_SCANNER_H
 
 #include "parser/token.h"
+#include "type/mark.h"
 #include <istream>
 
 namespace cyaml
@@ -22,8 +23,7 @@ namespace cyaml
     private:
         std::istream &input_stream_; // 输入流
 
-        uint32_t line_ = 1;       // 当前行号
-        uint32_t col_ = 1;        // 当前列号
+        Mark mark_ = Mark(1, 1);  // 当前输入位置
         uint32_t tab_cnt_ = 0;    // 该行'\t'个数
         uint32_t indent_ = 0;     // 当前 token 的缩进长度
         uint32_t min_indent_ = 0; // 用于限制多行字符串缩进
@@ -68,13 +68,23 @@ namespace cyaml
         Token lookahead();
 
         /**
+         * @brief   返回当前位置标记
+         * @return  Mark
+         * @retval  词法分析器当前读取输入的位置结构体
+         */
+        Mark mark()
+        {
+            return mark_;
+        }
+
+        /**
          * @brief   返回当前字符行号
          * @return  uint32_t
          * @retval  词法分析器当前读取位置的行号
          */
         uint32_t line_no()
         {
-            return line_;
+            return mark_.line;
         }
 
         /**
@@ -84,7 +94,7 @@ namespace cyaml
          */
         uint32_t col_no()
         {
-            return col_;
+            return mark_.column;
         }
 
         /**

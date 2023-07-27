@@ -6,6 +6,7 @@
  */
 
 #include "parser/parser.h"
+#include "error/exceptions.h"
 #include <assert.h>
 #include <iostream>
 
@@ -42,6 +43,7 @@ namespace cyaml
 
         } else {
             ///< @todo 错误处理
+            
         }
 
         token = scanner_.next_token();

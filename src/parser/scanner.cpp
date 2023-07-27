@@ -6,6 +6,7 @@
  */
 
 #include "parser/scanner.h"
+#include "error/exceptions.h"
 #include <assert.h>
 #include <iostream>
 
@@ -47,15 +48,15 @@ namespace cyaml
         switch (ret) {
         // 换行
         case '\n':
-            line_++;
-            col_ = 1;
+            mark_.line++;
+            mark_.column = 1;
             tab_cnt_ = 0;
             ignore_tab_ = true;
             break;
 
         // yaml 不允许制表符缩进，需要记录
         case '\t':
-            col_++;
+            mark_.column++;
             if (ignore_tab_)
                 tab_cnt_++;
             break;
@@ -66,7 +67,7 @@ namespace cyaml
             break;
 
         default:
-            col_++;
+            mark_.column++;
             break;
         }
 
@@ -90,12 +91,10 @@ namespace cyaml
         } else if (normal_) {
             normal_ = false;
             scan_normal_string();
-        } else if (is_number(next_char_) || is_string_begin(next_char_)) {
-            scan_scalar();
         } else if (is_operator(next_char_)) {
             scan_operator();
         } else {
-            // TODO: 报错或其他
+            scan_scalar();
         }
 
         // 解析出一个 key 或 '-'，更新对标量的缩进限制
@@ -110,39 +109,11 @@ namespace cyaml
     void Scanner::update_indent()
     {
         ignore_tab_ = false;
-        indent_ = col_ - tab_cnt_ - 1;
+        indent_ = mark_.column - tab_cnt_ - 1;
         if (next2_valid_) {
             indent_--;
         }
     }
-
-    // 字符类型判断函数
-
-#if 0
-    // token解析函数
-    // 解析数字类型，目前实现10进制int和real类型
-    void Scanner::scan_number()
-    {
-        Token_Type token_type;
-
-        while (is_number(next_char_)) {
-            value_ += next_char();
-        }
-
-        // 判断是否为real
-        if (next_char_ == '.') {
-            token_type = Token_Type::REAL;
-            value_ += next_char();
-            while (is_number(next_char_)) {
-                value_ += next_char();
-            }
-        } else {
-            token_type = Token_Type::INT;
-        }
-
-        next_token_ = Token(token_type, value_);
-    }
-#endif
 
     void Scanner::scan_scalar()
     {
@@ -241,7 +212,7 @@ namespace cyaml
         // 循环读取字符，直到 ’ 或 "
         while (next_char_ != end_char) {
             if (next_char_ == -1) {
-                // TODO: 报错
+                throw Parse_Exception(error_msgs::EOF_IN_SCALAR, mark_);
             } else if (next_char_ == '\\' && end_char == '\"') {
                 // 转义字符处理
                 value_ += escape();
@@ -272,7 +243,7 @@ namespace cyaml
     void Scanner::scan_normal_string(char replace, bool append_newline)
     {
         bool is_key = false;
-        while (!input_end_ && col_ - tab_cnt_ - 1 >= min_indent_) {
+        while (!input_end_ && mark_.column - tab_cnt_ - 1 >= min_indent_) {
             while (!input_end_ && next_char_ != '\n') {
                 char ch = next_char();
 
@@ -353,11 +324,8 @@ namespace cyaml
         case '0':
             return '\0';
         default:
-            break;
+            throw Parse_Exception(error_msgs::UNKNOWN_ESCAPE, mark_);
         }
-
-        // TODO: 报错 unknown escape sequence ...
-        return -1;
     }
 
 } // namespace cyaml

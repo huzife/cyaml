@@ -16,6 +16,11 @@ set(PARSER_SRC
 set(TYPE_SRC
     src/type/node.cpp
     src/type/value.cpp
+    src/type/mark.cpp
+)
+
+set(ERROR_SRC
+    src/error/exceptions.cpp
 )
 
 set(CYAML_LIB_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
@@ -25,6 +30,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CYAML_LIB_OUTPUT_PATH})
 add_library(cyaml SHARED
     ${PARSER_SRC}
     ${TYPE_SRC}
+    ${ERROR_SRC}
 )
 
 # 测试部分
