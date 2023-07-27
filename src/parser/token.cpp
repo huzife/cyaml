@@ -59,14 +59,6 @@ namespace cyaml
             return "LBRACKET";
         case Token_Type::RBRACKET:
             return "RBRACKET";
-        case Token_Type::PRESERVE:
-            return "PRESERVE";
-        case Token_Type::FOLD:
-            return "FOLD";
-        case Token_Type::SQUOTE:
-            return "SQUOTE";
-        case Token_Type::DQUOTE:
-            return "DQUOTE";
         case Token_Type::KEY:
             return "KEY";
         case Token_Type::SCALAR:

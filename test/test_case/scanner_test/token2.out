@@ -31,13 +31,11 @@
 (SCALAR, 1, 15)#
 (KEY, paragraph, 0)#
 (COLON, :, 9)#
-(PRESERVE, |, 11)#
 (SCALAR, Blank lines denote
 paragraph breaks
 , 2)#
 (KEY, content, 0)#
 (COLON, :, 7)#
-(PRESERVE, |-, 9)#
 (SCALAR, Or we
 can auto
 convert line breaks

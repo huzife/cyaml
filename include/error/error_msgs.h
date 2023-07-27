@@ -15,6 +15,7 @@ namespace cyaml
         const char *const UNKNOWN_TOKEN = "unknown token";
         const char *const UNKNOWN_ESCAPE = "unknown escape";
         const char *const EOF_IN_SCALAR = "illegal EOF in scalar";
+        const char *const NO_NEWLINE = "missing newline";
     }
 } // namespace cyaml
 

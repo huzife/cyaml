@@ -6,5 +6,4 @@
 (DASH, -, 0)#
 (KEY, string, 2)#
 (COLON, :, 8)#
-(FOLD, >-, 10)#
 (SCALAR, this is a test string, 4)#

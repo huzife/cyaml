@@ -29,12 +29,13 @@ namespace cyaml
         RBRACE,   // }
         LBRACKET, // [
         RBRACKET, // ]
-        PRESERVE, // |
-        FOLD,     // >
-        SQUOTE,   // '
-        DQUOTE,   // "
         KEY,      // 对象 key
-        SCALAR    // 标量
+        SCALAR,   // 标量
+
+        BLOCK_MAP_START,
+        BLOCK_MAP_END,
+        BLOCK_SEQ_START,
+        BLOCK_SEQ_END
     };
 
     /**

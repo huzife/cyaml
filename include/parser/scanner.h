@@ -40,7 +40,6 @@ namespace cyaml
 
         char replace_ = ' ';  // 字符串换行时替换的字符
         bool append_ = false; // 字符串末尾是否添加换行
-        bool normal_ = false; // 保留或折叠符号后处理普通字符串
 
     public:
         /**

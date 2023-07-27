@@ -1,11 +1,9 @@
 (START, ---, 0)#
 (KEY, empty, 0)#
 (COLON, :, 5)#
-(PRESERVE, |, 7)#
 (SCALAR, , 2)#
 (KEY, preserve, 0)#
 (COLON, :, 8)#
-(PRESERVE, |, 10)#
 (SCALAR, this
 is
 a
@@ -14,5 +12,4 @@ string
 , 2)#
 (KEY, fold, 0)#
 (COLON, :, 4)#
-(FOLD, >-, 6)#
 (SCALAR, this is a fold string, 2)#

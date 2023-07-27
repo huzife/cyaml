@@ -88,9 +88,6 @@ namespace cyaml
         if (next_char_ == -1) {
             next_token_ = Token();
             scan_end_ = true;
-        } else if (normal_) {
-            normal_ = false;
-            scan_normal_string();
         } else if (is_operator(next_char_)) {
             scan_operator();
         } else {
@@ -117,9 +114,9 @@ namespace cyaml
 
     void Scanner::scan_scalar()
     {
-        if (!normal_ && (next_char_ == '|' || next_char_ == '>')) {
+        if (next_char_ == '|' || next_char_ == '>') {
             scan_special_string();
-        } else if (!normal_ && (next_char_ == '\'' || next_char_ == '\"')) {
+        } else if (next_char_ == '\'' || next_char_ == '\"') {
             scan_quote_string();
         } else {
             scan_normal_string();
@@ -179,26 +176,23 @@ namespace cyaml
     {
         assert(next_char_ == '|' || next_char_ == '>');
 
-        Token_Type type = Token_Type::FOLD;
         // 换行替换字符
-        if (next_char_ == '|') {
-            type = Token_Type::PRESERVE;
+        if (next_char() == '|') {
             replace_ = '\n';
         }
-
-        value_ += next_char();
 
         // 字符串末尾是否添加换行
         if (next_char_ == '-') {
             append_ = false;
-            value_ += next_char();
+            next_char();
         } else if (is_delimiter(next_char_) && next_char_ != -1) {
             append_ = true;
         } else {
             // 报错：
+            throw Parse_Exception(error_msgs::NO_NEWLINE, mark_);
         }
 
-        next_token_ = Token(type, value_, indent_);
+        scan();
     }
 
     void Scanner::scan_quote_string()
