@@ -1,12 +1,16 @@
-(DASH, -, 0)#
-(KEY, key1, 2)#
-(COLON, :, 6)#
-(SCALAR, string1, 8)#
-(KEY, key2, 2)#
-(COLON, :, 6)#
-(SCALAR, string2 string3 string4, 8)#
-(KEY, key3, 2)#
-(COLON, :, 6)#
-(SCALAR, string5 string6, 16)#
-(DASH, -, 0)#
-(SCALAR, end, 2)#
+(BLOCK_SEQ_START, )#
+(DASH, -)#
+(BLOCK_MAP_START, )#
+(KEY, key1)#
+(COLON, :)#
+(SCALAR, string1)#
+(KEY, key2)#
+(COLON, :)#
+(SCALAR, string2 string3 string4)#
+(KEY, key3)#
+(COLON, :)#
+(SCALAR, string5 string6)#
+(BLOCK_MAP_END, )#
+(DASH, -)#
+(SCALAR, end)#
+(BLOCK_SEQ_END, )#

@@ -43,7 +43,6 @@ namespace cyaml
 
         } else {
             ///< @todo 错误处理
-            
         }
 
         token = scanner_.next_token();

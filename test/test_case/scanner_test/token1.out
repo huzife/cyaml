@@ -1,9 +1,13 @@
-(START, ---, 0)#
-(DASH, -, 0)#
-(SCALAR, 123456, 2)#
-(DASH, -, 0)#
-(SCALAR, test, 2)#
-(DASH, -, 0)#
-(KEY, string, 2)#
-(COLON, :, 8)#
-(SCALAR, this is a test string, 4)#
+(START, ---)#
+(BLOCK_SEQ_START, )#
+(DASH, -)#
+(SCALAR, 123456)#
+(DASH, -)#
+(SCALAR, test)#
+(DASH, -)#
+(BLOCK_MAP_START, )#
+(KEY, string)#
+(COLON, :)#
+(SCALAR, this is a test string)#
+(BLOCK_MAP_END, )#
+(BLOCK_SEQ_END, )#

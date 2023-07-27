@@ -20,14 +20,24 @@ namespace cyaml
 
     Token Scanner::next_token()
     {
-        Token ret = next_token_;
+        Token ret;
+        if (token_.empty())
+            ret = Token();
+        else {
+            ret = token_.front();
+            token_.pop();
+        }
+
         scan();
         return ret;
     }
 
     Token Scanner::lookahead()
     {
-        return next_token_;
+        if (token_.empty())
+            return Token();
+        else
+            return token_.front();
     }
 
     char Scanner::next_char()
@@ -86,29 +96,25 @@ namespace cyaml
         update_indent();
 
         if (next_char_ == -1) {
-            next_token_ = Token();
             scan_end_ = true;
+            // 匹配剩下的缩进
+            while (!indent_.empty()) {
+                token_.push(Token(indent_.top(), false));
+                indent_.pop();
+            }
         } else if (is_operator(next_char_)) {
             scan_operator();
         } else {
             scan_scalar();
-        }
-
-        // 解析出一个 key 或 '-'，更新对标量的缩进限制
-        Token_Type type = next_token_.token_type();
-        if (type == Token_Type::DASH || type == Token_Type::KEY) {
-            min_indent_ = next_token_.indent() + 1;
-        } else if (type == Token_Type::SCALAR) {
-            min_indent_ = 0;
         }
     }
 
     void Scanner::update_indent()
     {
         ignore_tab_ = false;
-        indent_ = mark_.column - tab_cnt_ - 1;
+        cur_indent_ = mark_.column - tab_cnt_ - 1;
         if (next2_valid_) {
-            indent_--;
+            cur_indent_--;
         }
     }
 
@@ -133,20 +139,19 @@ namespace cyaml
 
         switch (ch) {
         case '-':
-            if (next_char_ != '-') {
+            if (is_delimiter(next_char_)) {
+                push_indent(Indent_Type::SEQ);
                 token_type = Token_Type::DASH;
             } else {
                 // 读取后两个字符，判断是否匹配'---'
-                value_ += next_char();
-                ch = next_char();
-                value_ += ch;
-                if (ch == '-') {
-                    token_type = Token_Type::START;
-                    is_operator_ = true;
-                } else {
-                    scan_scalar();
-                    return;
+                for (int i = 0; i < 2; i++) {
+                    if (next_char_ != '-')
+                        break;
+
+                    value_ += next_char();
                 }
+                token_type = Token_Type::START;
+                is_operator_ = true;
             }
             break;
         case ':':
@@ -167,7 +172,7 @@ namespace cyaml
         }
 
         if (is_operator_ || is_delimiter(next_char_))
-            next_token_ = Token(token_type, value_, indent_);
+            token_.push(Token(token_type, value_));
         else
             scan_scalar();
     }
@@ -203,7 +208,7 @@ namespace cyaml
                                           ? String_Type::SQUOTE_STRING
                                           : String_Type::DQUOTE_STRING;
 
-        // 循环读取字符，直到 ’ 或 "
+        // 循环读取字符，直到 ' 或 "
         while (next_char_ != end_char) {
             if (next_char_ == -1) {
                 throw Parse_Exception(error_msgs::EOF_IN_SCALAR, mark_);
@@ -230,13 +235,18 @@ namespace cyaml
 
         // 消耗多出的引号
         next_char();
+        while (!input_end_ && is_delimiter(next_char_)) {
+            next_char();
+        }
 
-        next_token_ = Token(string_type, value_, indent_);
+        token_.push(Token(string_type, value_));
+        pop_indent();
     }
 
     void Scanner::scan_normal_string(char replace, bool append_newline)
     {
         bool is_key = false;
+
         while (!input_end_ && mark_.column - tab_cnt_ - 1 >= min_indent_) {
             while (!input_end_ && next_char_ != '\n') {
                 char ch = next_char();
@@ -280,12 +290,12 @@ namespace cyaml
         replace_ = ' ';
         append_ = false;
 
-        if (is_key)
-            next_token_ = Token(Token_Type::KEY, value_, indent_);
-        else {
-            uint32_t temp_indent = value_.empty() ? indent_ + 2 : indent_;
-            next_token_ =
-                    Token(String_Type::NORMAL_STRING, value_, temp_indent);
+        if (is_key) {
+            push_indent(Indent_Type::MAP);
+            token_.push(Token(Token_Type::KEY, value_));
+        } else {
+            token_.push(Token(String_Type::NORMAL_STRING, value_));
+            pop_indent();
         }
     }
 
@@ -320,6 +330,30 @@ namespace cyaml
         default:
             throw Parse_Exception(error_msgs::UNKNOWN_ESCAPE, mark_);
         }
+    }
+
+    void Scanner::push_indent(Indent_Type type)
+    {
+        Indent indent{type, cur_indent_};
+        if (indent_.empty() || cur_indent_ > indent_.top().len) {
+            token_.push(Token(indent, true));
+            indent_.push(indent);
+        }
+        min_indent_ = cur_indent_ + 1;
+    }
+
+    void Scanner::pop_indent()
+    {
+        uint32_t len = mark_.column - tab_cnt_ - 1;
+        while (!indent_.empty() && len != indent_.top().len) {
+            token_.push(Token(indent_.top(), false));
+            indent_.pop();
+        }
+
+        if (indent_.empty())
+            throw Parse_Exception(error_msgs::INVALID_INDENT, mark_);
+
+        min_indent_ = 0;
     }
 
 } // namespace cyaml

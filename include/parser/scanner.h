@@ -10,7 +10,10 @@
 
 #include "parser/token.h"
 #include "type/mark.h"
+#include "type/indent.h"
 #include <istream>
+#include <stack>
+#include <queue>
 
 namespace cyaml
 {
@@ -25,13 +28,15 @@ namespace cyaml
 
         Mark mark_ = Mark(1, 1);  // 当前输入位置
         uint32_t tab_cnt_ = 0;    // 该行'\t'个数
-        uint32_t indent_ = 0;     // 当前 token 的缩进长度
+        uint32_t cur_indent_ = 0; // 当前 token 的缩进长度
         uint32_t min_indent_ = 0; // 用于限制多行字符串缩进
         bool ignore_tab_ = true;  // 是否忽略 '\t'，用于计算缩进
         bool input_end_ = false;  // 记录是否读取完输入流
         bool scan_end_ = false;   // 记录是否解析完所有 token
 
-        Token next_token_;         // 暂存下一个 token
+        std::stack<Indent> indent_;
+
+        std::queue<Token> token_;  // 暂存下一个 token
         char next_char_ = -1;      // 暂存下一个字符
         char next2_char_ = -1;     // 暂存向前的第二个字符
         bool next2_valid_ = false; // 记录 next2_char_ 是否可用
@@ -104,7 +109,7 @@ namespace cyaml
          */
         bool end()
         {
-            return scan_end_;
+            return scan_end_ && token_.empty();
         }
 
     private:
@@ -170,6 +175,17 @@ namespace cyaml
          * @retval  解析得到的转义字符
          */
         char escape();
+
+        /**
+         * @brief   推入缩进值
+         * @param   Indent_Type     缩进类型
+         */
+        void push_indent(Indent_Type type);
+
+        /**
+         * @brief   弹出缩进值
+         */
+        void pop_indent();
 
         /**
          * @brief   判断字符是否属于分隔符

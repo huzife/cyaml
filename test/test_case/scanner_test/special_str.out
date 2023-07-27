@@ -1,15 +1,17 @@
-(START, ---, 0)#
-(KEY, empty, 0)#
-(COLON, :, 5)#
-(SCALAR, , 2)#
-(KEY, preserve, 0)#
-(COLON, :, 8)#
+(START, ---)#
+(BLOCK_MAP_START, )#
+(KEY, empty)#
+(COLON, :)#
+(SCALAR, )#
+(KEY, preserve)#
+(COLON, :)#
 (SCALAR, this
 is
 a
 preserve
 string
-, 2)#
-(KEY, fold, 0)#
-(COLON, :, 4)#
-(SCALAR, this is a fold string, 2)#
+)#
+(KEY, fold)#
+(COLON, :)#
+(SCALAR, this is a fold string)#
+(BLOCK_MAP_END, )#

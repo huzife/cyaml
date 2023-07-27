@@ -17,7 +17,7 @@ namespace cyaml
             return msg;
 
         return "cyaml error at line " + std::to_string(mark.line) +
-               ", column" + std::to_string(mark.column) + ": " + msg;
+               ", column " + std::to_string(mark.column) + ": " + msg;
     }
 
     Exception::Exception(const std::string &msg, const Mark &mark)

@@ -1,42 +1,59 @@
-(START, ---, 0)#
-(KEY, json, 0)#
-(COLON, :, 4)#
-(DASH, -, 2)#
-(SCALAR, rigid, 4)#
-(DASH, -, 2)#
-(SCALAR, better for data interchange, 4)#
-(KEY, yaml, 0)#
-(COLON, :, 4)#
-(DASH, -, 2)#
-(SCALAR, slim and flexible, 4)#
-(DASH, -, 2)#
-(SCALAR, better for configuration, 4)#
-(KEY, object, 0)#
-(COLON, :, 6)#
-(KEY, key, 2)#
-(COLON, :, 5)#
-(SCALAR, value, 7)#
-(KEY, array, 2)#
-(COLON, :, 7)#
-(DASH, -, 4)#
-(KEY, null_value, 6)#
-(COLON, :, 16)#
-(DASH, -, 4)#
-(KEY, boolean, 6)#
-(COLON, :, 13)#
-(SCALAR, true, 15)#
-(DASH, -, 4)#
-(KEY, integer, 6)#
-(COLON, :, 13)#
-(SCALAR, 1, 15)#
-(KEY, paragraph, 0)#
-(COLON, :, 9)#
+(START, ---)#
+(BLOCK_MAP_START, )#
+(KEY, json)#
+(COLON, :)#
+(BLOCK_SEQ_START, )#
+(DASH, -)#
+(SCALAR, rigid)#
+(DASH, -)#
+(SCALAR, better for data interchange)#
+(BLOCK_SEQ_END, )#
+(KEY, yaml)#
+(COLON, :)#
+(BLOCK_SEQ_START, )#
+(DASH, -)#
+(SCALAR, slim and flexible)#
+(DASH, -)#
+(SCALAR, better for configuration)#
+(BLOCK_SEQ_END, )#
+(KEY, object)#
+(COLON, :)#
+(BLOCK_MAP_START, )#
+(KEY, key)#
+(COLON, :)#
+(SCALAR, value)#
+(KEY, array)#
+(COLON, :)#
+(BLOCK_SEQ_START, )#
+(DASH, -)#
+(BLOCK_MAP_START, )#
+(KEY, null_value)#
+(COLON, :)#
+(SCALAR, null)#
+(BLOCK_MAP_END, )#
+(DASH, -)#
+(BLOCK_MAP_START, )#
+(KEY, boolean)#
+(COLON, :)#
+(SCALAR, true)#
+(BLOCK_MAP_END, )#
+(DASH, -)#
+(BLOCK_MAP_START, )#
+(KEY, integer)#
+(COLON, :)#
+(SCALAR, 1)#
+(BLOCK_MAP_END, )#
+(BLOCK_SEQ_END, )#
+(BLOCK_MAP_END, )#
+(KEY, paragraph)#
+(COLON, :)#
 (SCALAR, Blank lines denote
 paragraph breaks
-, 2)#
-(KEY, content, 0)#
-(COLON, :, 7)#
+)#
+(KEY, content)#
+(COLON, :)#
 (SCALAR, Or we
 can auto
 convert line breaks
-to save space, 2)#
+to save space)#
+(BLOCK_MAP_END, )#

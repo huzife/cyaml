@@ -8,6 +8,7 @@
 #ifndef CYAML_TOKEN_H
 #define CYAML_TOKEN_H
 
+#include "type/indent.h"
 #include <string>
 #include <ostream>
 #include <assert.h>
@@ -59,7 +60,7 @@ namespace cyaml
         Token_Type token_type_;   // token 类型
         String_Type string_type_; // 字符串类型
         std::string value_;       // 字面量
-        uint32_t indent_;
+        Indent indent_;
 
     public:
         /**
@@ -69,12 +70,19 @@ namespace cyaml
         Token();
 
         /**
+         * @brief   Token 类带缩进构造
+         * @param   Indent  缩进
+         * @param   bool    是否是一个 map 或 seq 的开始
+         */
+        Token(Indent indent, bool is_start);
+
+        /**
          * @brief   Token 类构造函数
          * @param   Token_Type      token 类型
          * @param   std::string     token 字面量
          * @retval  Token 对象
          */
-        Token(Token_Type type, std::string value, uint32_t indent);
+        Token(Token_Type type, std::string value);
 
         /**
          * @brief   Token 类构造函数
@@ -82,7 +90,7 @@ namespace cyaml
          * @param   std::string     token 字面量
          * @retval  Token 对象
          */
-        Token(String_Type str_type, std::string value, uint32_t indent);
+        Token(String_Type str_type, std::string value);
 
         /**
          * @brief   获取 token 类型
@@ -140,11 +148,11 @@ namespace cyaml
         }
 
         /**
-         * @brief   获取 token 的缩进长度
-         * @return  uint32_t
-         * @retval  token 的缩进长度(不是行的缩进)
+         * @brief   获取 token 的缩进
+         * @return  Indent
+         * @retval  存储 token 的缩进信息的对象
          */
-        uint32_t indent() const
+        Indent indent() const
         {
             assert(token_type_ != Token_Type::NONE);
             return indent_;
@@ -170,6 +178,14 @@ namespace cyaml
      * @retval  Token 类型名
      */
     static std::string token_type_to_string(Token_Type type);
+
+    /**
+     * @brief   缩进枚举类型转换为 Token 枚举类型
+     * @param   Indent_type     Indnet 枚举类型
+     * @param   bool            是否是一个集合的开始
+     * @return  Token_Type
+     */
+    static Token_Type from_indent_type(Indent_Type type, bool is_start);
 
 } // namespace cyaml
 

@@ -15,8 +15,11 @@ namespace cyaml
         const char *const UNKNOWN_TOKEN = "unknown token";
         const char *const UNKNOWN_ESCAPE = "unknown escape";
         const char *const EOF_IN_SCALAR = "illegal EOF in scalar";
+        const char *const NO_MAP_END = "missing end of map";
+        const char *const NO_SEQ_END = "missing end of sequence";
         const char *const NO_NEWLINE = "missing newline";
-    }
+        const char *const INVALID_INDENT = "invalid indentation";
+    } // namespace error_msgs
 } // namespace cyaml
 
 #endif // CYAML_ERROR_MSGS_H
