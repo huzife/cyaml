@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <exception>
 #include "gtest/gtest.h"
 
 class Parser_Test: public testing::Test
@@ -20,21 +21,24 @@ public:
         std::cout << "parser test finish" << std::endl;
     }
 
-    void parse_test(std::string in, std::string out)
+    void parse_test(std::string test_name)
     {
-        std::ifstream input_in(test_case_dirname + in);
+        std::ifstream input_in(test_case_dirname + test_name + ".in");
         ASSERT_TRUE(input_in.is_open());
 
-        cyaml::Parser parser(input_in);
-        cyaml::Value value = parser.parse();
-
-        EXPECT_EQ(value.type(), cyaml::Data_Type::SCALAR);
+        try {
+            cyaml::Parser parser(input_in);
+            cyaml::Value value = parser.parse();
+        } catch (std::exception &e) {
+            std::cout << e.what() << std::endl;
+            EXPECT_TRUE(false);
+        }
     }
 };
 
 TEST_F(Parser_Test, temp)
 {
-    parse_test("temp.in", "temp.out");
+    parse_test("temp");
 }
 
 int main(int argc, char *argv[])

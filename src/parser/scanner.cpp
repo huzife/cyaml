@@ -346,17 +346,23 @@ namespace cyaml
 
     void Scanner::push_indent(Indent_Type type)
     {
+        min_indent_ = cur_indent_ + 1;
+        get_scalar_ = false;
+
         Indent indent{type, cur_indent_};
         if (indent_.empty() || cur_indent_ > indent_.top().len) {
             token_.push(Token(indent, true));
             indent_.push(indent);
         }
-        min_indent_ = cur_indent_ + 1;
-        get_scalar_ = false;
     }
 
     void Scanner::pop_indent()
     {
+        min_indent_ = 0;
+
+        if (mark_.column == 1 && indent_.empty())
+            return;
+
         uint32_t len = mark_.column - tab_cnt_ - 1;
         while (!indent_.empty() && len != indent_.top().len) {
             token_.push(Token(indent_.top(), false));
@@ -365,8 +371,6 @@ namespace cyaml
 
         if (indent_.empty())
             throw Parse_Exception(error_msgs::INVALID_INDENT, mark_);
-
-        min_indent_ = 0;
     }
 
 } // namespace cyaml

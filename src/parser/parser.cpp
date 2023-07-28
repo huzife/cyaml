@@ -16,7 +16,7 @@ namespace cyaml
 
     Value Parser::parse()
     {
-        Node_Ptr node = std::make_shared<Node>();
+        Node_Ptr node = std::make_shared<Node>("");
 
         ///< @todo  解析并构造数据树
         parse_stream(node);
@@ -24,30 +24,86 @@ namespace cyaml
         return Value(node);
     }
 
-    void Parser::parse_stream(Node_Ptr &node)
+    Token Parser::expect(Token_Type type)
     {
-        Token token = scanner_.next_token();
-        assert(token.token_type() == Token_Type::DOC_START);
-
-        token = scanner_.lookahead();
-        if (token.token_type() == Token_Type::SCALAR) {
-            token = scanner_.next_token();
-            node = std::make_shared<Node>(token.string_value());
-        } else if (token.token_type() == Token_Type::DASH) {
-            node = std::make_shared<Node>(Data_Type::SEQUENCE);
-            ///< @todo 解析序列(数组)
-
-        } else if (token.token_type() == Token_Type::KEY) {
-            node = std::make_shared<Node>(Data_Type::MAPPING);
-            ///< @todo 解析映射(对象)
-
-        } else {
-            ///< @todo 错误处理
+        Token token = scanner_.lookahead();
+        if (token.token_type() != type) {
+            throw Parse_Exception(
+                    unexpected_token_msg(type, token), scanner_.mark());
         }
 
-        token = scanner_.next_token();
-        assert(token.token_type() == Token_Type::NONE ||
-               token.token_type() == Token_Type::DOC_END);
+        return scanner_.next_token();
+    }
+
+    void Parser::parse_stream(Node_Ptr &node)
+    {
+        expect(Token_Type::STREAM_START);
+        parse_document(node);
+        expect(Token_Type::STREAM_END);
+    }
+
+    void Parser::parse_document(Node_Ptr &node)
+    {
+        // DOC_START
+        expect(Token_Type::DOC_START);
+
+        // block_node
+        parse_block_node(node);
+
+        // DOC_END?
+        if (scanner_.lookahead().token_type() == Token_Type::DOC_END)
+            scanner_.next_token();
+    }
+
+    void Parser::parse_block_node(Node_Ptr &node)
+    {
+        Token next = scanner_.lookahead();
+        switch (next.token_type()) {
+        case Token_Type::BLOCK_MAP_START:
+            parse_block_map(node);
+            break;
+        case Token_Type::BLOCK_SEQ_START:
+            parse_block_sequence(node);
+            break;
+        case Token_Type::SCALAR:
+            node = std::make_shared<Node>(next.value());
+            scanner_.next_token();
+            break;
+        default:
+            throw Parse_Exception(unexpected_token_msg(next), scanner_.mark());
+        }
+    }
+
+    void Parser::parse_block_map(Node_Ptr &node)
+    {
+        node = std::make_shared<Node>(Node_Type::MAP);
+        expect(Token_Type::BLOCK_MAP_START);
+
+        // 循环解析 key : value
+        while (scanner_.lookahead().token_type() !=
+               Token_Type::BLOCK_MAP_END) {
+            Token key = expect(Token_Type::KEY);
+            expect(Token_Type::COLON);
+            parse_block_node(node->map_data_[key.value()]);
+        }
+
+        expect(Token_Type::BLOCK_MAP_END);
+    }
+
+    void Parser::parse_block_sequence(Node_Ptr &node)
+    {
+        node = std::make_shared<Node>(Node_Type::SEQUENCE);
+        expect(Token_Type::BLOCK_SEQ_START);
+
+        // 循环解析数组元素
+        while (scanner_.lookahead().token_type() !=
+               Token_Type::BLOCK_SEQ_END) {
+            expect(Token_Type::DASH);
+            node->sequence_data_.emplace_back();
+            parse_block_node(node->sequence_data_.back());
+        }
+
+        expect(Token_Type::BLOCK_SEQ_END);
     }
 
 } // namespace cyaml

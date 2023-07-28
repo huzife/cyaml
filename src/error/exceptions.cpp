@@ -9,6 +9,28 @@
 
 namespace cyaml
 {
+    std::string unexpected_token_msg(Token wrong_token)
+    {
+        return "unexpected token '" +
+               token_type_to_string(wrong_token.token_type()) + '\'';
+    }
+
+    std::string unexpected_token_msg(
+            Token_Type expected_type,
+            Token wrong_token)
+    {
+        std::string ret = "expected a '" +
+                          token_type_to_string(expected_type) +
+                          "', but received a '" +
+                          token_type_to_string(wrong_token.token_type()) + "'";
+
+        if (wrong_token.token_type() == Token_Type::SCALAR) {
+            ret += ", value = \"" + wrong_token.value() + '\"';
+        }
+
+        return ret;
+    }
+
     const std::string Exception::build_what(
             const std::string &msg,
             const Mark &mark)

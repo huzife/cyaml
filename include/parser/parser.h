@@ -42,9 +42,19 @@ namespace cyaml
         Value parse();
 
     private:
+        /**
+         * @brief   尝试接收一个目标 token
+         * @details 从 Scanner 中获取一个 token，并判断其类型是否符合传入类型
+         * @return  Token
+         * @retval  类型匹配时，返回接收到的 token
+         */
+        Token expect(Token_Type type);
+
         void parse_stream(Node_Ptr &node);
-        void parse_sequence(Node_Ptr &node);
-        void parse_mapping(Node_Ptr &node);
+        void parse_document(Node_Ptr &node);
+        void parse_block_node(Node_Ptr &node);
+        void parse_block_sequence(Node_Ptr &node);
+        void parse_block_map(Node_Ptr &node);
     };
 
 } // namespace cyaml

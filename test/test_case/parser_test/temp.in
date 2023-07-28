@@ -1,2 +1,16 @@
 ---
-  this is a test string
+scalar: a
+map:
+  map_scalar: aa
+  map_map:
+    map_map_scalar: aaa
+  map_seq: 
+    - aaa
+    - bbb
+seq:
+  - aa
+  - seq_map: aaa
+  -
+    - aaa
+    - bbb
+    - ccc

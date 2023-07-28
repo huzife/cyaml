@@ -21,13 +21,12 @@ namespace cyaml
     using Sequence = std::vector<Node_Ptr>;
 
     /**
-     * @enum    Data_Type
+     * @enum    Node_Type
      * @brief   声明节点的数据类型
      */
-    enum class Data_Type
+    enum class Node_Type
     {
-        NULL_DATA,
-        MAPPING,
+        MAP,
         SEQUENCE,
         SCALAR
     };
@@ -36,20 +35,20 @@ namespace cyaml
      * @class   Node
      * @brief   YAML 数据节点
      */
-    class Node
+    class Node: public std::enable_shared_from_this<Node>
     {
     public:
-        Data_Type type_;
-        Mapping mapping_data_;
+        Node_Type type_;
+        Mapping map_data_;
         Sequence sequence_data_;
         std::string scalar_data_;
 
         /**
          * @brief   Node 类构造函数
-         * @param   Data_Type       该节点数据类型
+         * @param   Node_Type       该节点数据类型
          * @retval  指定类型的节点
          */
-        Node(Data_Type type = Data_Type::NULL_DATA);
+        Node(Node_Type type);
 
         /**
          * @brief   Scalar Node 构造函数
@@ -57,6 +56,36 @@ namespace cyaml
          * @retval  标量节点
          */
         Node(std::string value);
+
+        /**
+         * @brief   判断是否为 map
+         * @return  bool
+         */
+        bool is_map() const
+        {
+            return type_ == Node_Type::MAP;
+        }
+
+        /**
+         * @brief   判断是否为 sequence
+         * @return  bool
+         */
+        bool is_sequence() const
+        {
+            return type_ == Node_Type::SEQUENCE;
+        }
+
+        /**
+         * @brief   判断是否为 scalar
+         * @return  bool
+         */
+        bool is_scalar() const
+        {
+            return type_ == Node_Type::SCALAR;
+        }
+
+        Node(const Node &) = default;
+        Node &operator=(const Node &) = default;
     };
 
 } // namespace cyaml

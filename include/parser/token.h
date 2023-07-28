@@ -117,35 +117,14 @@ namespace cyaml
         }
 
         /**
-         * @brief   获取 token 的 int 值
-         * @return  int
-         * @retval  token 所表示的 int 标量值
-         */
-        int int_value() const
-        {
-            assert(token_type_ == Token_Type::SCALAR);
-            return std::stoi(value_);
-        }
-
-        /**
-         * @brief   获取 token 的 real 值
-         * @return  float
-         * @retval  token 所表示的 real 标量值
-         */
-        float real_value() const
-        {
-            assert(token_type_ == Token_Type::SCALAR);
-            return std::stod(value_);
-        }
-
-        /**
-         * @brief   获取 token 的 string 值
+         * @brief   获取 token 的标量值
          * @return  std::string
-         * @retval  token 所表示的 string 标量值
+         * @retval  token 的标量值
          */
-        std::string string_value() const
+        std::string value() const
         {
-            assert(token_type_ == Token_Type::SCALAR);
+            assert(token_type_ == Token_Type::SCALAR ||
+                   token_type_ == Token_Type::KEY);
             return value_;
         }
 
@@ -179,7 +158,7 @@ namespace cyaml
      * @return  std::string
      * @retval  Token 类型名
      */
-    static std::string token_type_to_string(Token_Type type);
+    std::string token_type_to_string(Token_Type type);
 
     /**
      * @brief   缩进枚举类型转换为 Token 枚举类型

@@ -9,12 +9,32 @@
 #define CYAML_EXCEPTIONS_H
 
 #include "error/error_msgs.h"
+#include "parser/token.h"
 #include "type/mark.h"
 #include <stdexcept>
 #include <string>
 
 namespace cyaml
 {
+    /**
+     * @brief   生成 UNEXPECTED TOKEN 错误信息
+     * @param   Token       错误 token
+     * @return  std::string
+     * @retval  生成的错误信息
+     */
+    std::string unexpected_token_msg(Token wrong_token);
+
+    /**
+     * @brief   生成 UNEXPECTED TOKEN 错误信息
+     * @param   Token_type  期望的 token 类型
+     * @param   Token       错误 token
+     * @return  std::string
+     * @retval  生成的错误信息
+     */
+    std::string unexpected_token_msg(
+            Token_Type expected_type,
+            Token wrong_token);
+
     /**
      * @class   Exception
      * @brief   cyaml 异常类

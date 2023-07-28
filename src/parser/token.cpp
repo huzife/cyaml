@@ -42,7 +42,7 @@ namespace cyaml
         return out;
     }
 
-    static std::string token_type_to_string(Token_Type type)
+    std::string token_type_to_string(Token_Type type)
     {
         switch (type) {
         case Token_Type::NONE:

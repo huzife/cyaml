@@ -55,12 +55,22 @@ namespace cyaml
 
         /**
          * @brief   获取值的类型
-         * @return  Data_Type
+         * @return  Node_Type
          * @retval  该 Value 对应节点数据类型枚举值
          */
-        Data_Type type()
+        Node_Type type()
         {
             return node_->type_;
+        }
+
+        /**
+         * @brief   判断是否为空值
+         * @return  bool
+         */
+        bool is_null()
+        {
+            return node_->type_ == Node_Type::SCALAR &&
+                   node_->scalar_data_.empty();
         }
     };
 } // namespace cyaml
