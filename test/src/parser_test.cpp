@@ -26,20 +26,27 @@ public:
         std::ifstream input_in(test_case_dirname + test_name + ".in");
         ASSERT_TRUE(input_in.is_open());
 
-        try {
-            cyaml::Parser parser(input_in);
-            cyaml::Value value = parser.parse();
-        } catch (std::exception &e) {
-            std::cout << e.what() << std::endl;
-            EXPECT_TRUE(false);
-        }
+        cyaml::Parser parser(input_in);
+        cyaml::Value value = parser.parse();
+
+#ifdef CYAML_DEBUG
+        ASSERT_EQ(value.type(), cyaml::Node_Type::MAP);
+        ASSERT_EQ(value.size(), 3);
+        ASSERT_EQ(value["scalar"].scalar_value(), "a");
+        ASSERT_FALSE(value.find("seqq"));
+        ASSERT_EQ(value["map"].type(), cyaml::Node_Type::MAP);
+        ASSERT_EQ(value["seq"].type(), cyaml::Node_Type::SEQUENCE);
+        ASSERT_EQ(value["seq"][1]["seq_map"].scalar_value(), "aaa");
+#endif
     }
 };
 
+#ifdef CYAML_DEBUG
 TEST_F(Parser_Test, temp)
 {
     parse_test("temp");
 }
+#endif
 
 int main(int argc, char *argv[])
 {

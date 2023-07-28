@@ -61,8 +61,14 @@ namespace cyaml
     {
     }
 
+    Dereference_Exception::Dereference_Exception()
+        : Representation_Exception(error_msgs::BAD_DEREFERENCE, Mark())
+    {
+    }
+
     Exception::~Exception() = default;
     Parse_Exception::~Parse_Exception() = default;
     Representation_Exception::~Representation_Exception() = default;
+    Dereference_Exception::~Dereference_Exception() = default;
 
 } // namespace cyaml

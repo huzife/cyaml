@@ -19,6 +19,7 @@ namespace cyaml
         const char *const NO_SEQ_END = "missing end of sequence";
         const char *const NO_NEWLINE = "missing newline";
         const char *const INVALID_INDENT = "invalid indentation";
+        const char *const BAD_DEREFERENCE = "bad dereference";
     } // namespace error_msgs
 } // namespace cyaml
 

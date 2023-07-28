@@ -47,7 +47,7 @@ namespace cyaml
         Mark mark_;
 
     public:
-        Exception(const std::string &msg, const Mark &mark = Mark());
+        Exception(const std::string &msg, const Mark &mark);
         ~Exception() noexcept override;
         Exception(const Exception &) = default;
 
@@ -81,6 +81,19 @@ namespace cyaml
         Representation_Exception(const std::string &msg, const Mark &mark);
         ~Representation_Exception() noexcept override;
         Representation_Exception(const Representation_Exception &) = default;
+    };
+
+    /**
+     * @class   Dereference_Exception
+     * @brief   解引用异常
+     * @extends cyaml::Exception
+     */
+    class Dereference_Exception: public Representation_Exception
+    {
+    public:
+        Dereference_Exception();
+        ~Dereference_Exception() noexcept override;
+        Dereference_Exception(const Dereference_Exception &) = default;
     };
 
 } // namespace cyaml

@@ -58,20 +58,47 @@ namespace cyaml
          * @return  Node_Type
          * @retval  该 Value 对应节点数据类型枚举值
          */
-        Node_Type type()
+        Node_Type type() const
         {
             return node_->type_;
+        }
+
+        /**
+         * @brief   获取数据长度
+         * @return  uint32_t
+         * @retval  自动判断数据类型，返回相应长度
+         */
+        uint32_t size() const;
+
+        /**
+         * @brief   查找 key
+         * @param   std::string     key
+         * @return  bool
+         * @retval  该键是否存在
+         */
+        bool find(std::string key) const
+        {
+            return (node_->is_map() &&
+                    node_->map_data_.find(key) != node_->map_data_.end());
         }
 
         /**
          * @brief   判断是否为空值
          * @return  bool
          */
-        bool is_null()
+        bool is_null() const
         {
             return node_->type_ == Node_Type::SCALAR &&
                    node_->scalar_data_.empty();
         }
+
+#ifdef CYAML_DEBUG
+        // 临时测试用
+        std::string scalar_value()
+        {
+            return node_->scalar_data_;
+        }
+#endif
     };
 } // namespace cyaml
 

@@ -55,7 +55,7 @@ namespace cyaml
         {
             if (!node.is_scalar())
                 return false;
-            
+
             rhs = node.scalar_data_;
             return true;
         }
