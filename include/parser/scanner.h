@@ -43,8 +43,9 @@ namespace cyaml
 
         std::string value_; // 当前读取的字面量
 
-        char replace_ = ' ';  // 字符串换行时替换的字符
-        bool append_ = false; // 字符串末尾是否添加换行
+        char replace_ = ' ';      // 字符串换行时替换的字符
+        bool append_ = false;     // 字符串末尾是否添加换行
+        bool get_scalar_ = false; // 是否读取完一个标量
 
     public:
         /**

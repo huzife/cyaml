@@ -97,6 +97,12 @@ namespace cyaml
 
         if (next_char_ == -1) {
             scan_end_ = true;
+
+            // 检查最后一个标量是否 null
+            if (!get_scalar_) {
+                scan_scalar();
+            }
+
             // 匹配剩下的缩进
             while (!indent_.empty()) {
                 token_.push(Token(indent_.top(), false));
@@ -239,6 +245,7 @@ namespace cyaml
             next_char();
         }
 
+        get_scalar_ = true;
         token_.push(Token(string_type, value_));
         pop_indent();
     }
@@ -294,6 +301,7 @@ namespace cyaml
             push_indent(Indent_Type::MAP);
             token_.push(Token(Token_Type::KEY, value_));
         } else {
+            get_scalar_ = true;
             token_.push(Token(String_Type::NORMAL_STRING, value_));
             pop_indent();
         }
@@ -340,6 +348,7 @@ namespace cyaml
             indent_.push(indent);
         }
         min_indent_ = cur_indent_ + 1;
+        get_scalar_ = false;
     }
 
     void Scanner::pop_indent()

@@ -5,5 +5,8 @@
 (SCALAR, this     is a test string)#
 (KEY, next)#
 (COLON, :)#
-(SCALAR, null)#
+(SCALAR, )#
+(KEY, last)#
+(COLON, :)#
+(SCALAR, )#
 (BLOCK_MAP_END, )#
