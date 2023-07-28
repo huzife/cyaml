@@ -22,16 +22,18 @@ namespace cyaml
     enum class Token_Type
     {
         NONE,
-        START,    // ---
-        END,      // ...
-        DASH,     // -
-        COLON,    // :
-        LBRACE,   // {
-        RBRACE,   // }
-        LBRACKET, // [
-        RBRACKET, // ]
-        KEY,      // 对象 key
-        SCALAR,   // 标量
+        STREAM_START, // 输入流开始
+        STREAM_END,   // 输入流结束
+        DOC_START,    // ---
+        DOC_END,      // ...
+        DASH,         // -
+        COLON,        // :
+        LBRACE,       // {
+        RBRACE,       // }
+        LBRACKET,     // [
+        RBRACKET,     // ]
+        KEY,          // 对象 key
+        SCALAR,       // 标量
 
         BLOCK_MAP_START,
         BLOCK_MAP_END,
@@ -82,7 +84,7 @@ namespace cyaml
          * @param   std::string     token 字面量
          * @retval  Token 对象
          */
-        Token(Token_Type type, std::string value);
+        Token(Token_Type type, std::string value = "");
 
         /**
          * @brief   Token 类构造函数

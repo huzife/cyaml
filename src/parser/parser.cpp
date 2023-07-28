@@ -27,7 +27,7 @@ namespace cyaml
     void Parser::parse_stream(Node_Ptr &node)
     {
         Token token = scanner_.next_token();
-        assert(token.token_type() == Token_Type::START);
+        assert(token.token_type() == Token_Type::DOC_START);
 
         token = scanner_.lookahead();
         if (token.token_type() == Token_Type::SCALAR) {
@@ -47,7 +47,7 @@ namespace cyaml
 
         token = scanner_.next_token();
         assert(token.token_type() == Token_Type::NONE ||
-               token.token_type() == Token_Type::END);
+               token.token_type() == Token_Type::DOC_END);
     }
 
 } // namespace cyaml

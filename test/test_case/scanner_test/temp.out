@@ -1,4 +1,5 @@
-(START, ---)#
+(STREAM_START, )#
+(DOC_START, ---)#
 (BLOCK_SEQ_START, )#
 (DASH, -)#
 (BLOCK_SEQ_START, )#
@@ -25,3 +26,4 @@
 (BLOCK_MAP_END, )#
 (BLOCK_MAP_END, )#
 (BLOCK_SEQ_END, )#
+(STREAM_END, )#

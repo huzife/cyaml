@@ -1,4 +1,5 @@
-(START, ---)#
+(STREAM_START, )#
+(DOC_START, ---)#
 (BLOCK_SEQ_START, )#
 (DASH, -)#
 (SCALAR, 123456)#
@@ -11,3 +12,4 @@
 (SCALAR, this is a test string)#
 (BLOCK_MAP_END, )#
 (BLOCK_SEQ_END, )#
+(STREAM_END, )#

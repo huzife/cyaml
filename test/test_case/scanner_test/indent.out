@@ -1,3 +1,4 @@
+(STREAM_START, )#
 (BLOCK_SEQ_START, )#
 (DASH, -)#
 (BLOCK_MAP_START, )#
@@ -14,3 +15,4 @@
 (DASH, -)#
 (SCALAR, end)#
 (BLOCK_SEQ_END, )#
+(STREAM_END, )#

@@ -1,4 +1,5 @@
-(START, ---)#
+(STREAM_START, )#
+(DOC_START, ---)#
 (BLOCK_MAP_START, )#
 (KEY, quote_str)#
 (COLON, :)#
@@ -10,3 +11,4 @@
 (COLON, :)#
 (SCALAR, )#
 (BLOCK_MAP_END, )#
+(STREAM_END, )#

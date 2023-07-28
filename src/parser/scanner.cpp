@@ -15,7 +15,7 @@ namespace cyaml
     Scanner::Scanner(std::istream &in): input_stream_(in)
     {
         next_char_ = input_stream_.get();
-        scan();
+        token_.push(Token(Token_Type::STREAM_START));
     }
 
     Token Scanner::next_token()
@@ -28,7 +28,8 @@ namespace cyaml
             token_.pop();
         }
 
-        scan();
+        if (!scan_end_)
+            scan();
         return ret;
     }
 
@@ -108,6 +109,9 @@ namespace cyaml
                 token_.push(Token(indent_.top(), false));
                 indent_.pop();
             }
+
+            // 添加 STREAM_END
+            token_.push(Token(Token_Type::STREAM_END));
         } else if (is_operator(next_char_)) {
             scan_operator();
         } else {
@@ -156,7 +160,7 @@ namespace cyaml
 
                     value_ += next_char();
                 }
-                token_type = Token_Type::START;
+                token_type = Token_Type::DOC_START;
                 is_operator_ = true;
             }
             break;
