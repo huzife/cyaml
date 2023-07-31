@@ -53,6 +53,8 @@ namespace cyaml
         void parse_stream(Node_Ptr &node);
         void parse_document(Node_Ptr &node);
         void parse_block_node(Node_Ptr &node);
+        void parse_block_node_or_indentless_seq(Node_Ptr &node);
+        void parse_indentless_block_sequence(Node_Ptr &node);
         void parse_block_sequence(Node_Ptr &node);
         void parse_block_map(Node_Ptr &node);
     };

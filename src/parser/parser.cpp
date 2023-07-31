@@ -74,6 +74,38 @@ namespace cyaml
         }
     }
 
+    void Parser::parse_block_node_or_indentless_seq(Node_Ptr &node)
+    {
+        Token next = scanner_.lookahead();
+        switch (next.token_type()) {
+        case Token_Type::BLOCK_MAP_START:
+            parse_block_map(node);
+            break;
+        case Token_Type::BLOCK_SEQ_START:
+            parse_block_sequence(node);
+            break;
+        case Token_Type::BLOCK_SEQ_ENTRY:
+            parse_indentless_block_sequence(node);
+            break;
+        case Token_Type::SCALAR:
+            node = std::make_shared<Node>(next.value());
+            scanner_.next_token();
+            break;
+        }
+    }
+
+    void Parser::parse_indentless_block_sequence(Node_Ptr &node)
+    {
+        node = std::make_shared<Node>(Node_Type::SEQUENCE);
+        Token_Type type = scanner_.lookahead().token_type();
+        while (type != Token_Type::KEY && type != Token_Type::BLOCK_MAP_END) {
+            expect(Token_Type::BLOCK_SEQ_ENTRY);
+            node->sequence_data_.emplace_back();
+            parse_block_node(node->sequence_data_.back());
+            type = scanner_.lookahead().token_type();
+        }
+    }
+
     void Parser::parse_block_map(Node_Ptr &node)
     {
         node = std::make_shared<Node>(Node_Type::MAP);
@@ -83,7 +115,7 @@ namespace cyaml
         while (scanner_.lookahead().token_type() !=
                Token_Type::BLOCK_MAP_END) {
             Token key = expect(Token_Type::KEY);
-            parse_block_node(node->map_data_[key.value()]);
+            parse_block_node_or_indentless_seq(node->map_data_[key.value()]);
         }
 
         expect(Token_Type::BLOCK_MAP_END);
