@@ -34,12 +34,10 @@ namespace cyaml
         bool input_end_ = false;  // 记录是否读取完输入流
         bool scan_end_ = false;   // 记录是否解析完所有 token
 
-        std::stack<Indent> indent_;
+        std::stack<Indent> indent_; // 缩进状态栈
 
-        std::queue<Token> token_;  // 暂存下一个 token
-        char next_char_ = -1;      // 暂存下一个字符
-        char next2_char_ = -1;     // 暂存向前的第二个字符
-        bool next2_valid_ = false; // 记录 next2_char_ 是否可用
+        std::queue<Token> token_; // 暂存下一个 token
+        std::deque<char> char_;   // 存放读取的字符
 
         std::string value_; // 当前读取的字面量
 

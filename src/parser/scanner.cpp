@@ -14,7 +14,7 @@ namespace cyaml
 {
     Scanner::Scanner(std::istream &in): input_stream_(in)
     {
-        next_char_ = input_stream_.get();
+        char_.push_back(input_stream_.get());
         token_.push(Token(Token_Type::STREAM_START));
     }
 
@@ -43,18 +43,11 @@ namespace cyaml
 
     char Scanner::next_char()
     {
-        if (next2_valid_) {
-            next2_valid_ = false;
-            char ret = next_char_;
-            next_char_ = next2_char_;
-            return ret;
-        }
-
         assert(!input_end_);
 
-        char ret = next_char_;
-        if (ret != -1)
-            next_char_ = input_stream_.get();
+        if (!input_stream_.eof())
+            char_.push_back(input_stream_.get());
+        char ret = char_.front();
 
         switch (ret) {
         // 换行
@@ -82,6 +75,9 @@ namespace cyaml
             break;
         }
 
+        if (!input_end_)
+            char_.pop_front();
+
         return ret;
     }
 
@@ -90,13 +86,13 @@ namespace cyaml
         value_.clear();
 
         // 跳过\t和\n，暂时跳过空格
-        while (!input_end_ && is_delimiter(next_char_)) {
+        while (!input_end_ && is_delimiter(char_.front())) {
             next_char();
         }
 
         update_indent();
 
-        if (next_char_ == -1) {
+        if (char_.front() == -1) {
             scan_end_ = true;
 
             // 检查最后一个标量是否 null
@@ -112,7 +108,7 @@ namespace cyaml
 
             // 添加 STREAM_END
             token_.push(Token(Token_Type::STREAM_END));
-        } else if (is_operator(next_char_)) {
+        } else if (is_operator(char_.front())) {
             scan_operator();
         } else {
             scan_scalar();
@@ -123,16 +119,13 @@ namespace cyaml
     {
         ignore_tab_ = false;
         cur_indent_ = mark_.column - tab_cnt_ - 1;
-        if (next2_valid_) {
-            cur_indent_--;
-        }
     }
 
     void Scanner::scan_scalar()
     {
-        if (next_char_ == '|' || next_char_ == '>') {
+        if (char_.front() == '|' || char_.front() == '>') {
             scan_special_string();
-        } else if (next_char_ == '\'' || next_char_ == '\"') {
+        } else if (char_.front() == '\'' || char_.front() == '\"') {
             scan_quote_string();
         } else {
             scan_normal_string();
@@ -149,13 +142,13 @@ namespace cyaml
 
         switch (ch) {
         case '-':
-            if (is_delimiter(next_char_)) {
+            if (is_delimiter(char_.front())) {
                 push_indent(Indent_Type::SEQ);
                 token_type = Token_Type::DASH;
             } else {
                 // 读取后两个字符，判断是否匹配'---'
                 for (int i = 0; i < 2; i++) {
-                    if (next_char_ != '-')
+                    if (char_.front() != '-')
                         break;
 
                     value_ += next_char();
@@ -181,7 +174,7 @@ namespace cyaml
             break;
         }
 
-        if (is_operator_ || is_delimiter(next_char_))
+        if (is_operator_ || is_delimiter(char_.front()))
             token_.push(Token(token_type, value_));
         else
             scan_scalar();
@@ -189,7 +182,7 @@ namespace cyaml
 
     void Scanner::scan_special_string()
     {
-        assert(next_char_ == '|' || next_char_ == '>');
+        assert(char_.front() == '|' || char_.front() == '>');
 
         // 换行替换字符
         if (next_char() == '|') {
@@ -197,10 +190,10 @@ namespace cyaml
         }
 
         // 字符串末尾是否添加换行
-        if (next_char_ == '-') {
+        if (char_.front() == '-') {
             append_ = false;
             next_char();
-        } else if (is_delimiter(next_char_) && next_char_ != -1) {
+        } else if (is_delimiter(char_.front()) && char_.front() != -1) {
             append_ = true;
         } else {
             // 报错：
@@ -212,30 +205,30 @@ namespace cyaml
 
     void Scanner::scan_quote_string()
     {
-        assert(next_char_ == '\'' || next_char_ == '\"');
+        assert(char_.front() == '\'' || char_.front() == '\"');
         char end_char = next_char();
         String_Type string_type = end_char == '\''
                                           ? String_Type::SQUOTE_STRING
                                           : String_Type::DQUOTE_STRING;
 
         // 循环读取字符，直到 ' 或 "
-        while (next_char_ != end_char) {
-            if (next_char_ == -1) {
+        while (char_.front() != end_char) {
+            if (char_.front() == -1) {
                 throw Parse_Exception(error_msgs::EOF_IN_SCALAR, mark_);
-            } else if (next_char_ == '\\' && end_char == '\"') {
+            } else if (char_.front() == '\\' && end_char == '\"') {
                 // 转义字符处理
                 value_ += escape();
-            } else if (next_char_ == '\n') {
+            } else if (char_.front() == '\n') {
                 // 换行处理
                 value_ += ' ';
                 next_char();
 
                 // 连续多个换行时不替换为空格
-                while (next_char_ == '\n') {
+                while (char_.front() == '\n') {
                     value_ += '\n';
                     next_char();
                 }
-                while (next_char_ == ' ') {
+                while (char_.front() == ' ') {
                     next_char();
                 }
             } else {
@@ -245,7 +238,7 @@ namespace cyaml
 
         // 消耗多出的引号
         next_char();
-        while (!input_end_ && is_delimiter(next_char_)) {
+        while (!input_end_ && is_delimiter(char_.front())) {
             next_char();
         }
 
@@ -259,14 +252,13 @@ namespace cyaml
         bool is_key = false;
 
         while (!input_end_ && mark_.column - tab_cnt_ - 1 >= min_indent_) {
-            while (!input_end_ && next_char_ != '\n') {
+            while (!input_end_ && char_.front() != '\n') {
                 char ch = next_char();
 
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-                if (ch == ':' && is_delimiter(next_char_)) {
-                    next2_char_ = next_char_;
-                    next_char_ = ch;
-                    next2_valid_ = true;
+                if (ch == ':' && is_delimiter(char_.front())) {
+                    char_.push_front(ch);
+                    mark_.column--;
                     is_key = true;
                     break;
                 } else {
@@ -278,18 +270,18 @@ namespace cyaml
                 break;
 
             // 消耗换行符
-            if (next_char_ == '\n') {
+            if (char_.front() == '\n') {
                 value_ += replace_;
                 next_char();
                 // 连续多个换行符不替换为空格
-                while (next_char_ == '\n') {
+                while (char_.front() == '\n') {
                     value_ += '\n';
                     next_char();
                 }
             }
 
             // 消耗下一行的空格
-            while (!input_end_ && next_char_ == ' ') {
+            while (!input_end_ && char_.front() == ' ') {
                 next_char();
             }
         }

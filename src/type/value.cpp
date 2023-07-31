@@ -46,6 +46,8 @@ namespace cyaml
         case Node_Type::SCALAR:
             return node_->scalar_data_.size();
         }
+
+        return 0;
     }
 
 } // namespace cyaml
