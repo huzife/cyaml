@@ -5,7 +5,7 @@
  * @date        2023-7-20
  */
 
-#include "parser/token.h"
+#include "type/token.h"
 #include <assert.h>
 
 namespace cyaml
@@ -55,18 +55,16 @@ namespace cyaml
             return "DOC_START";
         case Token_Type::DOC_END:
             return "DOC_END";
-        case Token_Type::DASH:
-            return "DASH";
-        case Token_Type::COLON:
-            return "COLON";
-        case Token_Type::LBRACE:
-            return "LBRACE";
-        case Token_Type::RBRACE:
-            return "RBRACE";
-        case Token_Type::LBRACKET:
-            return "LBRACKET";
-        case Token_Type::RBRACKET:
-            return "RBRACKET";
+        case Token_Type::BLOCK_SEQ_ENTRY:
+            return "BLOCK_SEQ_ENTRY";
+        case Token_Type::FLOW_MAP_START:
+            return "FLOW_MAP_START";
+        case Token_Type::FLOW_MAP_END:
+            return "FLOW_MAP_END";
+        case Token_Type::FLOW_SEQ_START:
+            return "FLOW_SEQ_START";
+        case Token_Type::FLOW_SEQ_END:
+            return "FLOW_SEQ_END";
         case Token_Type::KEY:
             return "KEY";
         case Token_Type::SCALAR:

@@ -9,8 +9,7 @@
 #define CYAML_CONVERT_H
 
 #include "type/node.h"
-#include "type/value.h"
-#include "string"
+#include <string>
 
 namespace cyaml
 {
@@ -20,22 +19,18 @@ namespace cyaml
      * @tparam  T   转换类型
      */
     template<typename T>
-    struct Convert
-    {
-        Node encode(const T &rhs);
-        bool decode(const Node &node, T &rhs);
-    };
+    struct Convert;
 
     // Node
     template<>
     struct Convert<Node>
     {
-        Node encode(const Node &rhs)
+        static Node encode(const Node &rhs)
         {
             return rhs;
         }
 
-        bool decode(const Node &node, Node &rhs)
+        static bool decode(const Node &node, Node &rhs)
         {
             rhs = node;
             return true;
@@ -46,17 +41,52 @@ namespace cyaml
     template<>
     struct Convert<std::string>
     {
-        Node encode(const std::string &rhs)
+        static Node encode(const std::string &rhs)
         {
             return Node(rhs);
         }
 
-        bool decode(const Node &node, std::string &rhs)
+        static bool decode(const Node &node, std::string &rhs)
         {
+            if (node.is_null())
+                return "null";
+
             if (!node.is_scalar())
                 return false;
 
             rhs = node.scalar_data_;
+            return true;
+        }
+    };
+
+    // int
+    template<>
+    struct Convert<int>
+    {
+        static Node encode(const int &rhs)
+        {
+            return Node(std::to_string(rhs));
+        }
+
+        static bool decode(const Node &node, int &rhs)
+        {
+            rhs = std::stoi(node.scalar_data_);
+            return true;
+        }
+    };
+
+    // double
+    template<>
+    struct Convert<double>
+    {
+        static Node encode(const double &rhs)
+        {
+            return Node(std::to_string(rhs));
+        }
+
+        static bool decode(const Node &node, double &rhs)
+        {
+            rhs = std::stod(node.scalar_data_);
             return true;
         }
     };

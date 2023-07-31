@@ -66,9 +66,15 @@ namespace cyaml
     {
     }
 
+    Convertion_Exception::Convertion_Exception()
+        : Representation_Exception(error_msgs::BAD_CONVERTION, Mark())
+    {
+    }
+
     Exception::~Exception() = default;
     Parse_Exception::~Parse_Exception() = default;
     Representation_Exception::~Representation_Exception() = default;
     Dereference_Exception::~Dereference_Exception() = default;
+    Convertion_Exception::~Convertion_Exception() = default;
 
 } // namespace cyaml

@@ -26,6 +26,7 @@ namespace cyaml
      */
     enum class Node_Type
     {
+        NULL_NODE,
         MAP,
         SEQUENCE,
         SCALAR
@@ -82,6 +83,15 @@ namespace cyaml
         bool is_scalar() const
         {
             return type_ == Node_Type::SCALAR;
+        }
+
+        /**
+         * @brief   判断是否为 null
+         * @return  bool
+         */
+        bool is_null() const
+        {
+            return type_ == Node_Type::NULL_NODE;
         }
 
         Node(const Node &) = default;

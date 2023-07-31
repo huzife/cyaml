@@ -9,7 +9,7 @@
 #define CYAML_EXCEPTIONS_H
 
 #include "error/error_msgs.h"
-#include "parser/token.h"
+#include "type/token.h"
 #include "type/mark.h"
 #include <stdexcept>
 #include <string>
@@ -94,6 +94,19 @@ namespace cyaml
         Dereference_Exception();
         ~Dereference_Exception() noexcept override;
         Dereference_Exception(const Dereference_Exception &) = default;
+    };
+
+    /**
+     * @class   Convertion_Exception
+     * @brief   转换异常
+     * @extends cyaml::Exception
+     */
+    class Convertion_Exception: public Representation_Exception
+    {
+    public:
+        Convertion_Exception();
+        ~Convertion_Exception() noexcept override;
+        Convertion_Exception(const Convertion_Exception &) = default;
     };
 
 } // namespace cyaml

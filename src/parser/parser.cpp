@@ -83,7 +83,6 @@ namespace cyaml
         while (scanner_.lookahead().token_type() !=
                Token_Type::BLOCK_MAP_END) {
             Token key = expect(Token_Type::KEY);
-            expect(Token_Type::COLON);
             parse_block_node(node->map_data_[key.value()]);
         }
 
@@ -98,7 +97,7 @@ namespace cyaml
         // 循环解析数组元素
         while (scanner_.lookahead().token_type() !=
                Token_Type::BLOCK_SEQ_END) {
-            expect(Token_Type::DASH);
+            expect(Token_Type::BLOCK_SEQ_ENTRY);
             node->sequence_data_.emplace_back();
             parse_block_node(node->sequence_data_.back());
         }

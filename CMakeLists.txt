@@ -8,12 +8,13 @@ add_compile_definitions(CYAML_DEBUG)
 include_directories(include)
 
 set(PARSER_SRC
-    src/parser/token.cpp
     src/parser/scanner.cpp
+    src/parser/scan_token.cpp
     src/parser/parser.cpp
 )
 
 set(TYPE_SRC
+    src/type/token.cpp
     src/type/node.cpp
     src/type/value.cpp
     src/type/mark.cpp

@@ -8,7 +8,7 @@
 #ifndef CYAML_SCANNER_H
 #define CYAML_SCANNER_H
 
-#include "parser/token.h"
+#include "type/token.h"
 #include "type/mark.h"
 #include "type/indent.h"
 #include <istream>
@@ -37,7 +37,7 @@ namespace cyaml
         std::stack<Indent> indent_; // 缩进状态栈
 
         std::queue<Token> token_; // 暂存下一个 token
-        std::deque<char> char_;   // 存放读取的字符
+        std::deque<char> chars_;  // 存放读取的字符
 
         std::string value_; // 当前读取的字面量
 
@@ -120,16 +120,68 @@ namespace cyaml
         char next_char();
 
         /**
-         * @brief   扫描并解析一个 token
-         * @return  void
+         * @brief   查看下一个字符
+         * @return  char
          */
-        void scan();
+        char next() const
+        {
+            assert(!chars_.empty());
+            return chars_.front();
+        }
 
         /**
          * @brief   更新缩进值
          * @return  void
          */
         void update_indent();
+
+        /**
+         * @brief   跳过空白字符直到下一个 token
+         * @return  void
+         */
+        void skip_to_next_token();
+
+        /**
+         * @brief   扫描并解析一个 token
+         * @return  void
+         */
+        void scan();
+
+        /**
+         * @brief   结束 yaml 流
+         * @return  void
+         */
+        void stream_end();
+
+        /**
+         * @brief   扫描 DOC_START
+         * @return  void
+         */
+        void scan_doc_start();
+
+        /**
+         * @brief   扫描 DOC_END
+         * @return  void
+         */
+        void scan_doc_end();
+
+        /**
+         * @brief   扫描 FLOW_MAP_START 或 FLOW_SEQ_START
+         * @return  void
+         */
+        void scan_flow_start();
+
+        /**
+         * @brief   扫描 FLOW_MAP_END 或 FLOW_SEQ_END
+         * @return  void
+         */
+        void scan_flow_end();
+
+        /**
+         * @brief   扫描 BLOCK_SEQ_ENTRY
+         * @return  void
+         */
+        void scan_block_seq_entry();
 
         /**
          * @brief   扫描一个标量
@@ -140,31 +192,25 @@ namespace cyaml
         void scan_scalar();
 
         /**
-         * @brief   扫描一个符号，如 {}, [], :, --- 等
-         * @return  void
-         */
-        void scan_operator();
-
-        /**
          * @brief   扫描特殊字符串，包括保留换行和折叠换行
          * @details 该函数实际上只是识别保留换行和折叠换行相关符号，
-         *          然后调用 scan_normal_string()
+         *          然后调用 scan_normal_scalar()
          * @return  void
          */
-        void scan_special_string();
+        void scan_special_scalar();
 
         /**
          * @brief   扫描带引号的两种字符串
          * @return  void
          */
-        void scan_quote_string();
+        void scan_quote_scalar();
 
         /**
          * @brief   扫描字符串
          * @details 结合缩进检测字符串边界
          * @return  void
          */
-        void scan_normal_string(
+        void scan_normal_scalar(
                 char replace = ' ',
                 bool append_newline = false);
 
@@ -214,16 +260,6 @@ namespace cyaml
         }
 
         /**
-         * @brief   判断字符是否属于操作符
-         * @return  bool
-         */
-        bool is_operator(char ch)
-        {
-            return ch == '-' || ch == ':' || ch == '{' || ch == '}' ||
-                   ch == '[' || ch == ']';
-        }
-
-        /**
          * @brief   判断字符是否属于字符串起始符
          * @return  bool
          */
@@ -232,6 +268,12 @@ namespace cyaml
             return ch == '>' || ch == '\'' || ch == '\"' || ch == '|' ||
                    is_letter(ch);
         }
+
+        /**
+         * @brief   匹配字符串
+         * @return  bool
+         */
+        bool match(std::string pattern, bool end_with_delimiter = false);
     };
 
 } // namespace cyaml

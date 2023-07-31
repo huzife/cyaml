@@ -12,6 +12,7 @@ namespace cyaml
 {
     namespace error_msgs
     {
+        const char *const SCAN_TOKEN_ERROR = "scan token error";
         const char *const UNKNOWN_TOKEN = "unknown token";
         const char *const UNKNOWN_ESCAPE = "unknown escape";
         const char *const EOF_IN_SCALAR = "illegal EOF in scalar";
@@ -20,6 +21,7 @@ namespace cyaml
         const char *const NO_NEWLINE = "missing newline";
         const char *const INVALID_INDENT = "invalid indentation";
         const char *const BAD_DEREFERENCE = "bad dereference";
+        const char *const BAD_CONVERTION = "bad convertion";
     } // namespace error_msgs
 } // namespace cyaml
 

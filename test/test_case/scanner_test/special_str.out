@@ -2,10 +2,8 @@
 (DOC_START, ---)#
 (BLOCK_MAP_START, )#
 (KEY, empty)#
-(COLON, :)#
 (SCALAR, )#
 (KEY, preserve)#
-(COLON, :)#
 (SCALAR, this
 is
 a
@@ -13,7 +11,6 @@ preserve
 string
 )#
 (KEY, fold)#
-(COLON, :)#
 (SCALAR, this is a fold string)#
 (BLOCK_MAP_END, )#
 (STREAM_END, )#

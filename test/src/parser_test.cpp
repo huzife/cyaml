@@ -1,5 +1,6 @@
 #include "parser/parser.h"
 #include "type/value.h"
+// #include "type/value_impl.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -29,15 +30,13 @@ public:
         cyaml::Parser parser(input_in);
         cyaml::Value value = parser.parse();
 
-#ifdef CYAML_DEBUG
         ASSERT_EQ(value.type(), cyaml::Node_Type::MAP);
         ASSERT_EQ(value.size(), 3);
-        ASSERT_EQ(value["scalar"].scalar_value(), "a");
+        ASSERT_EQ(value["scalar"].as<std::string>(), "a");
         ASSERT_FALSE(value.find("seqq"));
         ASSERT_EQ(value["map"].type(), cyaml::Node_Type::MAP);
         ASSERT_EQ(value["seq"].type(), cyaml::Node_Type::SEQUENCE);
-        ASSERT_EQ(value["seq"][1]["seq_map"].scalar_value(), "aaa");
-#endif
+        ASSERT_DOUBLE_EQ(value["seq"][1]["seq_map"].as<double>(), 123.0);
     }
 };
 

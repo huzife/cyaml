@@ -9,7 +9,7 @@ map:
     - bbb
 seq:
   - aa
-  - seq_map: aaa
+  - seq_map: 123
   -
     - aaa
     - bbb

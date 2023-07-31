@@ -9,6 +9,8 @@
 #define CYAML_VALUE_H
 
 #include "type/node.h"
+#include "type/convert.h"
+#include "error/exceptions.h"
 #include <memory>
 
 namespace cyaml
@@ -51,7 +53,14 @@ namespace cyaml
          * @retval  转换后的标量值
          */
         template<typename T>
-        T as();
+        T as()
+        {
+            T ret;
+            if (Convert<T>::decode(*node_, ret))
+                return ret;
+
+            throw Convertion_Exception();
+        }
 
         /**
          * @brief   获取值的类型
@@ -61,6 +70,42 @@ namespace cyaml
         Node_Type type() const
         {
             return node_->type_;
+        }
+
+        /**
+         * @brief   判断是否为 map
+         * @return bool
+         */
+        bool is_map() const
+        {
+            return node_->is_map();
+        }
+
+        /**
+         * @brief   判断是否为 sequence
+         * @return bool
+         */
+        bool is_sequence() const
+        {
+            return node_->is_sequence();
+        }
+
+        /**
+         * @brief   判断是否为 scalar
+         * @return bool
+         */
+        bool is_scalar() const
+        {
+            return node_->is_scalar();
+        }
+
+        /**
+         * @brief   判断是否为空值
+         * @return  bool
+         */
+        bool is_null() const
+        {
+            return node_->is_null();
         }
 
         /**
@@ -80,16 +125,6 @@ namespace cyaml
         {
             return (node_->is_map() &&
                     node_->map_data_.find(key) != node_->map_data_.end());
-        }
-
-        /**
-         * @brief   判断是否为空值
-         * @return  bool
-         */
-        bool is_null() const
-        {
-            return node_->type_ == Node_Type::SCALAR &&
-                   node_->scalar_data_.empty();
         }
 
 #ifdef CYAML_DEBUG

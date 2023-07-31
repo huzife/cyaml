@@ -2,57 +2,47 @@
 (DOC_START, ---)#
 (BLOCK_MAP_START, )#
 (KEY, json)#
-(COLON, :)#
 (BLOCK_SEQ_START, )#
-(DASH, -)#
+(BLOCK_SEQ_ENTRY, -)#
 (SCALAR, rigid)#
-(DASH, -)#
+(BLOCK_SEQ_ENTRY, -)#
 (SCALAR, better for data interchange)#
 (BLOCK_SEQ_END, )#
 (KEY, yaml)#
-(COLON, :)#
 (BLOCK_SEQ_START, )#
-(DASH, -)#
+(BLOCK_SEQ_ENTRY, -)#
 (SCALAR, slim and flexible)#
-(DASH, -)#
+(BLOCK_SEQ_ENTRY, -)#
 (SCALAR, better for configuration)#
 (BLOCK_SEQ_END, )#
 (KEY, object)#
-(COLON, :)#
 (BLOCK_MAP_START, )#
 (KEY, key)#
-(COLON, :)#
 (SCALAR, value)#
 (KEY, array)#
-(COLON, :)#
 (BLOCK_SEQ_START, )#
-(DASH, -)#
+(BLOCK_SEQ_ENTRY, -)#
 (BLOCK_MAP_START, )#
 (KEY, null_value)#
-(COLON, :)#
 (SCALAR, null)#
 (BLOCK_MAP_END, )#
-(DASH, -)#
+(BLOCK_SEQ_ENTRY, -)#
 (BLOCK_MAP_START, )#
 (KEY, boolean)#
-(COLON, :)#
 (SCALAR, true)#
 (BLOCK_MAP_END, )#
-(DASH, -)#
+(BLOCK_SEQ_ENTRY, -)#
 (BLOCK_MAP_START, )#
 (KEY, integer)#
-(COLON, :)#
 (SCALAR, 1)#
 (BLOCK_MAP_END, )#
 (BLOCK_SEQ_END, )#
 (BLOCK_MAP_END, )#
 (KEY, paragraph)#
-(COLON, :)#
 (SCALAR, Blank lines denote
 paragraph breaks
 )#
 (KEY, content)#
-(COLON, :)#
 (SCALAR, Or we
 can auto
 convert line breaks
