@@ -43,6 +43,7 @@ namespace cyaml
 
         char replace_ = ' ';      // 字符串换行时替换的字符
         bool append_ = false;     // 字符串末尾是否添加换行
+        bool in_special_ = false; // 是否正在扫描特殊字符串
         bool get_scalar_ = false; // 是否读取完一个标量
 
     public:
@@ -142,6 +143,41 @@ namespace cyaml
         void skip_to_next_token();
 
         /**
+         * @brief   跳过空白符号
+         * @return  void
+         */
+        void skip_blank()
+        {
+            while (!input_end_ && is_delimiter(next())) {
+                next_char();
+            }
+        }
+
+        /**
+         * @brief   跳过注释
+         * @return  void
+         */
+        void skip_comment()
+        {
+            if (next() == '#') {
+                while (!input_end_ && next() != '\n') {
+                    next_char();
+                }
+            }
+        }
+
+        /**
+         * @brief   重置标量解析标志
+         * @return  void
+         */
+        void reset_scalar_flags()
+        {
+            replace_ = ' ';
+            append_ = false;
+            in_special_ = false;
+        }
+
+        /**
          * @brief   扫描并解析一个 token
          * @return  void
          */
@@ -210,9 +246,7 @@ namespace cyaml
          * @details 结合缩进检测字符串边界
          * @return  void
          */
-        void scan_normal_scalar(
-                char replace = ' ',
-                bool append_newline = false);
+        void scan_normal_scalar();
 
         /**
          * @brief   处理转义字符
@@ -231,6 +265,17 @@ namespace cyaml
          * @brief   弹出缩进值
          */
         void pop_indent();
+
+        /**
+         * @brief   匹配剩余所有缩进
+         */
+        void pop_all_indent()
+        {
+            while (!indent_.empty()) {
+                token_.push(Token(indent_.top(), false));
+                indent_.pop();
+            }
+        }
 
         /**
          * @brief   判断字符是否属于分隔符

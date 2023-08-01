@@ -7,6 +7,7 @@
 
 #include "parser/scanner.h"
 #include "error/exceptions.h"
+#include <iostream>
 
 namespace cyaml
 {
@@ -18,10 +19,7 @@ namespace cyaml
         }
 
         // 匹配剩下的缩进
-        while (!indent_.empty()) {
-            token_.push(Token(indent_.top(), false));
-            indent_.pop();
-        }
+        pop_all_indent();
 
         // 添加 STREAM_END
         token_.push(Token(Token_Type::STREAM_END));
@@ -40,6 +38,8 @@ namespace cyaml
 
     void Scanner::scan_doc_end()
     {
+        pop_all_indent();
+
         for (int i = 0; i < 3; i++) {
             if (next() != '.')
                 throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
@@ -122,6 +122,7 @@ namespace cyaml
             throw Parse_Exception(error_msgs::NO_NEWLINE, mark_);
         }
 
+        in_special_ = true;
         skip_to_next_token();
         scan_normal_scalar();
     }
@@ -172,24 +173,32 @@ namespace cyaml
         pop_indent();
     }
 
-    void Scanner::scan_normal_scalar(char replace, bool append_newline)
+    void Scanner::scan_normal_scalar()
     {
         bool is_key = false;
+        bool hit_comment = false;
 
         while (!input_end_ && mark_.column - tab_cnt_ - 1 >= min_indent_) {
+            // 扫描字符串直到换行
             while (!input_end_ && next() != '\n') {
-                char ch = next_char();
+                // 遇到注释停止
+                if (!in_special_ && next() == '#') {
+                    hit_comment = true;
+                    break;
+                }
 
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
+                char ch = next_char();
                 if (ch == ':' && is_delimiter(next())) {
                     is_key = true;
                     break;
-                } else {
-                    value_ += ch;
                 }
+
+                // 接收字符
+                value_ += ch;
             }
 
-            if (is_key)
+            if (is_key || hit_comment)
                 break;
 
             // 消耗换行符
@@ -204,18 +213,27 @@ namespace cyaml
                 }
             }
 
+            // 检查 DOC_END
+            if (match("...", true))
+                break;
+
             // 消耗下一行的空格
-            while (!input_end_ && next() == ' ') {
-                next_char();
-            }
+            skip_blank();
         }
 
-        value_ = value_.substr(0, value_.find_last_not_of(" \t\n\xFF") + 1);
-        if (!value_.empty() && append_ && !is_key)
-            value_ += '\n';
+        // 跳过注释
+        if (hit_comment || next() == '#') {
+            skip_comment();
+            skip_blank();
+        }
 
-        replace_ = ' ';
-        append_ = false;
+        // 删除结尾空白字符
+        value_ = value_.substr(0, value_.find_last_not_of(" \t\n\xFF") + 1);
+        if (!value_.empty() && append_ && !is_key) {
+            value_ += '\n';
+        }
+
+        reset_scalar_flags();
 
         if (is_key) {
             push_indent(Indent_Type::MAP);

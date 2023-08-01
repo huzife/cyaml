@@ -84,8 +84,9 @@ namespace cyaml
     void Scanner::skip_to_next_token()
     {
         value_.clear();
-        while (!input_end_ && is_delimiter(next())) {
-            next_char();
+        while (!input_end_ && (is_delimiter(next()) || next() == '#')) {
+            skip_blank();
+            skip_comment();
         }
         update_indent();
     }
@@ -97,30 +98,28 @@ namespace cyaml
         // STREAM_END
         if (next() == -1) {
             scan_end_ = true;
-            stream_end();
-            return;
+            return stream_end();
         }
 
         // DOC
         if (mark_.column == 1 && match("---"))
-            scan_doc_start();
+            return scan_doc_start();
 
-        else if (mark_.column == 1 && match("...", true))
-            scan_doc_end();
+        if (mark_.column == 1 && match("...", true))
+            return scan_doc_end();
 
         // BLOCK_SEQ_ENTRY
-        else if (match("-", true))
-            scan_block_seq_entry();
+        if (match("-", true))
+            return scan_block_seq_entry();
 
         // FLOW START AND END
-        else if (next() == '{' || next() == '[')
-            scan_flow_start();
+        if (next() == '{' || next() == '[')
+            return scan_flow_start();
 
-        else if (next() == '}' || next() == ']')
-            scan_flow_end();
+        if (next() == '}' || next() == ']')
+            return scan_flow_end();
 
-        else
-            scan_scalar();
+        return scan_scalar();
     }
 
     void Scanner::update_indent()
