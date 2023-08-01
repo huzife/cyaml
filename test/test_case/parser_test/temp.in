@@ -11,6 +11,6 @@ seq:
   - aa
   - seq_map: 123
   -
-    - aaa
-    - bbb
-    - ccc
+    - 
+    - true
+    - 

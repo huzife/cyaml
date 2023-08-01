@@ -17,7 +17,7 @@ namespace cyaml
         if (!node_->is_sequence())
             throw Dereference_Exception();
 
-        ///< @todo  out_of_bound exception
+        ///< @todo  out_of_range exception
         if (index >= node_->sequence_data_.size())
             throw Dereference_Exception();
 

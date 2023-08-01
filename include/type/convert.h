@@ -37,9 +37,11 @@ namespace cyaml
         }
     };
 
+    using namespace cyaml::type;
+
     // string
     template<>
-    struct Convert<std::string>
+    struct Convert<String>
     {
         static Node encode(const std::string &rhs)
         {
@@ -61,7 +63,7 @@ namespace cyaml
 
     // int
     template<>
-    struct Convert<int>
+    struct Convert<Int>
     {
         static Node encode(const int &rhs)
         {
@@ -75,9 +77,9 @@ namespace cyaml
         }
     };
 
-    // double
+    // real
     template<>
-    struct Convert<double>
+    struct Convert<Real>
     {
         static Node encode(const double &rhs)
         {
@@ -87,6 +89,31 @@ namespace cyaml
         static bool decode(const Node &node, double &rhs)
         {
             rhs = std::stod(node.scalar_data_);
+            return true;
+        }
+    };
+
+    template<>
+    struct Convert<Bool>
+    {
+        static Node encode(const bool &rhs)
+        {
+            if (rhs)
+                return Node("true");
+            else
+                return Node("false");
+        }
+
+        static bool decode(const Node &node, bool &rhs)
+        {
+            if (!node.is_scalar())
+                return false;
+
+            std::string value = node.scalar_data_;
+            if (value != "true" && value != "false")
+                return false;
+
+            rhs = value == "true" ? true : false;
             return true;
         }
     };

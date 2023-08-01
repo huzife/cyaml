@@ -33,6 +33,7 @@ public:
         cyaml::Parser parser(input_in);
         cyaml::Value value = parser.parse();
 
+        using namespace cyaml::type;
         ASSERT_EQ(value.type(), cyaml::Node_Type::MAP);
         ASSERT_EQ(value.size(), 3);
         ASSERT_EQ(value["scalar"].as<std::string>(), "a");
@@ -40,6 +41,9 @@ public:
         ASSERT_EQ(value["map"].type(), cyaml::Node_Type::MAP);
         ASSERT_EQ(value["seq"].type(), cyaml::Node_Type::SEQUENCE);
         ASSERT_DOUBLE_EQ(value["seq"][1]["seq_map"].as<double>(), 123.0);
+        ASSERT_TRUE(value["seq"][2][0].is_null());
+        ASSERT_TRUE(value["seq"][2][1].as<Bool>());
+        ASSERT_TRUE(value["seq"][2][2].is_null());
     }
 };
 

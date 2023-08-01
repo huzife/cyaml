@@ -8,18 +8,10 @@
 #ifndef CYAML_NODE_H
 #define CYAML_NODE_H
 
-#include <memory>
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include "type/type.h"
 
 namespace cyaml
 {
-    class Node;
-    using Node_Ptr = std::shared_ptr<Node>;
-    using Mapping = std::unordered_map<std::string, Node_Ptr>;
-    using Sequence = std::vector<Node_Ptr>;
-
     /**
      * @enum    Node_Type
      * @brief   声明节点的数据类型
@@ -40,8 +32,8 @@ namespace cyaml
     {
     public:
         Node_Type type_;
-        Mapping map_data_;
-        Sequence sequence_data_;
+        type::Map map_data_;
+        type::Sequence sequence_data_;
         std::string scalar_data_;
 
         /**

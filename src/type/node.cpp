@@ -15,6 +15,8 @@ namespace cyaml
         : type_(Node_Type::SCALAR),
           scalar_data_(value)
     {
+        if (value.empty() || value == "~" || value == "null")
+            type_ = Node_Type::NULL_NODE;
     }
 
 } // namespace cyaml
