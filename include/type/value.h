@@ -25,6 +25,9 @@ namespace cyaml
         Node_Ptr node_;
 
     public:
+        Value() = default;
+        Value(const Value &) = default;
+
         /**
          * @brief   Value 构造
          * @param   Node_Ptr    数据节点指针
