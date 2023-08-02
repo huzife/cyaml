@@ -15,14 +15,14 @@ namespace cyaml
     {
         // 检查最后一个标量是否 null
         if (need_scalar_) {
-            token_.push(Token(Token_Type::SCALAR, ""));
+            add_token(Token(Token_Type::SCALAR, ""));
         }
 
         // 匹配剩下的缩进
         pop_all_indent();
 
         // 添加 STREAM_END
-        token_.push(Token(Token_Type::STREAM_END));
+        add_token(Token(Token_Type::STREAM_END));
     }
 
     void Scanner::scan_doc_start()
@@ -30,10 +30,10 @@ namespace cyaml
         for (auto i = 0; i < 3; i++) {
             if (next() != '-')
                 throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
-            value_ += next_char();
+            next_char();
         }
 
-        token_.push(Token(Token_Type::DOC_START, value_));
+        add_token(Token(Token_Type::DOC_START));
     }
 
     void Scanner::scan_doc_end()
@@ -43,20 +43,20 @@ namespace cyaml
         for (int i = 0; i < 3; i++) {
             if (next() != '.')
                 throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
-            value_ += next_char();
+            next_char();
         }
 
         if (!is_delimiter(next()))
             throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
 
-        token_.push(Token(Token_Type::DOC_END, value_));
+        add_token(Token(Token_Type::DOC_END));
     }
 
     void Scanner::scan_block_seq_entry()
     {
         bool success = false;
         if (next() == '-') {
-            value_ += next_char();
+            next_char();
             if (is_delimiter(next()))
                 success = true;
         }
@@ -68,7 +68,7 @@ namespace cyaml
         fill_null(Indent_Type::SEQ);
         start_scalar();
         push_indent(Indent_Type::SEQ);
-        token_.push(Token(Token_Type::BLOCK_SEQ_ENTRY, value_));
+        add_token(Token(Token_Type::BLOCK_SEQ_ENTRY));
     }
 
     void Scanner::scan_flow_start()
@@ -76,10 +76,10 @@ namespace cyaml
         if (next() != '{' && next() != '[')
             throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
 
-        Token_Type type = next() == '{' ? Token_Type::FLOW_MAP_START
-                                        : Token_Type::FLOW_SEQ_START;
-        value_ += next_char();
-        token_.push(Token(type, value_));
+        Flow_Type type = next_char() == '{' ? Flow_Type::MAP : Flow_Type::SEQ;
+
+        flow_.push(type);
+        add_token(Token(from_flow_type(type, true)));
     }
 
     void Scanner::scan_flow_end()
@@ -87,21 +87,27 @@ namespace cyaml
         if (next() != '}' && next() != ']')
             throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
 
-        Token_Type type = next() == '}' ? Token_Type::FLOW_MAP_END
-                                        : Token_Type::FLOW_SEQ_END;
-        value_ += next_char();
-        token_.push(Token(type, value_));
+        Flow_Type type = next_char() == '}' ? Flow_Type::MAP : Flow_Type::SEQ;
+
+        if (type != flow_.top())
+            throw Parse_Exception(error_msgs::INVALID_FLOW_END, mark_);
+
+        flow_.pop();
+        add_token(Token(from_flow_type(type, false)));
+
+        end_scalar();
     }
 
-    void Scanner::scan_scalar()
+    void Scanner::scan_flow_entry()
     {
-        if (next() == '|' || next() == '>') {
-            scan_special_scalar();
-        } else if (next() == '\'' || next() == '\"') {
-            scan_quote_scalar();
-        } else {
-            scan_normal_scalar();
-        }
+        if (next() != ',')
+            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
+
+        next_char();
+
+        // 连续两个 FLOW_ENTRY 中间补充 null
+        fill_null(flow_.top());
+        add_token(Token(Token_Type::FLOW_ENTRY));
     }
 
     void Scanner::scan_special_scalar()
@@ -178,27 +184,47 @@ namespace cyaml
         }
 
         skip_blank();
-
-        // 识别为 KEY
-        if (is_key) {
-            fill_null(Indent_Type::MAP);
-            start_scalar();
-            push_indent(Indent_Type::MAP);
-            token_.push(Token(Token_Type::KEY, value_));
-            return;
+        if (in_block()) {
+            if (is_key) {
+                // 识别为 KEY
+                fill_null(Indent_Type::MAP);
+                start_scalar();
+                push_indent(Indent_Type::MAP);
+                add_token(Token(Token_Type::KEY, value_));
+            } else {
+                // 识别为标量
+                add_token(Token(value_));
+                end_scalar();
+                pop_indent();
+            }
+        } else {
+            if (is_key) {
+                add_token(Token(Token_Type::KEY, value_));
+            } else {
+                add_token(Token(value_));
+            }
         }
-
-        token_.push(Token(value_));
-        end_scalar();
-        pop_indent();
     }
 
     void Scanner::scan_normal_scalar()
     {
         bool is_key = false;
         bool hit_comment = false;
+        bool hit_stop_char = false;
 
-        while (!input_end_ && mark_.column - tab_cnt_ - 1 >= min_indent_) {
+        std::string end_chars;
+        if (!in_block()) {
+            end_chars = ",";
+            if (flow_.top() == Flow_Type::MAP)
+                end_chars += '}';
+            else if (flow_.top() == Flow_Type::SEQ)
+                end_chars += ']';
+        }
+
+        while (!input_end_) {
+            if (in_block() && get_cur_indent() < min_indent_)
+                break;
+
             // 扫描字符串直到换行
             while (!input_end_ && next() != '\n') {
                 // 遇到注释停止
@@ -207,18 +233,27 @@ namespace cyaml
                     break;
                 }
 
-                // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-                char ch = next_char();
-                if (ch == ':' && is_delimiter(next())) {
-                    is_key = true;
+                // 流节点中，遇到 FLOW_ENTRY 和 FLOW_END 停止扫描当前标量
+                if (!in_block() && match_any_of(end_chars)) {
+                    hit_stop_char = true;
                     break;
+                }
+
+                char ch = next_char();
+
+                // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
+                if (in_block() || in_flow_map()) {
+                    if (ch == ':' && is_delimiter(next())) {
+                        is_key = true;
+                        break;
+                    }
                 }
 
                 // 接收字符
                 value_ += ch;
             }
 
-            if (is_key || hit_comment)
+            if (is_key || hit_comment || hit_stop_char)
                 break;
 
             // 消耗换行符
@@ -253,27 +288,34 @@ namespace cyaml
             value_ += '\n';
         }
 
-        // 跳过空字符串
-        if (value_.empty()) {
-            min_indent_ = 0;
-            return;
+        if (in_block()) {
+            // 跳过空字符串
+            if (value_.empty()) {
+                min_indent_ = 0;
+                return;
+            }
+
+            reset_scalar_flags();
+
+            if (is_key) {
+                // 识别为 KEY
+                fill_null(Indent_Type::MAP);
+                start_scalar();
+                push_indent(Indent_Type::MAP);
+                add_token(Token(Token_Type::KEY, value_));
+            } else {
+                // 识别为标量
+                add_token(Token(value_));
+                end_scalar();
+                pop_indent();
+            }
+        } else {
+            if (is_key) {
+                add_token(Token(Token_Type::KEY, value_));
+            } else {
+                add_token(Token(value_));
+            }
         }
-
-        reset_scalar_flags();
-
-        // 识别为 KEY
-        if (is_key) {
-            fill_null(Indent_Type::MAP);
-            start_scalar();
-            push_indent(Indent_Type::MAP);
-            token_.push(Token(Token_Type::KEY, value_));
-            return;
-        }
-
-        // 识别为标量
-        token_.push(Token(value_));
-        end_scalar();
-        pop_indent();
     }
 
 } // namespace cyaml

@@ -27,6 +27,7 @@ namespace cyaml
         DOC_START,       // ---
         DOC_END,         // ...
         BLOCK_SEQ_ENTRY, // -
+        FLOW_ENTRY,      // ,
         FLOW_MAP_START,  // {
         FLOW_MAP_END,    // }
         FLOW_SEQ_START,  // [
@@ -135,11 +136,19 @@ namespace cyaml
 
     /**
      * @brief   缩进枚举类型转换为 Token 枚举类型
-     * @param   Indent_type     Indnet 枚举类型
+     * @param   Indent_Type     Indnet 枚举类型
      * @param   bool            是否是一个集合的开始
      * @return  Token_Type
      */
-    static Token_Type from_indent_type(Indent_Type type, bool is_start);
+    Token_Type from_indent_type(Indent_Type type, bool is_start);
+
+    /**
+     * @brief   流枚举类型转换为 Token 枚举类型
+     * @param   Flow_Type       Indnet 枚举类型
+     * @param   bool            是否是一个集合的开始
+     * @return  Token_Type
+     */
+    Token_Type from_flow_type(Flow_Type type, bool is_start);
 
 } // namespace cyaml
 

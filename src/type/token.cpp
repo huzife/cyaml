@@ -60,6 +60,8 @@ namespace cyaml
             return "DOC_END";
         case Token_Type::BLOCK_SEQ_ENTRY:
             return "BLOCK_SEQ_ENTRY";
+        case Token_Type::FLOW_ENTRY:
+            return "FLOW_ENTRY";
         case Token_Type::FLOW_MAP_START:
             return "FLOW_MAP_START";
         case Token_Type::FLOW_MAP_END:
@@ -87,7 +89,7 @@ namespace cyaml
         return "";
     }
 
-    static Token_Type from_indent_type(Indent_Type type, bool is_start)
+    Token_Type from_indent_type(Indent_Type type, bool is_start)
     {
         assert(type != Indent_Type::NONE);
         if (type == Indent_Type::MAP)
@@ -97,5 +99,17 @@ namespace cyaml
             return is_start ? Token_Type::BLOCK_SEQ_START
                             : Token_Type::BLOCK_SEQ_END;
     }
+
+    Token_Type from_flow_type(Flow_Type type, bool is_start)
+    {
+        assert(type != Flow_Type::NONE);
+        if (type == Flow_Type::MAP)
+            return is_start ? Token_Type::FLOW_MAP_START
+                            : Token_Type::FLOW_MAP_END;
+        else 
+            return is_start ? Token_Type::FLOW_SEQ_START
+                            : Token_Type::FLOW_SEQ_END;
+    }
+    
 
 } // namespace cyaml

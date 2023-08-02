@@ -13,6 +13,17 @@
 namespace cyaml
 {
     /**
+     * @enum    Flow_Type
+     * @brief   用于判断当前流式节点的类型
+     */
+    enum class Flow_Type
+    {
+        NONE,
+        MAP,
+        SEQ
+    };
+
+    /**
      * @enum    Indent_Type
      * @brief   缩进类型
      */

@@ -104,6 +104,12 @@ TEST_F(Scanner_Test, quote_key)
 {
     scan_test("quote_key");
 }
+
+// 流样式测试
+TEST_F(Scanner_Test, flow_style)
+{
+    scan_test("flow_style");
+}
 #endif
 
 #ifdef CYAML_DEBUG

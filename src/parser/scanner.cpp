@@ -8,6 +8,7 @@
 #include "parser/scanner.h"
 #include "error/exceptions.h"
 #include <assert.h>
+#include <algorithm>
 #include <iostream>
 
 namespace cyaml
@@ -15,7 +16,8 @@ namespace cyaml
     Scanner::Scanner(std::istream &in): input_stream_(in)
     {
         chars_.push_back(input_stream_.get());
-        token_.push(Token(Token_Type::STREAM_START));
+        add_token(Token(Token_Type::STREAM_START));
+        last_token_type_ = Token_Type::STREAM_START;
     }
 
     Token Scanner::next_token()
@@ -118,7 +120,19 @@ namespace cyaml
         if (next() == '}' || next() == ']')
             return scan_flow_end();
 
-        return scan_scalar();
+        if (next() == ',')
+            return scan_flow_entry();
+
+        if (in_block() && (next() == '|' || next() == '>'))
+            return scan_special_scalar();
+
+        if (next() == '\'' || next() == '\"')
+            return scan_quote_scalar();
+
+        if (!match_any_of("[]{},#|>\'\""))
+            return scan_normal_scalar();
+
+        throw Parse_Exception(error_msgs::UNKNOWN_TOKEN, mark_);
     }
 
     void Scanner::fill_null(Indent_Type type)
@@ -126,8 +140,19 @@ namespace cyaml
         if (need_scalar_ && !indent_.empty() &&
             cur_indent_ <= indent_.top().len && type == indent_.top().type) {
             need_scalar_ = false;
-            token_.push(Token(""));
+            add_token(Token(""));
         }
+    }
+
+    void Scanner::fill_null(Flow_Type type)
+    {
+        if (last_token_type_ != Token_Type::FLOW_ENTRY)
+            return;
+
+        if (type == Flow_Type::MAP) {
+            add_token(Token(Token_Type::KEY, "null"));
+        }
+        add_token(Token("null"));
     }
 
     void Scanner::update_indent()
@@ -173,7 +198,7 @@ namespace cyaml
     {
         Indent indent{type, cur_indent_};
         if (indent_.empty() || cur_indent_ > indent_.top().len) {
-            token_.push(Token(type, true));
+            add_token(Token(type, true));
             indent_.push(indent);
         }
     }
@@ -185,7 +210,7 @@ namespace cyaml
 
         uint32_t len = get_cur_indent();
         while (!indent_.empty() && len != indent_.top().len) {
-            token_.push(Token(indent_.top().type, false));
+            add_token(Token(indent_.top().type, false));
             indent_.pop();
         }
 

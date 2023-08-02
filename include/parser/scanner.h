@@ -34,7 +34,8 @@ namespace cyaml
         bool input_end_ = false;  // 记录是否读取完输入流
         bool scan_end_ = false;   // 记录是否解析完所有 token
 
-        std::stack<Indent> indent_; // 缩进状态栈
+        std::stack<Indent> indent_;  // 缩进状态栈
+        std::stack<Flow_Type> flow_; // 流状态栈
 
         std::queue<Token> token_; // 暂存下一个 token
         std::deque<char> chars_;  // 存放读取的字符
@@ -45,6 +46,8 @@ namespace cyaml
         bool append_ = false;      // 字符串末尾是否添加换行
         bool in_special_ = false;  // 是否正在扫描特殊字符串
         bool need_scalar_ = false; // 是否需要读取标量
+
+        Token_Type last_token_type_; // 存放上一个 token 类型
 
     public:
         /**
@@ -141,6 +144,16 @@ namespace cyaml
         }
 
         /**
+         * @brief   添加 token
+         * @return  void
+         */
+        void add_token(Token token)
+        {
+            token_.push(token);
+            last_token_type_ = token.token_type();
+        }
+
+        /**
          * @brief   更新缩进值
          * @return  void
          */
@@ -202,6 +215,14 @@ namespace cyaml
         void fill_null(Indent_Type type);
 
         /**
+         * @brief   检查是否需要添加 null
+         * @details 读取连续的 FLOW_ENTRY 时需要补充 null
+         * @param   Flow_Type       当前 flow 类型
+         * @return  void
+         */
+        void fill_null(Flow_Type type);
+
+        /**
          * @brief   结束 yaml 流
          * @return  void
          */
@@ -232,18 +253,16 @@ namespace cyaml
         void scan_flow_end();
 
         /**
+         * @brief   扫描 FLOW_ENTRY
+         * @return  void
+         */
+        void scan_flow_entry();
+
+        /**
          * @brief   扫描 BLOCK_SEQ_ENTRY
          * @return  void
          */
         void scan_block_seq_entry();
-
-        /**
-         * @brief   扫描一个标量
-         * @details 由于 YAML 的字符串使用很灵活，词法分析阶段无法区分
-         *          string 和其他标量，所以目前先全部按照字符串解析
-         * @return  void
-         */
-        void scan_scalar();
 
         /**
          * @brief   扫描特殊字符串，包括保留换行和折叠换行
@@ -314,6 +333,33 @@ namespace cyaml
         }
 
         /**
+         * @brief   判断当前是否处于块节点内
+         * @return  bool
+         */
+        bool in_block() const
+        {
+            return flow_.empty();
+        }
+
+        /**
+         * @brief   判断是否处于 flow_map
+         * @return  bool
+         */
+        bool in_flow_map() const
+        {
+            return !in_block() && flow_.top() == Flow_Type::MAP;
+        }
+
+        /**
+         * @brief   判断是否处于 flow_seq
+         * @return  bool
+         */
+        bool in_flow_seq() const
+        {
+            return !in_block() && flow_.top() == Flow_Type::SEQ;
+        }
+
+        /**
          * @brief   判断字符是否属于分隔符
          * @return  bool
          */
@@ -323,38 +369,19 @@ namespace cyaml
         }
 
         /**
-         * @brief   判断字符是否属于数字
-         * @return  bool
-         */
-        bool is_number(char ch)
-        {
-            return '0' <= ch && ch <= '9';
-        }
-
-        /**
-         * @brief   判断字符是否属于字母
-         * @return  bool
-         */
-        bool is_letter(char ch)
-        {
-            return 'A' <= ch && ch <= 'Z' || 'a' <= ch && ch <= 'z';
-        }
-
-        /**
-         * @brief   判断字符是否属于字符串起始符
-         * @return  bool
-         */
-        bool is_string_begin(char ch)
-        {
-            return ch == '>' || ch == '\'' || ch == '\"' || ch == '|' ||
-                   is_letter(ch);
-        }
-
-        /**
          * @brief   匹配字符串
          * @return  bool
          */
         bool match(std::string pattern, bool end_with_delimiter = false);
+
+        /**
+         * @brief   匹配其中一个字符
+         * @return  bool
+         */
+        bool match_any_of(std::string pattern) const
+        {
+            return pattern.find(next()) != -1;
+        }
     };
 
 } // namespace cyaml
