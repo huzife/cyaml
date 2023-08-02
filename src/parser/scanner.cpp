@@ -20,16 +20,15 @@ namespace cyaml
 
     Token Scanner::next_token()
     {
-        Token ret;
-        if (token_.empty())
-            ret = Token();
-        else {
-            ret = token_.front();
-            token_.pop();
+        while (!scan_end_ && token_.size() < 2) {
+            scan();
         }
 
-        if (!scan_end_)
-            scan();
+        if (token_.empty())
+            return Token();
+
+        Token ret = token_.front();
+        token_.pop();
         return ret;
     }
 
@@ -174,7 +173,7 @@ namespace cyaml
     {
         Indent indent{type, cur_indent_};
         if (indent_.empty() || cur_indent_ > indent_.top().len) {
-            token_.push(Token(indent, true));
+            token_.push(Token(type, true));
             indent_.push(indent);
         }
     }
@@ -186,7 +185,7 @@ namespace cyaml
 
         uint32_t len = get_cur_indent();
         while (!indent_.empty() && len != indent_.top().len) {
-            token_.push(Token(indent_.top(), false));
+            token_.push(Token(indent_.top().type, false));
             indent_.pop();
         }
 

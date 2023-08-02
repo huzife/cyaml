@@ -49,7 +49,6 @@ namespace cyaml
     private:
         Token_Type token_type_; // token 类型
         std::string value_;     // 字面量
-        Indent indent_;         // 缩进
 
     public:
         /**
@@ -63,7 +62,7 @@ namespace cyaml
          * @param   Indent  缩进
          * @param   bool    是否是一个 map 或 seq 的开始
          */
-        Token(Indent indent, bool is_start);
+        Token(Indent_Type type, bool is_start);
 
         /**
          * @brief   Token 类构造函数
@@ -111,17 +110,6 @@ namespace cyaml
         {
             assert(has_value());
             return value_;
-        }
-
-        /**
-         * @brief   获取 token 的缩进
-         * @return  Indent
-         * @retval  存储 token 的缩进信息的对象
-         */
-        Indent indent() const
-        {
-            assert(token_type_ != Token_Type::NONE);
-            return indent_;
         }
 
         /**

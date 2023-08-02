@@ -12,9 +12,8 @@ namespace cyaml
 {
     Token::Token(): token_type_(Token_Type::NONE) {}
 
-    Token::Token(Indent indent, bool is_start)
-        : indent_(indent),
-          token_type_(from_indent_type(indent.type, is_start))
+    Token::Token(Indent_Type type, bool is_start)
+        : token_type_(from_indent_type(type, is_start))
     {
     }
 

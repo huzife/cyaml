@@ -308,7 +308,7 @@ namespace cyaml
         void pop_all_indent()
         {
             while (!indent_.empty()) {
-                token_.push(Token(indent_.top(), false));
+                token_.push(Token(indent_.top().type, false));
                 indent_.pop();
             }
         }
