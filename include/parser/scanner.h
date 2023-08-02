@@ -41,10 +41,10 @@ namespace cyaml
 
         std::string value_; // 当前读取的字面量
 
-        char replace_ = ' ';      // 字符串换行时替换的字符
-        bool append_ = false;     // 字符串末尾是否添加换行
-        bool in_special_ = false; // 是否正在扫描特殊字符串
-        bool get_scalar_ = false; // 是否读取完一个标量
+        char replace_ = ' ';       // 字符串换行时替换的字符
+        bool append_ = false;      // 字符串末尾是否添加换行
+        bool in_special_ = false;  // 是否正在扫描特殊字符串
+        bool need_scalar_ = false; // 是否需要读取标量
 
     public:
         /**
@@ -99,6 +99,16 @@ namespace cyaml
         uint32_t col_no()
         {
             return mark_.column;
+        }
+
+        /**
+         * @brief   获取当前缩进位置
+         * @return  uint32_t
+         * @retval  当前输入流读取位置对应缩进值
+         */
+        uint32_t get_cur_indent() const
+        {
+            return mark_.column - tab_cnt_ - 1;
         }
 
         /**
@@ -184,6 +194,14 @@ namespace cyaml
         void scan();
 
         /**
+         * @brief   检查是否需要添加 null
+         * @details 识别到 BLOCK_SEQ_ENTRY 或 KEY 时，检查上一个 token 是否为空
+         * @param   Indent_Type     当前缩进类型
+         * @return  void
+         */
+        void fill_null(Indent_Type type);
+
+        /**
          * @brief   结束 yaml 流
          * @return  void
          */
@@ -247,6 +265,24 @@ namespace cyaml
          * @return  void
          */
         void scan_normal_scalar();
+
+        /**
+         * @brief   扫描到 KEY 或 '-' 后调用
+         */
+        void start_scalar()
+        {
+            need_scalar_ = true;
+            min_indent_ = cur_indent_ + 1;
+        }
+
+        /**
+         * @brief   扫描标量结束后调用
+         */
+        void end_scalar()
+        {
+            need_scalar_ = false;
+            min_indent_ = 0;
+        }
 
         /**
          * @brief   处理转义字符

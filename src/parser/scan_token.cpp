@@ -14,8 +14,8 @@ namespace cyaml
     void Scanner::stream_end()
     {
         // 检查最后一个标量是否 null
-        if (!get_scalar_) {
-            scan_scalar();
+        if (need_scalar_) {
+            token_.push(Token(Token_Type::SCALAR, ""));
         }
 
         // 匹配剩下的缩进
@@ -65,6 +65,8 @@ namespace cyaml
             throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
         }
 
+        fill_null(Indent_Type::SEQ);
+        start_scalar();
         push_indent(Indent_Type::SEQ);
         token_.push(Token(Token_Type::BLOCK_SEQ_ENTRY, value_));
     }
@@ -127,6 +129,7 @@ namespace cyaml
         scan_normal_scalar();
     }
 
+    ///< @todo 处理带引号字符串为key的情况
     void Scanner::scan_quote_scalar()
     {
         assert(next() == '\'' || next() == '\"');
@@ -168,8 +171,8 @@ namespace cyaml
             next_char();
         }
 
-        get_scalar_ = true;
         token_.push(Token(string_type, value_));
+        end_scalar();
         pop_indent();
     }
 
@@ -233,16 +236,27 @@ namespace cyaml
             value_ += '\n';
         }
 
+        // 跳过空字符串
+        if (value_.empty()) {
+            min_indent_ = 0;
+            return;
+        }
+
         reset_scalar_flags();
 
+        // 识别为 KEY
         if (is_key) {
+            fill_null(Indent_Type::MAP);
+            start_scalar();
             push_indent(Indent_Type::MAP);
             token_.push(Token(Token_Type::KEY, value_));
-        } else {
-            get_scalar_ = true;
-            token_.push(Token(String_Type::NORMAL_STRING, value_));
-            pop_indent();
+            return;
         }
+
+        // 识别为标量
+        token_.push(Token(String_Type::NORMAL_STRING, value_));
+        end_scalar();
+        pop_indent();
     }
 
 } // namespace cyaml

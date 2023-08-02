@@ -122,10 +122,19 @@ namespace cyaml
         return scan_scalar();
     }
 
+    void Scanner::fill_null(Indent_Type type)
+    {
+        if (need_scalar_ && !indent_.empty() &&
+            cur_indent_ <= indent_.top().len && type == indent_.top().type) {
+            need_scalar_ = false;
+            token_.push(Token(String_Type::NORMAL_STRING, ""));
+        }
+    }
+
     void Scanner::update_indent()
     {
         ignore_tab_ = false;
-        cur_indent_ = mark_.column - tab_cnt_ - 1;
+        cur_indent_ = get_cur_indent();
     }
 
     char Scanner::escape()
@@ -163,9 +172,6 @@ namespace cyaml
 
     void Scanner::push_indent(Indent_Type type)
     {
-        min_indent_ = cur_indent_ + 1;
-        get_scalar_ = false;
-
         Indent indent{type, cur_indent_};
         if (indent_.empty() || cur_indent_ > indent_.top().len) {
             token_.push(Token(indent, true));
@@ -175,12 +181,10 @@ namespace cyaml
 
     void Scanner::pop_indent()
     {
-        min_indent_ = 0;
-
-        if (mark_.column == 1 && indent_.empty())
+        if (indent_.empty())
             return;
 
-        uint32_t len = mark_.column - tab_cnt_ - 1;
+        uint32_t len = get_cur_indent();
         while (!indent_.empty() && len != indent_.top().len) {
             token_.push(Token(indent_.top(), false));
             indent_.pop();
