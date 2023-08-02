@@ -24,16 +24,20 @@ namespace cyaml
     {
     }
 
-    Token::Token(String_Type str_type, std::string value)
+    Token::Token(std::string value)
         : token_type_(Token_Type::SCALAR),
-          value_(value),
-          string_type_(str_type)
+          value_(value)
     {
     }
 
     std::string Token::to_string() const
     {
-        return "(" + token_type_to_string(token_type_) + ", " + value_ + ")";
+        std::string ret = "(" + token_type_to_string(token_type_);
+        if (has_value()) {
+            ret += (", " + value_);
+        }
+        ret += ")";
+        return ret;
     }
 
     std::ostream &operator<<(std::ostream &out, const Token &token)

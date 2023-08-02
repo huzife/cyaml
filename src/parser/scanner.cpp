@@ -127,7 +127,7 @@ namespace cyaml
         if (need_scalar_ && !indent_.empty() &&
             cur_indent_ <= indent_.top().len && type == indent_.top().type) {
             need_scalar_ = false;
-            token_.push(Token(String_Type::NORMAL_STRING, ""));
+            token_.push(Token(""));
         }
     }
 

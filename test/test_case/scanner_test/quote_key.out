@@ -1,0 +1,16 @@
+(STREAM_START)#
+(DOC_START)#
+(BLOCK_MAP_START)#
+(KEY, first_key)#
+(BLOCK_MAP_START)#
+(KEY, 
+second_	key)#
+(SCALAR, )#
+(KEY, third_key)#
+(SCALAR, hello)#
+(BLOCK_MAP_END)#
+(KEY, \""\)#
+(SCALAR, test)#
+(BLOCK_MAP_END)#
+(DOC_END)#
+(STREAM_END)#

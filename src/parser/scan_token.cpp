@@ -134,9 +134,6 @@ namespace cyaml
     {
         assert(next() == '\'' || next() == '\"');
         char end_char = next_char();
-        String_Type string_type = end_char == '\''
-                                          ? String_Type::SQUOTE_STRING
-                                          : String_Type::DQUOTE_STRING;
 
         // 循环读取字符，直到 ' 或 "
         while (next() != end_char) {
@@ -165,13 +162,33 @@ namespace cyaml
             }
         }
 
-        // 消耗多出的引号
+        // 消耗右引号
         next_char();
-        while (!input_end_ && is_delimiter(next())) {
-            next_char();
+
+        // 检查是否为 KEY
+        bool is_key = false;
+        while (!input_end_ && next() != '\n') {
+            if (!is_delimiter(next()) && next() != ':')
+                break;
+
+            if (next_char() == ':' && is_delimiter(next())) {
+                is_key = true;
+                break;
+            }
         }
 
-        token_.push(Token(string_type, value_));
+        skip_blank();
+
+        // 识别为 KEY
+        if (is_key) {
+            fill_null(Indent_Type::MAP);
+            start_scalar();
+            push_indent(Indent_Type::MAP);
+            token_.push(Token(Token_Type::KEY, value_));
+            return;
+        }
+
+        token_.push(Token(value_));
         end_scalar();
         pop_indent();
     }
@@ -254,7 +271,7 @@ namespace cyaml
         }
 
         // 识别为标量
-        token_.push(Token(String_Type::NORMAL_STRING, value_));
+        token_.push(Token(value_));
         end_scalar();
         pop_indent();
     }

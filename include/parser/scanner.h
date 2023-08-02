@@ -86,7 +86,7 @@ namespace cyaml
          * @return  uint32_t
          * @retval  词法分析器当前读取位置的行号
          */
-        uint32_t line_no()
+        uint32_t line()
         {
             return mark_.line;
         }
@@ -96,7 +96,7 @@ namespace cyaml
          * @return  uint32_t
          * @retval  词法分析器当前读取位置的列号
          */
-        uint32_t col_no()
+        uint32_t col()
         {
             return mark_.column;
         }

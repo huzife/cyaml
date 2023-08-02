@@ -41,27 +41,15 @@ namespace cyaml
     };
 
     /**
-     * @enum    String_Type
-     * @brief   声明字符串类型
-     */
-    enum class String_Type
-    {
-        NORMAL_STRING, // 不带引号
-        SQUOTE_STRING, // 带单引号
-        DQUOTE_STRING  // 带双引号
-    };
-
-    /**
      * @class   Token
      * @brief   存储 token 字面量、类型信息
      */
     class Token
     {
     private:
-        Token_Type token_type_;   // token 类型
-        String_Type string_type_; // 字符串类型
-        std::string value_;       // 字面量
-        Indent indent_;
+        Token_Type token_type_; // token 类型
+        std::string value_;     // 字面量
+        Indent indent_;         // 缩进
 
     public:
         /**
@@ -91,7 +79,7 @@ namespace cyaml
          * @param   std::string     token 字面量
          * @retval  Token 对象
          */
-        Token(String_Type str_type, std::string value);
+        Token(std::string value);
 
         /**
          * @brief   获取 token 类型
@@ -104,15 +92,14 @@ namespace cyaml
         }
 
         /**
-         * @brief   获取 token 的字符串类型
-         * @return  String_Type
-         * @retval  若 token 表示字符串标量，返回值为字符串类型
-         *          若 token 为其他标量，返回值无意义
+         * @brief   判断 token 是否拥有值
+         * @details 目前只有 KEY 和 SCALAR 有值
+         * @return  bool
          */
-        String_Type string_type() const
+        bool has_value() const
         {
-            assert(token_type_ == Token_Type::SCALAR);
-            return string_type_;
+            return token_type_ == Token_Type::SCALAR ||
+                   token_type_ == Token_Type::KEY;
         }
 
         /**
@@ -122,8 +109,7 @@ namespace cyaml
          */
         std::string value() const
         {
-            assert(token_type_ == Token_Type::SCALAR ||
-                   token_type_ == Token_Type::KEY);
+            assert(has_value());
             return value_;
         }
 

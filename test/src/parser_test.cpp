@@ -26,10 +26,6 @@ public:
         std::ifstream input_in(test_case_dirname + test_name + ".in");
         ASSERT_TRUE(input_in.is_open());
 
-        // cyaml::Scanner scanner(input_in);
-        // while (!scanner.end()) {
-        //     std::cout << scanner.next_token() << std::endl;
-        // }
         cyaml::Parser parser(input_in);
         cyaml::Value value = parser.parse();
 
