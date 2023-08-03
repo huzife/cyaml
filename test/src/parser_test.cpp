@@ -38,9 +38,15 @@ TEST_F(Parser_Test, empty_document1)
 {
     cyaml::Value value;
     parse("empty_document1", value);
-    std::cout << value.size() << std::endl;
+    ASSERT_EQ(value.size(), 0);
 }
 
+TEST_F(Parser_Test, empty_document2)
+{
+    cyaml::Value value;
+    parse("empty_document2", value);
+    ASSERT_EQ(value.size(), 0);
+}
 
 TEST_F(Parser_Test, flow)
 {
@@ -55,6 +61,25 @@ TEST_F(Parser_Test, flow)
     ASSERT_TRUE(value["flow_seq"][2].is_null());
 }
 
+TEST_F(Parser_Test, nested_flow)
+{
+    cyaml::Value value;
+    parse("nested_flow", value);
+
+    ASSERT_EQ(value.type(), cyaml::Node_Type::MAP);
+    ASSERT_EQ(value.size(), 5);
+    ASSERT_EQ(value["a"].as<String>(), "hello");
+    ASSERT_EQ(value["b"].as<String>(), "world");
+    ASSERT_EQ(value["null"].as<String>(), "");
+    ASSERT_EQ(value["c"].type(), cyaml::Node_Type::SEQ);
+    ASSERT_EQ(value["c"].size(), 4);
+    ASSERT_EQ(value["c"][0].as<Int>(), 1);
+    ASSERT_TRUE(value["c"][2].is_null());
+    ASSERT_EQ(value["c"][3].type(), cyaml::Node_Type::MAP);
+    ASSERT_EQ(value["c"][3]["3"].as<String>(), "map in flow_seq");
+    ASSERT_TRUE(value["key"].is_null());
+}
+
 TEST_F(Parser_Test, value)
 {
     cyaml::Value value;
@@ -65,7 +90,7 @@ TEST_F(Parser_Test, value)
     ASSERT_EQ(value["scalar"].as<std::string>(), "a");
     ASSERT_FALSE(value.find("seqq"));
     ASSERT_EQ(value["map"].type(), cyaml::Node_Type::MAP);
-    ASSERT_EQ(value["seq"].type(), cyaml::Node_Type::SEQUENCE);
+    ASSERT_EQ(value["seq"].type(), cyaml::Node_Type::SEQ);
     ASSERT_DOUBLE_EQ(value["seq"][1]["seq_map"].as<double>(), 123.0);
     ASSERT_TRUE(value["seq"][2][0].is_null());
     ASSERT_TRUE(value["seq"][2][1].as<Bool>());

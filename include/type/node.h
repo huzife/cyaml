@@ -20,7 +20,7 @@ namespace cyaml
     {
         NULL_NODE,
         MAP,
-        SEQUENCE,
+        SEQ,
         SCALAR
     };
 
@@ -65,7 +65,7 @@ namespace cyaml
          */
         bool is_sequence() const
         {
-            return type_ == Node_Type::SEQUENCE;
+            return type_ == Node_Type::SEQ;
         }
 
         /**

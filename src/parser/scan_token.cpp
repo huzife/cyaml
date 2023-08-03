@@ -242,11 +242,9 @@ namespace cyaml
                 char ch = next_char();
 
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-                if (in_block() || in_flow_map()) {
-                    if (ch == ':' && is_delimiter(next())) {
-                        is_key = true;
-                        break;
-                    }
+                if (ch == ':' && is_delimiter(next())) {
+                    is_key = true;
+                    break;
                 }
 
                 // 接收字符

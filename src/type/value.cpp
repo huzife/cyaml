@@ -41,7 +41,7 @@ namespace cyaml
         switch (node_->type_) {
         case Node_Type::MAP:
             return node_->map_data_.size();
-        case Node_Type::SEQUENCE:
+        case Node_Type::SEQ:
             return node_->sequence_data_.size();
         case Node_Type::SCALAR:
             return node_->scalar_data_.size();

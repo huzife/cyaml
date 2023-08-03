@@ -23,6 +23,7 @@ namespace cyaml
         const char *const INVALID_FLOW_END = "invalid flow end";
         const char *const BAD_DEREFERENCE = "bad dereference";
         const char *const BAD_CONVERTION = "bad convertion";
+        const char *const KEY_NOT_FOUND = "omitting key in flow map is not allowed yet";
     } // namespace error_msgs
 } // namespace cyaml
 

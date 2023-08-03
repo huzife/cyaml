@@ -58,8 +58,17 @@ namespace cyaml
          */
         bool belong(const First_Set &first_set) const
         {
-            auto type = scanner_.lookahead().token_type();
+            auto type = next_token_type();
             return first_set.find(type) != first_set.end();
+        }
+
+        /**
+         * @brief   获取下个 token 类型
+         * @return  Token_Type
+        */
+        Token_Type next_token_type() const
+        {
+            return scanner_.lookahead().token_type();
         }
 
         /**
@@ -88,11 +97,18 @@ namespace cyaml
         void parse_document(Node_Ptr &node);
         void parse_block_node_or_indentless_seq(Node_Ptr &node);
         void parse_block_node(Node_Ptr &node);
+        void parse_flow_node(Node_Ptr &node);
         void parse_block_content(Node_Ptr &node);
+        void parse_flow_content(Node_Ptr &node);
         void parse_block_collection(Node_Ptr &node);
+        void parse_flow_collection(Node_Ptr &node);
         void parse_block_map(Node_Ptr &node);
         void parse_block_seq(Node_Ptr &node);
         void parse_indentless_seq(Node_Ptr &node);
+        void parse_flow_map(Node_Ptr &node);
+        void parse_flow_seq(Node_Ptr &node);
+        void parse_flow_map_entry(Node_Ptr &node);
+        void parse_flow_seq_entry(Node_Ptr &node);
     };
 
 } // namespace cyaml

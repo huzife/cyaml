@@ -38,19 +38,42 @@ namespace cyaml
             Token_Type::BLOCK_SEQ_START, Token_Type::FLOW_MAP_START,
             Token_Type::FLOW_SEQ_START};
 
+    static const First_Set flow_node_set = {
+            Token_Type::SCALAR, Token_Type::FLOW_MAP_START,
+            Token_Type::FLOW_SEQ_START};
+
     static const First_Set block_content_set = {
             Token_Type::SCALAR, Token_Type::BLOCK_MAP_START,
             Token_Type::BLOCK_SEQ_START, Token_Type::FLOW_MAP_START,
             Token_Type::FLOW_SEQ_START};
 
+    static const First_Set flow_content_set = {
+            Token_Type::SCALAR, Token_Type::FLOW_MAP_START,
+            Token_Type::FLOW_SEQ_START};
+
     static const First_Set block_collection_set = {
             Token_Type::BLOCK_MAP_START, Token_Type::BLOCK_SEQ_START};
+
+    static const First_Set flow_collection_set = {
+            Token_Type::FLOW_MAP_START, Token_Type::FLOW_SEQ_START};
 
     static const First_Set block_map_set = {Token_Type::BLOCK_MAP_START};
 
     static const First_Set block_seq_set = {Token_Type::BLOCK_SEQ_START};
 
     static const First_Set indentless_seq_set = {Token_Type::BLOCK_ENTRY};
+
+    static const First_Set flow_map_set = {Token_Type::FLOW_MAP_START};
+
+    static const First_Set flow_seq_set = {Token_Type::FLOW_SEQ_START};
+
+    static const First_Set flow_map_entry = {
+            Token_Type::SCALAR, Token_Type::FLOW_MAP_START,
+            Token_Type::FLOW_SEQ_START, Token_Type::KEY};
+
+    static const First_Set flow_seq_entry = {
+            Token_Type::SCALAR, Token_Type::FLOW_MAP_START,
+            Token_Type::FLOW_SEQ_START, Token_Type::KEY};
 
 } // namespace cyaml
 

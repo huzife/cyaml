@@ -147,7 +147,9 @@ namespace cyaml
 
     void Scanner::fill_null(Flow_Type type)
     {
-        if (last_token_type_ != Token_Type::FLOW_ENTRY)
+        if (last_token_type_ != Token_Type::FLOW_ENTRY &&
+            last_token_type_ != Token_Type::FLOW_MAP_START &&
+            last_token_type_ != Token_Type::FLOW_SEQ_START)
             return;
 
         if (type == Flow_Type::MAP) {
