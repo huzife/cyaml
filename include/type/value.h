@@ -129,14 +129,6 @@ namespace cyaml
             return (node_->is_map() &&
                     node_->map_data_.find(key) != node_->map_data_.end());
         }
-
-#ifdef CYAML_DEBUG
-        // 临时测试用
-        std::string scalar_value()
-        {
-            return node_->scalar_data_;
-        }
-#endif
     };
 } // namespace cyaml
 

@@ -141,7 +141,7 @@ namespace cyaml
         if (need_scalar_ && !indent_.empty() &&
             cur_indent_ <= indent_.top().len && type == indent_.top().type) {
             need_scalar_ = false;
-            add_token(Token(""));
+            add_token(Token::null());
         }
     }
 
@@ -155,7 +155,7 @@ namespace cyaml
         if (type == Flow_Type::MAP) {
             add_token(Token(Token_Type::KEY, "null"));
         }
-        add_token(Token("null"));
+        add_token(Token::null());
     }
 
     void Scanner::update_indent()

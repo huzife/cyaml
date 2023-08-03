@@ -4,8 +4,8 @@
 (KEY, quote_str)#
 (SCALAR, this     is a test string)#
 (KEY, next)#
-(SCALAR, )#
+(NULL)#
 (KEY, last)#
-(SCALAR, )#
+(NULL)#
 (BLOCK_MAP_END)#
 (STREAM_END)#

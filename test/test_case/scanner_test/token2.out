@@ -24,7 +24,7 @@
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#
 (KEY, null_value)#
-(SCALAR, null)#
+(NULL)#
 (BLOCK_MAP_END)#
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#

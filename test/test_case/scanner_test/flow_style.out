@@ -15,7 +15,7 @@
 (FLOW_ENTRY)#
 (SCALAR, 2)#
 (FLOW_ENTRY)#
-(SCALAR, null)#
+(NULL)#
 (FLOW_ENTRY)#
 (SCALAR, 3)#
 (FLOW_SEQ_END)#

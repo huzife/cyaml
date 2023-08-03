@@ -50,6 +50,7 @@ namespace cyaml
     private:
         Token_Type token_type_; // token 类型
         std::string value_;     // 字面量
+        bool is_null_ = false;  // 是否为空节点
 
     public:
         /**
@@ -80,6 +81,25 @@ namespace cyaml
          * @retval  Token 对象
          */
         Token(std::string value);
+
+        /**
+         * @brief   获取空节点
+         */
+        static Token null()
+        {
+            Token ret(Token_Type::SCALAR);
+            ret.is_null_ = true;
+            return ret;
+        }
+
+        /**
+         * @brief   判断是否为空节点
+         * @return  bool
+        */
+        bool is_null() const
+        {
+            return is_null_;
+        }
 
         /**
          * @brief   获取 token 类型

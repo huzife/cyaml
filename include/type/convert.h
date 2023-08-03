@@ -50,8 +50,10 @@ namespace cyaml
 
         static bool decode(const Node &node, std::string &rhs)
         {
-            if (node.is_null())
-                return "null";
+            if (node.is_null()) {
+                rhs = "null";
+                return true;
+            }
 
             if (!node.is_scalar())
                 return false;

@@ -37,11 +37,11 @@ namespace cyaml
         std::string scalar_data_;
 
         /**
-         * @brief   Node 类构造函数
+         * @brief   Node 类构造函数，默认为空节点
          * @param   Node_Type       该节点数据类型
          * @retval  指定类型的节点
          */
-        Node(Node_Type type);
+        Node(Node_Type type = Node_Type::NULL_NODE);
 
         /**
          * @brief   Scalar Node 构造函数

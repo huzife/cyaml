@@ -25,6 +25,7 @@ namespace cyaml
     {
     private:
         Scanner scanner_;
+        Node_Ptr node_ = std::make_shared<Node>();
 
     public:
         /**
@@ -74,24 +75,13 @@ namespace cyaml
         /**
          * @brief   抛出错误 token 异常
          */
-        void throw_unexpected_token()
-        {
-            Token next = scanner_.next_token();
-            Mark mark = scanner_.mark();
-            throw Parse_Exception(unexpected_token_msg(next), mark);
-        }
+        void throw_unexpected_token();
 
         /**
          * @brief   抛出错误 token 异常
          * @param   Token_Type      期望的 token 类型
          */
-        void throw_unexpected_token(Token_Type expected_type)
-        {
-            Token next = scanner_.next_token();
-            Mark mark = scanner_.mark();
-            throw Parse_Exception(
-                    unexpected_token_msg(expected_type, next), mark);
-        }
+        void throw_unexpected_token(Token_Type expected_type);
 
         void parse_stream(Node_Ptr &node);
         void parse_document(Node_Ptr &node);

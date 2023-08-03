@@ -24,13 +24,26 @@ namespace cyaml
         return scanner_.next_token();
     }
 
+    void Parser::throw_unexpected_token()
+    {
+        Token next = scanner_.next_token();
+        Mark mark = scanner_.mark();
+        throw Parse_Exception(unexpected_token_msg(next), mark);
+    }
+
+    void Parser::throw_unexpected_token(Token_Type expected_type)
+    {
+        Token next = scanner_.next_token();
+        Mark mark = scanner_.mark();
+        throw Parse_Exception(unexpected_token_msg(expected_type, next), mark);
+    }
+
+    // 解析部分
     Value Parser::parse()
     {
-        Node_Ptr node = std::make_shared<Node>("");
+        parse_stream(node_);
 
-        parse_stream(node);
-
-        return Value(node);
+        return Value(node_);
     }
 
     void Parser::parse_stream(Node_Ptr &node)
@@ -43,7 +56,9 @@ namespace cyaml
     void Parser::parse_document(Node_Ptr &node)
     {
         // DOC_START
-        expect(Token_Type::DOC_START);
+        if (next_token_type() == Token_Type::DOC_START) {
+            expect(Token_Type::DOC_START);
+        }
 
         // block_node
         if (belong(block_node_set)) {
@@ -85,7 +100,10 @@ namespace cyaml
             parse_flow_collection(node);
         } else if (next_token_type() == Token_Type::SCALAR) {
             Token next = scanner_.next_token();
-            node = std::make_shared<Node>(next.value());
+            if (next.is_null())
+                node = std::make_shared<Node>();
+            else
+                node = std::make_shared<Node>(next.value());
         } else {
             throw_unexpected_token();
         }
@@ -97,7 +115,10 @@ namespace cyaml
             parse_flow_collection(node);
         } else if (next_token_type() == Token_Type::SCALAR) {
             Token next = scanner_.next_token();
-            node = std::make_shared<Node>(next.value());
+            if (next.is_null())
+                node = std::make_shared<Node>();
+            else
+                node = std::make_shared<Node>(next.value());
         } else {
             throw_unexpected_token();
         }
@@ -219,7 +240,7 @@ namespace cyaml
             if (next_token_type() == Token_Type::FLOW_MAP_END ||
                 next_token_type() == Token_Type::FLOW_ENTRY &&
                         key.token_type() == Token_Type::SCALAR) {
-                node->map_data_[key.value()] = std::make_shared<Node>("null");
+                node->map_data_[key.value()] = std::make_shared<Node>();
             } else {
                 parse_flow_node(node->map_data_[key.value()]);
             }

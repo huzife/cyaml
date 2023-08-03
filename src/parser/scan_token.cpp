@@ -15,7 +15,7 @@ namespace cyaml
     {
         // 检查最后一个标量是否 null
         if (need_scalar_) {
-            add_token(Token(Token_Type::SCALAR, ""));
+            add_token(Token::null());
         }
 
         // 匹配剩下的缩进
@@ -177,7 +177,9 @@ namespace cyaml
             if (!is_delimiter(next()) && next() != ':')
                 break;
 
-            if (next_char() == ':' && is_delimiter(next())) {
+            if (next_char() == ':' &&
+                (is_delimiter(next()) ||
+                 !in_block() && match_any_of("[]{},#|>\'\""))) {
                 is_key = true;
                 break;
             }
@@ -242,7 +244,9 @@ namespace cyaml
                 char ch = next_char();
 
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-                if (ch == ':' && is_delimiter(next())) {
+                if (ch == ':' &&
+                    (is_delimiter(next()) ||
+                     !in_block() && match_any_of("[]{},#|>\'\""))) {
                     is_key = true;
                     break;
                 }
@@ -288,12 +292,11 @@ namespace cyaml
 
         if (in_block()) {
             // 跳过空字符串
-            if (value_.empty()) {
+            if (!in_special_ && value_.empty()) {
                 min_indent_ = 0;
+                reset_scalar_flags();
                 return;
             }
-
-            reset_scalar_flags();
 
             if (is_key) {
                 // 识别为 KEY
@@ -302,16 +305,27 @@ namespace cyaml
                 push_indent(Indent_Type::MAP);
                 add_token(Token(Token_Type::KEY, value_));
             } else {
-                // 识别为标量
-                add_token(Token(value_));
+                // 只有在 block 内可以使用特殊字符串，此时标量不识别为 null
+                if ((value_ == "~" || value_ == "null") &&
+                    !in_special_) {
+                    add_token(Token::null());
+                } else {
+                    add_token(Token(value_));
+                }
                 end_scalar();
                 pop_indent();
             }
+
+            reset_scalar_flags();
         } else {
             if (is_key) {
                 add_token(Token(Token_Type::KEY, value_));
             } else {
-                add_token(Token(value_));
+                if (value_ == "~" || value_ == "null") {
+                    add_token(Token::null());
+                } else {
+                    add_token(Token(value_));
+                }
             }
         }
     }

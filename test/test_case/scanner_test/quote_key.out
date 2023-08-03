@@ -5,7 +5,7 @@
 (BLOCK_MAP_START)#
 (KEY, 
 second_	key)#
-(SCALAR, )#
+(NULL)#
 (KEY, third_key)#
 (SCALAR, hello)#
 (BLOCK_MAP_END)#
