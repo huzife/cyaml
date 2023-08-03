@@ -25,5 +25,7 @@ make
 echo -e "\nstart testing..."
 for test in $root_path/build/bin/test/*
 do
-    $test
+    if [ -f $test ]; then
+        $test
+    fi;
 done
