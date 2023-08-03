@@ -6,6 +6,7 @@
  */
 
 #include "parser/scanner.h"
+#include "type/tables.h"
 #include "error/exceptions.h"
 #include <assert.h>
 #include <algorithm>
@@ -34,7 +35,7 @@ namespace cyaml
         return ret;
     }
 
-    Token Scanner::lookahead()
+    Token Scanner::lookahead() const
     {
         if (token_.empty())
             return Token();
@@ -109,7 +110,7 @@ namespace cyaml
         if (mark_.column == 1 && match("...", true))
             return scan_doc_end();
 
-        // BLOCK_SEQ_ENTRY
+        // BLOCK_ENTRY
         if (match("-", true))
             return scan_block_seq_entry();
 
@@ -166,32 +167,12 @@ namespace cyaml
         char slash = next_char();
         assert(slash == '\\');
 
-        switch (next_char()) {
-        case 'a':
-            return '\a';
-        case 'b':
-            return '\b';
-        case 'f':
-            return '\f';
-        case 'n':
-            return '\n';
-        case 'r':
-            return '\r';
-        case 't':
-            return '\t';
-        case 'v':
-            return '\v';
-        case '\\':
-            return '\\';
-        case '\'':
-            return '\'';
-        case '\"':
-            return '\"';
-        case '0':
-            return '\0';
-        default:
-            throw Parse_Exception(error_msgs::UNKNOWN_ESCAPE, mark_);
+        if (auto iter = escape_map.find(next()); iter != escape_map.end()) {
+            next_char();
+            return iter->second;
         }
+
+        throw Parse_Exception(error_msgs::UNKNOWN_ESCAPE, mark_);
     }
 
     void Scanner::push_indent(Indent_Type type)

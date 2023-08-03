@@ -68,7 +68,7 @@ namespace cyaml
         fill_null(Indent_Type::SEQ);
         start_scalar();
         push_indent(Indent_Type::SEQ);
-        add_token(Token(Token_Type::BLOCK_SEQ_ENTRY));
+        add_token(Token(Token_Type::BLOCK_ENTRY));
     }
 
     void Scanner::scan_flow_start()

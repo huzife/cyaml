@@ -58,8 +58,8 @@ namespace cyaml
             return "DOC_START";
         case Token_Type::DOC_END:
             return "DOC_END";
-        case Token_Type::BLOCK_SEQ_ENTRY:
-            return "BLOCK_SEQ_ENTRY";
+        case Token_Type::BLOCK_ENTRY:
+            return "BLOCK_ENTRY";
         case Token_Type::FLOW_ENTRY:
             return "FLOW_ENTRY";
         case Token_Type::FLOW_MAP_START:

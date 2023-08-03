@@ -11,6 +11,7 @@
 #include "parser/scanner.h"
 #include "type/node.h"
 #include "type/value.h"
+#include "type/tables.h"
 #include <unordered_map>
 #include <unordered_set>
 
@@ -50,13 +51,48 @@ namespace cyaml
          */
         Token expect(Token_Type type);
 
+        /**
+         * @brief   判断下一个字符是否属于某个 first 集
+         * @param   const First_Set &
+         * @return  bool
+         */
+        bool belong(const First_Set &first_set) const
+        {
+            auto type = scanner_.lookahead().token_type();
+            return first_set.find(type) != first_set.end();
+        }
+
+        /**
+         * @brief   抛出错误 token 异常
+         */
+        void throw_unexpected_token()
+        {
+            Token next = scanner_.next_token();
+            Mark mark = scanner_.mark();
+            throw Parse_Exception(unexpected_token_msg(next), mark);
+        }
+
+        /**
+         * @brief   抛出错误 token 异常
+         * @param   Token_Type      期望的 token 类型
+         */
+        void throw_unexpected_token(Token_Type expected_type)
+        {
+            Token next = scanner_.next_token();
+            Mark mark = scanner_.mark();
+            throw Parse_Exception(
+                    unexpected_token_msg(expected_type, next), mark);
+        }
+
         void parse_stream(Node_Ptr &node);
         void parse_document(Node_Ptr &node);
-        void parse_block_node(Node_Ptr &node);
         void parse_block_node_or_indentless_seq(Node_Ptr &node);
-        void parse_indentless_block_sequence(Node_Ptr &node);
-        void parse_block_sequence(Node_Ptr &node);
+        void parse_block_node(Node_Ptr &node);
+        void parse_block_content(Node_Ptr &node);
+        void parse_block_collection(Node_Ptr &node);
         void parse_block_map(Node_Ptr &node);
+        void parse_block_seq(Node_Ptr &node);
+        void parse_indentless_seq(Node_Ptr &node);
     };
 
 } // namespace cyaml

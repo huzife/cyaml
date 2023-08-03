@@ -1,6 +1,6 @@
 (STREAM_START)#
 (BLOCK_SEQ_START)#
-(BLOCK_SEQ_ENTRY)#
+(BLOCK_ENTRY)#
 (BLOCK_MAP_START)#
 (KEY, key1)#
 (SCALAR, string1)#
@@ -9,7 +9,7 @@
 (KEY, key3)#
 (SCALAR, string5 string6)#
 (BLOCK_MAP_END)#
-(BLOCK_SEQ_ENTRY)#
+(BLOCK_ENTRY)#
 (SCALAR, end)#
 (BLOCK_SEQ_END)#
 (STREAM_END)#

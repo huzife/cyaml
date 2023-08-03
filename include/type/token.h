@@ -22,18 +22,18 @@ namespace cyaml
     enum class Token_Type
     {
         NONE,
-        STREAM_START,    // 输入流开始
-        STREAM_END,      // 输入流结束
-        DOC_START,       // ---
-        DOC_END,         // ...
-        BLOCK_SEQ_ENTRY, // -
-        FLOW_ENTRY,      // ,
-        FLOW_MAP_START,  // {
-        FLOW_MAP_END,    // }
-        FLOW_SEQ_START,  // [
-        FLOW_SEQ_END,    // ]
-        KEY,             // 对象 key
-        SCALAR,          // 标量
+        STREAM_START,   // 输入流开始
+        STREAM_END,     // 输入流结束
+        DOC_START,      // ---
+        DOC_END,        // ...
+        BLOCK_ENTRY,    // -
+        FLOW_ENTRY,     // ,
+        FLOW_MAP_START, // {
+        FLOW_MAP_END,   // }
+        FLOW_SEQ_START, // [
+        FLOW_SEQ_END,   // ]
+        KEY,            // 对象 key
+        SCALAR,         // 标量
 
         BLOCK_MAP_START,
         BLOCK_MAP_END,

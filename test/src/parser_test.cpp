@@ -34,6 +34,14 @@ public:
 };
 
 #ifdef CYAML_TEST
+TEST_F(Parser_Test, empty_document1)
+{
+    cyaml::Value value;
+    parse("empty_document1", value);
+    std::cout << value.size() << std::endl;
+}
+
+
 TEST_F(Parser_Test, flow)
 {
     cyaml::Value value;
@@ -47,10 +55,10 @@ TEST_F(Parser_Test, flow)
     ASSERT_TRUE(value["flow_seq"][2].is_null());
 }
 
-TEST_F(Parser_Test, temp)
+TEST_F(Parser_Test, value)
 {
     cyaml::Value value;
-    parse("temp", value);
+    parse("value", value);
 
     ASSERT_EQ(value.type(), cyaml::Node_Type::MAP);
     ASSERT_EQ(value.size(), 3);

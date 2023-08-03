@@ -72,7 +72,7 @@ namespace cyaml
          * @return  Token
          * @retval  下一个 token
          */
-        Token lookahead();
+        Token lookahead() const;
 
         /**
          * @brief   返回当前位置标记
@@ -137,7 +137,7 @@ namespace cyaml
          * @brief   查看下一个字符
          * @return  char
          */
-        char next() const
+        const char next() const
         {
             assert(!chars_.empty());
             return chars_.front();
