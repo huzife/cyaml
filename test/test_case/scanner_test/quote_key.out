@@ -3,10 +3,11 @@
 (BLOCK_MAP_START)#
 (KEY)#
 (SCALAR, first_key)#
+(VALUE)#
 (BLOCK_MAP_START)#
 (KEY)#
-(SCALAR, 
-second_	key)#
+(SCALAR, second_
+	key)#
 (VALUE)#
 (NULL)#
 (KEY)#

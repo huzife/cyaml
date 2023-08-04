@@ -11,13 +11,13 @@
 (SCALAR, abcde fghijk)#
 (BLOCK_MAP_END)#
 (BLOCK_ENTRY)#
-(VALUE)#
 (SCALAR, bbb)#
 (BLOCK_SEQ_END)#
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#
 (KEY)#
 (SCALAR, key1)#
+(VALUE)#
 (BLOCK_MAP_START)#
 (KEY)#
 (SCALAR, key11)#

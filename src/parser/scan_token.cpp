@@ -15,7 +15,6 @@ namespace cyaml
     {
         // 检查最后一个标量是否 null
         if (need_scalar_) {
-            add_token(Token_Type::VALUE);
             add_token(Token::null());
         }
 
@@ -53,13 +52,14 @@ namespace cyaml
         add_token(Token_Type::DOC_END);
     }
 
-    void Scanner::scan_block_seq_entry()
+    void Scanner::scan_block_entry()
     {
         bool success = false;
         if (next() == '-') {
             next_char();
-            if (is_delimiter(next()))
+            if (is_delimiter(next())) {
                 success = true;
+            }
         }
 
         if (!success) {
@@ -70,6 +70,40 @@ namespace cyaml
         start_scalar();
         push_indent(Indent_Type::SEQ);
         add_token(Token_Type::BLOCK_ENTRY);
+    }
+
+    void Scanner::scan_key()
+    {
+        bool success = false;
+        if (next() == '?') {
+            next_char();
+            if (is_delimiter(next())) {
+                success = true;
+            }
+        }
+
+        if (!success) {
+            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
+        }
+
+        add_token(Token_Type::KEY);
+    }
+
+    void Scanner::scan_value()
+    {
+        bool success = false;
+        if (next() == ':') {
+            next_char();
+            if (is_delimiter(next()) || match_any_of("?[]{},#|>\'\"")) {
+                success = true;
+            }
+        }
+
+        if (!success) {
+            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
+        }
+
+        add_token(Token_Type::VALUE);
     }
 
     void Scanner::scan_flow_start()
@@ -173,22 +207,24 @@ namespace cyaml
         next_char();
 
         // 检查是否为 KEY
-        bool is_key = false;
+        bool can_be_key = false;
         while (!input_end_ && next() != '\n') {
             if (!is_delimiter(next()) && next() != ':')
                 break;
 
-            if (next_char() == ':' &&
-                (is_delimiter(next()) ||
-                 !in_block() && match_any_of("[]{},#|>\'\""))) {
-                is_key = true;
+            // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
+            if (match(":", true) ||
+                !in_block() && match(":", "[]{},#|>\'\"")) {
+                can_be_key = true;
                 break;
             }
+
+            next_char();
         }
 
         skip_blank();
         if (in_block()) {
-            if (is_key) {
+            if (can_be_key) {
                 // 识别为 KEY
                 fill_null(Indent_Type::MAP);
                 start_scalar();
@@ -197,17 +233,15 @@ namespace cyaml
                 add_token(value_);
             } else {
                 // 识别为标量
-                add_token(Token_Type::VALUE);
                 add_token(value_);
                 end_scalar();
                 pop_indent();
             }
         } else {
-            if (is_key) {
+            if (can_be_key) {
                 add_token(Token_Type::KEY);
                 add_token(value_);
             } else {
-                add_token(Token_Type::VALUE);
                 add_token(value_);
             }
         }
@@ -215,7 +249,7 @@ namespace cyaml
 
     void Scanner::scan_normal_scalar()
     {
-        bool is_key = false;
+        bool can_be_key = false;
         bool hit_comment = false;
         bool hit_stop_char = false;
 
@@ -246,21 +280,20 @@ namespace cyaml
                     break;
                 }
 
-                char ch = next_char();
-
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-                if (ch == ':' &&
-                    (is_delimiter(next()) ||
-                     !in_block() && match_any_of("[]{},#|>\'\""))) {
-                    is_key = true;
-                    break;
+                if (next() == ':') {
+                    if (match(":", true) ||
+                        !in_block() && match(":", "[]{},#|>\'\"")) {
+                        can_be_key = true;
+                        break;
+                    }
                 }
 
                 // 接收字符
-                value_ += ch;
+                value_ += next_char();
             }
 
-            if (is_key || hit_comment || hit_stop_char)
+            if (can_be_key || hit_comment || hit_stop_char)
                 break;
 
             // 消耗换行符
@@ -291,7 +324,7 @@ namespace cyaml
 
         // 删除结尾空白字符
         value_ = value_.substr(0, value_.find_last_not_of(" \t\n\xFF") + 1);
-        if (!value_.empty() && append_ && !is_key) {
+        if (!value_.empty() && append_ && !can_be_key) {
             value_ += '\n';
         }
 
@@ -303,7 +336,7 @@ namespace cyaml
                 return;
             }
 
-            if (is_key) {
+            if (can_be_key) {
                 // 识别为 KEY
                 fill_null(Indent_Type::MAP);
                 start_scalar();
@@ -311,7 +344,6 @@ namespace cyaml
                 add_token(Token_Type::KEY);
                 add_token(value_);
             } else {
-                add_token(Token_Type::VALUE);
                 // 只有在 block 内可以使用特殊字符串，此时标量不识别为 null
                 if ((value_ == "~" || value_ == "null") && !in_special_) {
                     add_token(Token::null());
@@ -324,11 +356,10 @@ namespace cyaml
 
             reset_scalar_flags();
         } else {
-            if (is_key) {
+            if (can_be_key) {
                 add_token(Token_Type::KEY);
                 add_token(value_);
             } else {
-                add_token(Token_Type::VALUE);
                 if (value_ == "~" || value_ == "null") {
                     add_token(Token::null());
                 } else {

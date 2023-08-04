@@ -14,6 +14,7 @@
 #include <istream>
 #include <stack>
 #include <queue>
+#include <iostream>
 
 namespace cyaml
 {
@@ -147,7 +148,7 @@ namespace cyaml
          * @brief   添加 token
          * @return  void
          */
-        template <typename... Args>
+        template<typename... Args>
         void add_token(Args... args)
         {
             Token t(args...);
@@ -261,10 +262,10 @@ namespace cyaml
         void scan_flow_entry();
 
         /**
-         * @brief   扫描 BLOCK_SEQ_ENTRY
+         * @brief   扫描 BLOCK_ENTRY
          * @return  void
          */
-        void scan_block_seq_entry();
+        void scan_block_entry();
 
         /**
          * @brief   扫描 KEY
@@ -323,6 +324,15 @@ namespace cyaml
          * @retval  解析得到的转义字符
          */
         char escape();
+
+        /**
+         * @brief   判断是否允许添加一个 key
+         */
+        bool allow_key() const
+        {
+            return !need_scalar_ || indent_.empty() ||
+                   cur_indent_ > indent_.top().len;
+        }
 
         /**
          * @brief   推入缩进值
@@ -387,6 +397,12 @@ namespace cyaml
          * @return  bool
          */
         bool match(std::string pattern, bool end_with_delimiter = false);
+
+        /**
+         * @brief   匹配字符串+任意字符
+         * @return  bool
+         */
+        bool match(std::string str, std::string chars);
 
         /**
          * @brief   匹配其中一个字符

@@ -16,7 +16,6 @@
 (SCALAR, string5 string6)#
 (BLOCK_MAP_END)#
 (BLOCK_ENTRY)#
-(VALUE)#
 (SCALAR, end)#
 (BLOCK_SEQ_END)#
 (STREAM_END)#

@@ -3,26 +3,25 @@
 (BLOCK_MAP_START)#
 (KEY)#
 (SCALAR, json)#
+(VALUE)#
 (BLOCK_SEQ_START)#
 (BLOCK_ENTRY)#
-(VALUE)#
 (SCALAR, rigid)#
 (BLOCK_ENTRY)#
-(VALUE)#
 (SCALAR, better for data interchange)#
 (BLOCK_SEQ_END)#
 (KEY)#
 (SCALAR, yaml)#
+(VALUE)#
 (BLOCK_SEQ_START)#
 (BLOCK_ENTRY)#
-(VALUE)#
 (SCALAR, slim and flexible)#
 (BLOCK_ENTRY)#
-(VALUE)#
 (SCALAR, better for configuration)#
 (BLOCK_SEQ_END)#
 (KEY)#
 (SCALAR, object)#
+(VALUE)#
 (BLOCK_MAP_START)#
 (KEY)#
 (SCALAR, key)#
@@ -30,6 +29,7 @@
 (SCALAR, value)#
 (KEY)#
 (SCALAR, array)#
+(VALUE)#
 (BLOCK_SEQ_START)#
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#

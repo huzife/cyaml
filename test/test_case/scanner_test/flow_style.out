@@ -3,11 +3,17 @@
 (BLOCK_MAP_START)#
 (KEY)#
 (SCALAR, flow_map)#
+(VALUE)#
 (FLOW_MAP_START)#
 (KEY)#
 (SCALAR, key1)#
 (VALUE)#
 (SCALAR, value1)#
+(FLOW_ENTRY)#
+(KEY)#
+(SCALAR, null)#
+(VALUE)#
+(NULL)#
 (FLOW_ENTRY)#
 (KEY)#
 (SCALAR, key2)#
@@ -16,17 +22,14 @@
 (FLOW_MAP_END)#
 (KEY)#
 (SCALAR, flow_seq)#
-(FLOW_SEQ_START)#
 (VALUE)#
+(FLOW_SEQ_START)#
 (SCALAR, 1)#
 (FLOW_ENTRY)#
-(VALUE)#
 (SCALAR, 2)#
 (FLOW_ENTRY)#
-(VALUE)#
 (NULL)#
 (FLOW_ENTRY)#
-(VALUE)#
 (SCALAR, 3)#
 (FLOW_SEQ_END)#
 (BLOCK_MAP_END)#

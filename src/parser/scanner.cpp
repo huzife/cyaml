@@ -112,7 +112,7 @@ namespace cyaml
 
         // BLOCK_ENTRY
         if (match("-", true))
-            return scan_block_seq_entry();
+            return scan_block_entry();
 
         // FLOW START AND END
         if (next() == '{' || next() == '[')
@@ -121,8 +121,17 @@ namespace cyaml
         if (next() == '}' || next() == ']')
             return scan_flow_end();
 
+        // FLOW_ENTRY
         if (next() == ',')
             return scan_flow_entry();
+
+        // KEY
+        if (in_block() && match("?", true))
+            return scan_key();
+
+        // VALUE
+        if (match(":", "[]{},#|>\'\""))
+            return scan_value();
 
         if (in_block() && (next() == '|' || next() == '>'))
             return scan_special_scalar();
@@ -141,7 +150,6 @@ namespace cyaml
         if (need_scalar_ && !indent_.empty() &&
             cur_indent_ <= indent_.top().len && type == indent_.top().type) {
             need_scalar_ = false;
-            add_token(Token_Type::VALUE);
             add_token(Token::null());
         }
     }
@@ -156,8 +164,8 @@ namespace cyaml
         if (type == Flow_Type::MAP) {
             add_token(Token_Type::KEY);
             add_token(Token("null"));
+            add_token(Token_Type::VALUE);
         }
-        add_token(Token_Type::VALUE);
         add_token(Token::null());
     }
 
@@ -223,6 +231,34 @@ namespace cyaml
 
         if (end_with_delimiter && !is_delimiter(next()))
             ret = false;
+
+        while (!chars.empty()) {
+            char ch = chars.top();
+            chars_.push_front(ch);
+            chars.pop();
+        }
+
+        return ret;
+    }
+
+    bool Scanner::match(std::string pattern1, std::string pattern2)
+    {
+        bool ret = true;
+        std::stack<char> chars;
+        for (char ch : pattern1) {
+            if (!input_stream_.eof())
+                chars_.push_back(input_stream_.get());
+
+            if (ch != next()) {
+                ret = false;
+                break;
+            }
+
+            chars.push(next());
+            chars_.pop_front();
+        }
+
+        ret &= match_any_of(pattern2);
 
         while (!chars.empty()) {
             char ch = chars.top();
