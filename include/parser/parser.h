@@ -66,7 +66,7 @@ namespace cyaml
         /**
          * @brief   获取下个 token 类型
          * @return  Token_Type
-        */
+         */
         Token_Type next_token_type() const
         {
             return scanner_.lookahead().token_type();
@@ -83,6 +83,18 @@ namespace cyaml
          */
         void throw_unexpected_token(Token_Type expected_type);
 
+        /**
+         * @brief   插入键值对
+         * @param   Node_Ptr &  当前节点
+         * @param   Node_Ptr &  KEY 节点
+         * @param   Node_Ptr &  VALUE 节点
+         * @return  void
+         */
+        void insert_key_value(
+                Node_Ptr &node,
+                Node_Ptr &key_node,
+                Node_Ptr &value_node);
+
         void parse_stream(Node_Ptr &node);
         void parse_document(Node_Ptr &node);
         void parse_block_node_or_indentless_seq(Node_Ptr &node);
@@ -97,7 +109,7 @@ namespace cyaml
         void parse_indentless_seq(Node_Ptr &node);
         void parse_flow_map(Node_Ptr &node);
         void parse_flow_seq(Node_Ptr &node);
-        void parse_flow_map_entry(Node_Ptr &node);
+        void parse_flow_map_entry(Node_Ptr &key_node, Node_Ptr &value_node);
         void parse_flow_seq_entry(Node_Ptr &node);
     };
 

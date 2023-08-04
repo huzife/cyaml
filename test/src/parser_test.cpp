@@ -70,7 +70,7 @@ TEST_F(Parser_Test, nested_flow)
     EXPECT_EQ(value.size(), 5);
     EXPECT_EQ(value["a"].as<String>(), "hello");
     EXPECT_EQ(value["b"].as<String>(), "world");
-    EXPECT_EQ(value["null"].as<String>(), "");
+    EXPECT_EQ(value["null"].as<String>(), "null");
     EXPECT_EQ(value["c"].type(), cyaml::Node_Type::SEQ);
     EXPECT_EQ(value["c"].size(), 4);
     EXPECT_EQ(value["c"][0].as<Int>(), 1);

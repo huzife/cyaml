@@ -14,14 +14,14 @@ namespace cyaml
 
     Value Value::operator[](uint32_t index)
     {
-        if (!node_->is_sequence())
+        if (!node_->is_seq())
             throw Dereference_Exception();
 
         ///< @todo  out_of_range exception
-        if (index >= node_->sequence_data_.size())
+        if (index >= node_->seq_data_.size())
             throw Dereference_Exception();
 
-        return Value(node_->sequence_data_[index]);
+        return Value(node_->seq_data_[index]);
     }
 
     Value Value::operator[](std::string key)
@@ -42,7 +42,7 @@ namespace cyaml
         case Node_Type::MAP:
             return node_->map_data_.size();
         case Node_Type::SEQ:
-            return node_->sequence_data_.size();
+            return node_->seq_data_.size();
         case Node_Type::SCALAR:
             return node_->scalar_data_.size();
         }

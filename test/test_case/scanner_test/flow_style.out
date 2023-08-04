@@ -10,10 +10,6 @@
 (VALUE)#
 (SCALAR, value1)#
 (FLOW_ENTRY)#
-(KEY)#
-(SCALAR, null)#
-(VALUE)#
-(NULL)#
 (FLOW_ENTRY)#
 (KEY)#
 (SCALAR, key2)#
@@ -28,7 +24,6 @@
 (FLOW_ENTRY)#
 (SCALAR, 2)#
 (FLOW_ENTRY)#
-(NULL)#
 (FLOW_ENTRY)#
 (SCALAR, 3)#
 (FLOW_SEQ_END)#

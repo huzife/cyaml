@@ -55,10 +55,46 @@ namespace cyaml
                 return true;
             }
 
-            if (!node.is_scalar())
-                return false;
+            if (node.is_seq()) {
+                bool first = true;
+                rhs = "[";
+                for (auto &i : node.seq_data_) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        rhs += ", ";
+                    }
 
-            rhs = node.scalar_data_;
+                    std::string temp;
+                    Convert<String>::decode(*i, temp);
+                    rhs += temp;
+                }
+                rhs += "]";
+                return true;
+            }
+
+            if (node.is_map()) {
+                bool first = true;
+                rhs = "{";
+                for (auto &i : node.map_data_) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        rhs += ", ";
+                    }
+
+                    rhs += i.first;
+                    rhs += ": ";
+                    std::string temp;
+                    Convert<String>::decode(*(i.second), temp);
+                    rhs += temp;
+                }
+                rhs += "}";
+            }
+
+            if (node.is_scalar())
+                rhs = node.scalar_data_;
+
             return true;
         }
     };

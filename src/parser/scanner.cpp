@@ -130,7 +130,8 @@ namespace cyaml
             return scan_key();
 
         // VALUE
-        if (match(":", "[]{},#|>\'\""))
+        if (match(":", true) ||
+            !in_block() && match(":", std::string("[]{},#|>\'\"")))
             return scan_value();
 
         if (in_block() && (next() == '|' || next() == '>'))
@@ -143,30 +144,6 @@ namespace cyaml
             return scan_normal_scalar();
 
         throw Parse_Exception(error_msgs::UNKNOWN_TOKEN, mark_);
-    }
-
-    void Scanner::fill_null(Indent_Type type)
-    {
-        if (need_scalar_ && !indent_.empty() &&
-            cur_indent_ <= indent_.top().len && type == indent_.top().type) {
-            need_scalar_ = false;
-            add_token(Token::null());
-        }
-    }
-
-    void Scanner::fill_null(Flow_Type type)
-    {
-        if (last_token_type_ != Token_Type::FLOW_ENTRY &&
-            last_token_type_ != Token_Type::FLOW_MAP_START &&
-            last_token_type_ != Token_Type::FLOW_SEQ_START)
-            return;
-
-        if (type == Flow_Type::MAP) {
-            add_token(Token_Type::KEY);
-            add_token(Token("null"));
-            add_token(Token_Type::VALUE);
-        }
-        add_token(Token::null());
     }
 
     void Scanner::update_indent()
@@ -215,9 +192,9 @@ namespace cyaml
     bool Scanner::match(std::string pattern, bool end_with_delimiter)
     {
         bool ret = true;
-        std::stack<char> chars;
+        std::stack<char> temp_chars;
         for (char ch : pattern) {
-            if (!input_stream_.eof())
+            if (!input_stream_.eof() && !chars_.empty())
                 chars_.push_back(input_stream_.get());
 
             if (ch != next()) {
@@ -225,17 +202,17 @@ namespace cyaml
                 break;
             }
 
-            chars.push(next());
+            temp_chars.push(next());
             chars_.pop_front();
         }
 
         if (end_with_delimiter && !is_delimiter(next()))
             ret = false;
 
-        while (!chars.empty()) {
-            char ch = chars.top();
+        while (!temp_chars.empty()) {
+            char ch = temp_chars.top();
             chars_.push_front(ch);
-            chars.pop();
+            temp_chars.pop();
         }
 
         return ret;
@@ -244,9 +221,9 @@ namespace cyaml
     bool Scanner::match(std::string pattern1, std::string pattern2)
     {
         bool ret = true;
-        std::stack<char> chars;
+        std::stack<char> temp_chars;
         for (char ch : pattern1) {
-            if (!input_stream_.eof())
+            if (!input_stream_.eof() && !chars_.empty())
                 chars_.push_back(input_stream_.get());
 
             if (ch != next()) {
@@ -254,16 +231,16 @@ namespace cyaml
                 break;
             }
 
-            chars.push(next());
+            temp_chars.push(next());
             chars_.pop_front();
         }
 
         ret &= match_any_of(pattern2);
 
-        while (!chars.empty()) {
-            char ch = chars.top();
+        while (!temp_chars.empty()) {
+            char ch = temp_chars.top();
             chars_.push_front(ch);
-            chars.pop();
+            temp_chars.pop();
         }
 
         return ret;

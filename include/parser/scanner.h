@@ -43,10 +43,9 @@ namespace cyaml
 
         std::string value_; // 当前读取的字面量
 
-        char replace_ = ' ';       // 字符串换行时替换的字符
-        bool append_ = false;      // 字符串末尾是否添加换行
-        bool in_special_ = false;  // 是否正在扫描特殊字符串
-        bool need_scalar_ = false; // 是否需要读取标量
+        char replace_ = ' ';      // 字符串换行时替换的字符
+        bool append_ = false;     // 字符串末尾是否添加换行
+        bool in_special_ = false; // 是否正在扫描特殊字符串
 
         Token_Type last_token_type_; // 存放上一个 token 类型
 
@@ -210,22 +209,6 @@ namespace cyaml
         void scan();
 
         /**
-         * @brief   检查是否需要添加 null
-         * @details 识别到 BLOCK_SEQ_ENTRY 或 KEY 时，检查上一个 token 是否为空
-         * @param   Indent_Type     当前缩进类型
-         * @return  void
-         */
-        void fill_null(Indent_Type type);
-
-        /**
-         * @brief   检查是否需要添加 null
-         * @details 读取连续的 FLOW_ENTRY 时需要补充 null
-         * @param   Flow_Type       当前 flow 类型
-         * @return  void
-         */
-        void fill_null(Flow_Type type);
-
-        /**
          * @brief   结束 yaml 流
          * @return  void
          */
@@ -305,7 +288,6 @@ namespace cyaml
          */
         void start_scalar()
         {
-            need_scalar_ = true;
             min_indent_ = cur_indent_ + 1;
         }
 
@@ -314,7 +296,6 @@ namespace cyaml
          */
         void end_scalar()
         {
-            need_scalar_ = false;
             min_indent_ = 0;
         }
 
@@ -324,15 +305,6 @@ namespace cyaml
          * @retval  解析得到的转义字符
          */
         char escape();
-
-        /**
-         * @brief   判断是否允许添加一个 key
-         */
-        bool allow_key() const
-        {
-            return !need_scalar_ || indent_.empty() ||
-                   cur_indent_ > indent_.top().len;
-        }
 
         /**
          * @brief   推入缩进值
@@ -363,6 +335,16 @@ namespace cyaml
         bool in_block() const
         {
             return flow_.empty();
+        }
+
+        /**
+         * @brief   判断是否特殊标量
+         * @return  bool
+         */
+        bool in_special() const
+        {
+            assert(in_block() || !in_special_);
+            return in_special_;
         }
 
         /**

@@ -84,19 +84,9 @@ namespace cyaml
         Token(std::string value);
 
         /**
-         * @brief   获取空节点
-         */
-        static Token null()
-        {
-            Token ret(Token_Type::SCALAR);
-            ret.is_null_ = true;
-            return ret;
-        }
-
-        /**
          * @brief   判断是否为空节点
          * @return  bool
-        */
+         */
         bool is_null() const
         {
             return is_null_;

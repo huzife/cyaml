@@ -88,9 +88,9 @@ namespace cyaml
          * @brief   判断是否为 sequence
          * @return bool
          */
-        bool is_sequence() const
+        bool is_seq() const
         {
-            return node_->is_sequence();
+            return node_->is_seq();
         }
 
         /**

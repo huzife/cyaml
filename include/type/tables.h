@@ -67,11 +67,11 @@ namespace cyaml
 
     static const First_Set flow_seq_set = {Token_Type::FLOW_SEQ_START};
 
-    static const First_Set flow_map_entry = {
+    static const First_Set flow_map_entry_set = {
             Token_Type::SCALAR, Token_Type::FLOW_MAP_START,
             Token_Type::FLOW_SEQ_START, Token_Type::KEY};
 
-    static const First_Set flow_seq_entry = {
+    static const First_Set flow_seq_entry_set = {
             Token_Type::SCALAR, Token_Type::FLOW_MAP_START,
             Token_Type::FLOW_SEQ_START, Token_Type::KEY};
 

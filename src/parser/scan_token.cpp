@@ -14,9 +14,9 @@ namespace cyaml
     void Scanner::stream_end()
     {
         // 检查最后一个标量是否 null
-        if (need_scalar_) {
-            add_token(Token::null());
-        }
+        // if (need_scalar_) {
+        //     add_token(Token::null());
+        // }
 
         // 匹配剩下的缩进
         pop_all_indent();
@@ -66,7 +66,6 @@ namespace cyaml
             throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
         }
 
-        fill_null(Indent_Type::SEQ);
         start_scalar();
         push_indent(Indent_Type::SEQ);
         add_token(Token_Type::BLOCK_ENTRY);
@@ -141,7 +140,6 @@ namespace cyaml
         next_char();
 
         // 连续两个 FLOW_ENTRY 中间补充 null
-        fill_null(flow_.top());
         add_token(Token_Type::FLOW_ENTRY);
     }
 
@@ -214,7 +212,7 @@ namespace cyaml
 
             // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
             if (match(":", true) ||
-                !in_block() && match(":", "[]{},#|>\'\"")) {
+                !in_block() && match(":", std::string("[]{},#|>\'\""))) {
                 can_be_key = true;
                 break;
             }
@@ -223,27 +221,20 @@ namespace cyaml
         }
 
         skip_blank();
-        if (in_block()) {
-            if (can_be_key) {
-                // 识别为 KEY
-                fill_null(Indent_Type::MAP);
-                start_scalar();
+
+        if (can_be_key) {
+            if (in_block()) {
                 push_indent(Indent_Type::MAP);
-                add_token(Token_Type::KEY);
-                add_token(value_);
-            } else {
-                // 识别为标量
-                add_token(value_);
-                end_scalar();
+                start_scalar();
+            }
+            add_token(Token_Type::KEY);
+            add_token(value_);
+        } else {
+            if (in_block()) {
                 pop_indent();
             }
-        } else {
-            if (can_be_key) {
-                add_token(Token_Type::KEY);
-                add_token(value_);
-            } else {
-                add_token(value_);
-            }
+            add_token(value_);
+            end_scalar();
         }
     }
 
@@ -269,7 +260,7 @@ namespace cyaml
             // 扫描字符串直到换行
             while (!input_end_ && next() != '\n') {
                 // 遇到注释停止
-                if (!in_special_ && next() == '#') {
+                if (!in_special() && next() == '#') {
                     hit_comment = true;
                     break;
                 }
@@ -283,7 +274,8 @@ namespace cyaml
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
                 if (next() == ':') {
                     if (match(":", true) ||
-                        !in_block() && match(":", "[]{},#|>\'\"")) {
+                        !in_block() &&
+                                match(":", std::string("[]{},#|>\'\""))) {
                         can_be_key = true;
                         break;
                     }
@@ -328,44 +320,34 @@ namespace cyaml
             value_ += '\n';
         }
 
-        if (in_block()) {
-            // 跳过空字符串
-            if (!in_special_ && value_.empty()) {
-                min_indent_ = 0;
-                reset_scalar_flags();
-                return;
-            }
-
-            if (can_be_key) {
-                // 识别为 KEY
-                fill_null(Indent_Type::MAP);
-                start_scalar();
-                push_indent(Indent_Type::MAP);
-                add_token(Token_Type::KEY);
-                add_token(value_);
-            } else {
-                // 只有在 block 内可以使用特殊字符串，此时标量不识别为 null
-                if ((value_ == "~" || value_ == "null") && !in_special_) {
-                    add_token(Token::null());
-                } else {
-                    add_token(value_);
-                }
-                end_scalar();
+        // 跳过空字符串
+        if (value_.empty() && !in_special()) {
+            if (in_block()) {
                 pop_indent();
             }
-
             reset_scalar_flags();
-        } else {
-            if (can_be_key) {
-                add_token(Token_Type::KEY);
-                add_token(value_);
-            } else {
-                if (value_ == "~" || value_ == "null") {
-                    add_token(Token::null());
-                } else {
-                    add_token(value_);
-                }
+            end_scalar();
+            return;
+        }
+
+        // 特殊标量不可以作为 key
+        if (can_be_key && !in_special()) {
+            if (in_block()) {
+                push_indent(Indent_Type::MAP);
+                start_scalar();
             }
+            add_token(Token_Type::KEY);
+            add_token(value_);
+        } else {
+            // 特殊字符串不作为 null
+            if (value_ != "~" && value_ != "null" || in_special()) {
+                add_token(value_);
+            }
+            if (in_block()) {
+                pop_indent();
+            }
+            reset_scalar_flags();
+            end_scalar();
         }
     }
 

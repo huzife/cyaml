@@ -8,10 +8,8 @@
 (KEY)#
 (SCALAR, next)#
 (VALUE)#
-(NULL)#
 (KEY)#
 (SCALAR, last)#
 (VALUE)#
-(NULL)#
 (BLOCK_MAP_END)#
 (STREAM_END)#

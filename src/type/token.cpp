@@ -31,9 +31,6 @@ namespace cyaml
 
     std::string Token::to_string() const
     {
-        if (is_null())
-            return "(NULL)";
-
         std::string ret = "(" + token_type_to_string(token_type_);
         if (has_value()) {
             ret += (", " + value_);
@@ -115,6 +112,5 @@ namespace cyaml
             return is_start ? Token_Type::FLOW_SEQ_START
                             : Token_Type::FLOW_SEQ_END;
     }
-
 
 } // namespace cyaml

@@ -32,8 +32,9 @@ namespace cyaml
     {
     public:
         Node_Type type_;
+        type::Key_Map keys_;
         type::Map map_data_;
-        type::Sequence sequence_data_;
+        type::Sequence seq_data_;
         std::string scalar_data_;
 
         /**
@@ -63,7 +64,7 @@ namespace cyaml
          * @brief   判断是否为 sequence
          * @return  bool
          */
-        bool is_sequence() const
+        bool is_seq() const
         {
             return type_ == Node_Type::SEQ;
         }

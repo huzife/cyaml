@@ -20,6 +20,7 @@ namespace cyaml
 
     namespace type
     {
+        using Key_Map = std::unordered_map<Node_Ptr, std::string>;
         using Map = std::unordered_map<std::string, Node_Ptr>;
         using Sequence = std::vector<Node_Ptr>;
         using Int = int;
