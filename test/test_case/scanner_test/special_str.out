@@ -1,16 +1,22 @@
 (STREAM_START)#
 (DOC_START)#
 (BLOCK_MAP_START)#
-(KEY, empty)#
+(KEY)#
+(SCALAR, empty)#
+(VALUE)#
 (SCALAR, )#
-(KEY, preserve)#
+(KEY)#
+(SCALAR, preserve)#
+(VALUE)#
 (SCALAR, this
 is
 a
 preserve
 string
 )#
-(KEY, fold)#
+(KEY)#
+(SCALAR, fold)#
+(VALUE)#
 (SCALAR, this is a fold string)#
 (BLOCK_MAP_END)#
 (STREAM_END)#

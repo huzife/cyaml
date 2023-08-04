@@ -32,7 +32,8 @@ namespace cyaml
         FLOW_MAP_END,   // }
         FLOW_SEQ_START, // [
         FLOW_SEQ_END,   // ]
-        KEY,            // 对象 key
+        KEY,            // key 标志
+        VALUE,          // value 标志
         SCALAR,         // 标量
 
         BLOCK_MAP_START,
@@ -118,8 +119,7 @@ namespace cyaml
          */
         bool has_value() const
         {
-            return token_type_ == Token_Type::SCALAR ||
-                   token_type_ == Token_Type::KEY;
+            return token_type_ == Token_Type::SCALAR;
         }
 
         /**

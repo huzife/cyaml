@@ -17,7 +17,7 @@ namespace cyaml
     Scanner::Scanner(std::istream &in): input_stream_(in)
     {
         chars_.push_back(input_stream_.get());
-        add_token(Token(Token_Type::STREAM_START));
+        add_token(Token_Type::STREAM_START);
         last_token_type_ = Token_Type::STREAM_START;
     }
 
@@ -141,6 +141,7 @@ namespace cyaml
         if (need_scalar_ && !indent_.empty() &&
             cur_indent_ <= indent_.top().len && type == indent_.top().type) {
             need_scalar_ = false;
+            add_token(Token_Type::VALUE);
             add_token(Token::null());
         }
     }
@@ -153,8 +154,10 @@ namespace cyaml
             return;
 
         if (type == Flow_Type::MAP) {
-            add_token(Token(Token_Type::KEY, "null"));
+            add_token(Token_Type::KEY);
+            add_token(Token("null"));
         }
+        add_token(Token_Type::VALUE);
         add_token(Token::null());
     }
 
@@ -181,7 +184,7 @@ namespace cyaml
     {
         Indent indent{type, cur_indent_};
         if (indent_.empty() || cur_indent_ > indent_.top().len) {
-            add_token(Token(type, true));
+            add_token(type, true);
             indent_.push(indent);
         }
     }
@@ -193,7 +196,7 @@ namespace cyaml
 
         uint32_t len = get_cur_indent();
         while (!indent_.empty() && len != indent_.top().len) {
-            add_token(Token(indent_.top().type, false));
+            add_token(indent_.top().type, false);
             indent_.pop();
         }
 

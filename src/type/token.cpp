@@ -75,6 +75,8 @@ namespace cyaml
             return "FLOW_SEQ_END";
         case Token_Type::KEY:
             return "KEY";
+        case Token_Type::VALUE:
+            return "VALUE";
         case Token_Type::SCALAR:
             return "SCALAR";
         case Token_Type::BLOCK_MAP_START:
@@ -109,10 +111,10 @@ namespace cyaml
         if (type == Flow_Type::MAP)
             return is_start ? Token_Type::FLOW_MAP_START
                             : Token_Type::FLOW_MAP_END;
-        else 
+        else
             return is_start ? Token_Type::FLOW_SEQ_START
                             : Token_Type::FLOW_SEQ_END;
     }
-    
+
 
 } // namespace cyaml

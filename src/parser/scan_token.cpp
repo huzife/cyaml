@@ -15,6 +15,7 @@ namespace cyaml
     {
         // 检查最后一个标量是否 null
         if (need_scalar_) {
+            add_token(Token_Type::VALUE);
             add_token(Token::null());
         }
 
@@ -22,7 +23,7 @@ namespace cyaml
         pop_all_indent();
 
         // 添加 STREAM_END
-        add_token(Token(Token_Type::STREAM_END));
+        add_token(Token_Type::STREAM_END);
     }
 
     void Scanner::scan_doc_start()
@@ -33,7 +34,7 @@ namespace cyaml
             next_char();
         }
 
-        add_token(Token(Token_Type::DOC_START));
+        add_token(Token_Type::DOC_START);
     }
 
     void Scanner::scan_doc_end()
@@ -49,7 +50,7 @@ namespace cyaml
         if (!is_delimiter(next()))
             throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
 
-        add_token(Token(Token_Type::DOC_END));
+        add_token(Token_Type::DOC_END);
     }
 
     void Scanner::scan_block_seq_entry()
@@ -68,7 +69,7 @@ namespace cyaml
         fill_null(Indent_Type::SEQ);
         start_scalar();
         push_indent(Indent_Type::SEQ);
-        add_token(Token(Token_Type::BLOCK_ENTRY));
+        add_token(Token_Type::BLOCK_ENTRY);
     }
 
     void Scanner::scan_flow_start()
@@ -79,7 +80,7 @@ namespace cyaml
         Flow_Type type = next_char() == '{' ? Flow_Type::MAP : Flow_Type::SEQ;
 
         flow_.push(type);
-        add_token(Token(from_flow_type(type, true)));
+        add_token(from_flow_type(type, true));
     }
 
     void Scanner::scan_flow_end()
@@ -93,7 +94,7 @@ namespace cyaml
             throw Parse_Exception(error_msgs::INVALID_FLOW_END, mark_);
 
         flow_.pop();
-        add_token(Token(from_flow_type(type, false)));
+        add_token(from_flow_type(type, false));
 
         end_scalar();
     }
@@ -107,7 +108,7 @@ namespace cyaml
 
         // 连续两个 FLOW_ENTRY 中间补充 null
         fill_null(flow_.top());
-        add_token(Token(Token_Type::FLOW_ENTRY));
+        add_token(Token_Type::FLOW_ENTRY);
     }
 
     void Scanner::scan_special_scalar()
@@ -192,18 +193,22 @@ namespace cyaml
                 fill_null(Indent_Type::MAP);
                 start_scalar();
                 push_indent(Indent_Type::MAP);
-                add_token(Token(Token_Type::KEY, value_));
+                add_token(Token_Type::KEY);
+                add_token(value_);
             } else {
                 // 识别为标量
-                add_token(Token(value_));
+                add_token(Token_Type::VALUE);
+                add_token(value_);
                 end_scalar();
                 pop_indent();
             }
         } else {
             if (is_key) {
-                add_token(Token(Token_Type::KEY, value_));
+                add_token(Token_Type::KEY);
+                add_token(value_);
             } else {
-                add_token(Token(value_));
+                add_token(Token_Type::VALUE);
+                add_token(value_);
             }
         }
     }
@@ -303,14 +308,15 @@ namespace cyaml
                 fill_null(Indent_Type::MAP);
                 start_scalar();
                 push_indent(Indent_Type::MAP);
-                add_token(Token(Token_Type::KEY, value_));
+                add_token(Token_Type::KEY);
+                add_token(value_);
             } else {
+                add_token(Token_Type::VALUE);
                 // 只有在 block 内可以使用特殊字符串，此时标量不识别为 null
-                if ((value_ == "~" || value_ == "null") &&
-                    !in_special_) {
+                if ((value_ == "~" || value_ == "null") && !in_special_) {
                     add_token(Token::null());
                 } else {
-                    add_token(Token(value_));
+                    add_token(value_);
                 }
                 end_scalar();
                 pop_indent();
@@ -319,12 +325,14 @@ namespace cyaml
             reset_scalar_flags();
         } else {
             if (is_key) {
-                add_token(Token(Token_Type::KEY, value_));
+                add_token(Token_Type::KEY);
+                add_token(value_);
             } else {
+                add_token(Token_Type::VALUE);
                 if (value_ == "~" || value_ == "null") {
                     add_token(Token::null());
                 } else {
-                    add_token(Token(value_));
+                    add_token(value_);
                 }
             }
         }

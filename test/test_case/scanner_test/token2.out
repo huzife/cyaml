@@ -1,48 +1,68 @@
 (STREAM_START)#
 (DOC_START)#
 (BLOCK_MAP_START)#
-(KEY, json)#
+(KEY)#
+(SCALAR, json)#
 (BLOCK_SEQ_START)#
 (BLOCK_ENTRY)#
+(VALUE)#
 (SCALAR, rigid)#
 (BLOCK_ENTRY)#
+(VALUE)#
 (SCALAR, better for data interchange)#
 (BLOCK_SEQ_END)#
-(KEY, yaml)#
+(KEY)#
+(SCALAR, yaml)#
 (BLOCK_SEQ_START)#
 (BLOCK_ENTRY)#
+(VALUE)#
 (SCALAR, slim and flexible)#
 (BLOCK_ENTRY)#
+(VALUE)#
 (SCALAR, better for configuration)#
 (BLOCK_SEQ_END)#
-(KEY, object)#
+(KEY)#
+(SCALAR, object)#
 (BLOCK_MAP_START)#
-(KEY, key)#
+(KEY)#
+(SCALAR, key)#
+(VALUE)#
 (SCALAR, value)#
-(KEY, array)#
+(KEY)#
+(SCALAR, array)#
 (BLOCK_SEQ_START)#
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#
-(KEY, null_value)#
+(KEY)#
+(SCALAR, null_value)#
+(VALUE)#
 (NULL)#
 (BLOCK_MAP_END)#
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#
-(KEY, boolean)#
+(KEY)#
+(SCALAR, boolean)#
+(VALUE)#
 (SCALAR, true)#
 (BLOCK_MAP_END)#
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#
-(KEY, integer)#
+(KEY)#
+(SCALAR, integer)#
+(VALUE)#
 (SCALAR, 1)#
 (BLOCK_MAP_END)#
 (BLOCK_SEQ_END)#
 (BLOCK_MAP_END)#
-(KEY, paragraph)#
+(KEY)#
+(SCALAR, paragraph)#
+(VALUE)#
 (SCALAR, Blank lines denote
 paragraph breaks
 )#
-(KEY, content)#
+(KEY)#
+(SCALAR, content)#
+(VALUE)#
 (SCALAR, Or we
 can auto
 convert line breaks

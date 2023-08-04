@@ -2,14 +2,21 @@
 (BLOCK_SEQ_START)#
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#
-(KEY, key1)#
+(KEY)#
+(SCALAR, key1)#
+(VALUE)#
 (SCALAR, string1)#
-(KEY, key2)#
+(KEY)#
+(SCALAR, key2)#
+(VALUE)#
 (SCALAR, string2 string3 string4)#
-(KEY, key3)#
+(KEY)#
+(SCALAR, key3)#
+(VALUE)#
 (SCALAR, string5 string6)#
 (BLOCK_MAP_END)#
 (BLOCK_ENTRY)#
+(VALUE)#
 (SCALAR, end)#
 (BLOCK_SEQ_END)#
 (STREAM_END)#

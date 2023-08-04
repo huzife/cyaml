@@ -5,19 +5,27 @@
 (BLOCK_SEQ_START)#
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#
-(KEY, aaa)#
+(KEY)#
+(SCALAR, aaa)#
+(VALUE)#
 (SCALAR, abcde fghijk)#
 (BLOCK_MAP_END)#
 (BLOCK_ENTRY)#
+(VALUE)#
 (SCALAR, bbb)#
 (BLOCK_SEQ_END)#
 (BLOCK_ENTRY)#
 (BLOCK_MAP_START)#
-(KEY, key1)#
+(KEY)#
+(SCALAR, key1)#
 (BLOCK_MAP_START)#
-(KEY, key11)#
+(KEY)#
+(SCALAR, key11)#
+(VALUE)#
 (SCALAR, ccc cccccc)#
-(KEY, key12)#
+(KEY)#
+(SCALAR, key12)#
+(VALUE)#
 (SCALAR, ddddddd)#
 (BLOCK_MAP_END)#
 (BLOCK_MAP_END)#

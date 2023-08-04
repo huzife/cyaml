@@ -1,22 +1,32 @@
 (STREAM_START)#
 (DOC_START)#
 (BLOCK_MAP_START)#
-(KEY, flow_map)#
+(KEY)#
+(SCALAR, flow_map)#
 (FLOW_MAP_START)#
-(KEY, key1)#
+(KEY)#
+(SCALAR, key1)#
+(VALUE)#
 (SCALAR, value1)#
 (FLOW_ENTRY)#
-(KEY, key2)#
+(KEY)#
+(SCALAR, key2)#
+(VALUE)#
 (SCALAR, value2)#
 (FLOW_MAP_END)#
-(KEY, flow_seq)#
+(KEY)#
+(SCALAR, flow_seq)#
 (FLOW_SEQ_START)#
+(VALUE)#
 (SCALAR, 1)#
 (FLOW_ENTRY)#
+(VALUE)#
 (SCALAR, 2)#
 (FLOW_ENTRY)#
+(VALUE)#
 (NULL)#
 (FLOW_ENTRY)#
+(VALUE)#
 (SCALAR, 3)#
 (FLOW_SEQ_END)#
 (BLOCK_MAP_END)#

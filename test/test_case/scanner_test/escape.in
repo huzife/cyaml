@@ -1,2 +1,2 @@
 escape: "this\\
- is a\t \n string\'\""
+ is \t a\n string\'\""

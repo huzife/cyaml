@@ -147,10 +147,12 @@ namespace cyaml
          * @brief   添加 token
          * @return  void
          */
-        void add_token(Token token)
+        template <typename... Args>
+        void add_token(Args... args)
         {
-            token_.push(token);
-            last_token_type_ = token.token_type();
+            Token t(args...);
+            token_.push(t);
+            last_token_type_ = t.token_type();
         }
 
         /**
@@ -263,6 +265,18 @@ namespace cyaml
          * @return  void
          */
         void scan_block_seq_entry();
+
+        /**
+         * @brief   扫描 KEY
+         * @return  void
+         */
+        void scan_key();
+
+        /**
+         * @brief   扫描 value
+         * @return  void
+         */
+        void scan_value();
 
         /**
          * @brief   扫描特殊字符串，包括保留换行和折叠换行

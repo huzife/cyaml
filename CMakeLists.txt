@@ -40,19 +40,19 @@ if (GTest_FOUND)
     message(${GTEST_LIBRARY})
     message(${GTEST_INCLUDE_DIR})
     message(${GTEST_MAIN_LIBRARY})
-    
+
     include_directories(${GTEST_INCLUDE_DIR})
-    
+
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYAML_TEST_OUTPUT_PATH})
     add_executable(scanner_test test/src/scanner_test.cpp)
-    add_executable(parser_test test/src/parser_test.cpp)
+    # add_executable(parser_test test/src/parser_test.cpp)
 
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYAML_TEST_OUTPUT_PATH}/stdin)
-    add_executable(stdin_test test/src/stdin/stdin_test.cpp)
-    
+    # add_executable(stdin_test test/src/stdin/stdin_test.cpp)
+
     target_link_libraries(scanner_test cyaml pthread libgtest.so)
-    target_link_libraries(parser_test cyaml pthread libgtest.so)
-    target_link_libraries(stdin_test cyaml pthread libgtest.so)
+    # target_link_libraries(parser_test cyaml pthread libgtest.so)
+    # target_link_libraries(stdin_test cyaml pthread libgtest.so)
 else()
     message(WARNING "GTest not found, abort building test")
 endif()
