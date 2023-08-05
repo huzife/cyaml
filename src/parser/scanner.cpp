@@ -176,13 +176,12 @@ namespace cyaml
         if (indent_.empty())
             return;
 
-        uint32_t len = get_cur_indent();
-        while (!indent_.empty() && len != indent_.top().len) {
+        while (!indent_.empty() && cur_indent_ < indent_.top().len) {
             add_token(indent_.top().type, false);
             indent_.pop();
         }
 
-        if (indent_.empty())
+        if (indent_.empty() || cur_indent_ != indent_.top().len)
             throw Parse_Exception(error_msgs::INVALID_INDENT, mark_);
     }
 

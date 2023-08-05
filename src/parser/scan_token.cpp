@@ -43,16 +43,18 @@ namespace cyaml
     void Scanner::scan_block_entry()
     {
         next_char();
-        start_scalar();
         push_indent(Indent_Type::SEQ);
+        pop_indent();
+        start_scalar();
         add_token(Token_Type::BLOCK_ENTRY);
     }
 
     void Scanner::scan_key()
     {
         next_char();
-        start_scalar();
         push_indent(Indent_Type::MAP);
+        pop_indent();
+        start_scalar();
         add_token(Token_Type::KEY);
     }
 
@@ -60,9 +62,16 @@ namespace cyaml
     {
         next_char();
 
-        // 复杂结构的 VALUE 后要设置标量缩进
-        if (cur_indent_ == indent_.top().len) {
-            start_scalar();
+        // 处理复杂 key 的缩进，普通 key 不处理
+        if (in_block()) {
+            if (cur_indent_ < indent_.top().len) {
+                pop_indent();
+            }
+
+            // 复杂结构的 VALUE 后要设置标量缩进，以及处理 KEY 的缩进
+            if (cur_indent_ == indent_.top().len) {
+                start_scalar();
+            }
         }
 
         add_token(Token_Type::VALUE);
@@ -85,7 +94,6 @@ namespace cyaml
 
         flow_.pop();
         add_token(from_flow_type(type, false));
-
         end_scalar();
     }
 
@@ -172,19 +180,15 @@ namespace cyaml
             next_char();
         }
 
-        skip_blank();
-
         if (can_be_key) {
             if (in_block()) {
                 push_indent(Indent_Type::MAP);
+                pop_indent();
                 start_scalar();
             }
             add_token(Token_Type::KEY);
             add_token(value_);
         } else {
-            if (in_block()) {
-                pop_indent();
-            }
             add_token(value_);
             end_scalar();
         }
@@ -273,9 +277,6 @@ namespace cyaml
 
         // 跳过空字符串
         if (value_.empty() && !in_special()) {
-            if (in_block()) {
-                pop_indent();
-            }
             reset_scalar_flags();
             end_scalar();
             return;
@@ -285,6 +286,7 @@ namespace cyaml
         if (can_be_key) {
             if (in_block()) {
                 push_indent(Indent_Type::MAP);
+                pop_indent();
                 start_scalar();
             }
             add_token(Token_Type::KEY);
@@ -293,9 +295,6 @@ namespace cyaml
             // 特殊字符串不作为 null
             if (value_ != "~" && value_ != "null" || in_special()) {
                 add_token(value_);
-            }
-            if (in_block()) {
-                pop_indent();
             }
             reset_scalar_flags();
             end_scalar();

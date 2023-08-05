@@ -35,11 +35,11 @@ add_library(cyaml SHARED
 )
 
 # 测试部分
-# find_package(GTest)
-# if (GTest_FOUND)
-#     message(${GTEST_LIBRARY})
-#     message(${GTEST_INCLUDE_DIR})
-#     message(${GTEST_MAIN_LIBRARY})
+find_package(GTest)
+if (GTest_FOUND)
+    message(${GTEST_LIBRARY})
+    message(${GTEST_INCLUDE_DIR})
+    message(${GTEST_MAIN_LIBRARY})
 
     include_directories(${GTEST_INCLUDE_DIR})
 
@@ -53,6 +53,6 @@ add_library(cyaml SHARED
     target_link_libraries(scanner_test cyaml pthread libgtest.so)
     target_link_libraries(parser_test cyaml pthread libgtest.so)
     target_link_libraries(stdin_test cyaml pthread libgtest.so)
-# else()
-#     message(WARNING "GTest not found, abort building test")
-# endif()
+else()
+    message(WARNING "GTest not found, abort building test")
+endif()

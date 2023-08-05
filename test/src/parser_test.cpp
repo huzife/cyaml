@@ -39,6 +39,12 @@ TEST_F(Parser_Test, complex_key)
     cyaml::Value value;
     parse("complex_key", value);
     EXPECT_EQ(value.size(), 2);
+    EXPECT_TRUE(value.find("{b: 2, a: 1}"));
+    EXPECT_TRUE(value.find("[4, 5]"));
+    EXPECT_EQ(value["{b: 2, a: 1}"][0].as<Int>(), 3);
+    EXPECT_TRUE(value["{b: 2, a: 1}"][1].is_null());
+    EXPECT_EQ(value["[4, 5]"]["c"].as<Int>(), 6);
+    EXPECT_EQ(value["[4, 5]"]["d"].as<Int>(), 7);
 }
 
 TEST_F(Parser_Test, empty_document1)

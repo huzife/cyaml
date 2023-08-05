@@ -150,7 +150,6 @@ namespace cyaml
         {
             Token t(args...);
             token_.push(t);
-            std::cout << t << std::endl;
         }
 
         /**
