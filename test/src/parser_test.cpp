@@ -34,6 +34,13 @@ public:
 };
 
 #ifdef CYAML_TEST
+TEST_F(Parser_Test, complex_key)
+{
+    cyaml::Value value;
+    parse("complex_key", value);
+    EXPECT_EQ(value.size(), 2);
+}
+
 TEST_F(Parser_Test, empty_document1)
 {
     cyaml::Value value;

@@ -18,7 +18,6 @@ namespace cyaml
     {
         chars_.push_back(input_stream_.get());
         add_token(Token_Type::STREAM_START);
-        last_token_type_ = Token_Type::STREAM_START;
     }
 
     Token Scanner::next_token()
@@ -130,8 +129,7 @@ namespace cyaml
             return scan_key();
 
         // VALUE
-        if (match(":", true) ||
-            !in_block() && match(":", std::string("[]{},#|>\'\"")))
+        if (match(":", true) || !in_block() && match(":", std::string("]},")))
             return scan_value();
 
         if (in_block() && (next() == '|' || next() == '>'))
@@ -140,7 +138,7 @@ namespace cyaml
         if (next() == '\'' || next() == '\"')
             return scan_quote_scalar();
 
-        if (!match_any_of("[]{},#|>\'\""))
+        if (!is_delimiter(next()) && !match_any_of(",[]{}#&*!|>\'\"%@`"))
             return scan_normal_scalar();
 
         throw Parse_Exception(error_msgs::UNKNOWN_TOKEN, mark_);
@@ -167,10 +165,9 @@ namespace cyaml
 
     void Scanner::push_indent(Indent_Type type)
     {
-        Indent indent{type, cur_indent_};
         if (indent_.empty() || cur_indent_ > indent_.top().len) {
             add_token(type, true);
-            indent_.push(indent);
+            indent_.push({type, cur_indent_});
         }
     }
 

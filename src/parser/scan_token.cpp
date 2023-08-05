@@ -13,11 +13,6 @@ namespace cyaml
 {
     void Scanner::stream_end()
     {
-        // 检查最后一个标量是否 null
-        // if (need_scalar_) {
-        //     add_token(Token::null());
-        // }
-
         // 匹配剩下的缩进
         pop_all_indent();
 
@@ -28,8 +23,6 @@ namespace cyaml
     void Scanner::scan_doc_start()
     {
         for (auto i = 0; i < 3; i++) {
-            if (next() != '-')
-                throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
             next_char();
         }
 
@@ -41,31 +34,15 @@ namespace cyaml
         pop_all_indent();
 
         for (int i = 0; i < 3; i++) {
-            if (next() != '.')
-                throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
             next_char();
         }
-
-        if (!is_delimiter(next()))
-            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
 
         add_token(Token_Type::DOC_END);
     }
 
     void Scanner::scan_block_entry()
     {
-        bool success = false;
-        if (next() == '-') {
-            next_char();
-            if (is_delimiter(next())) {
-                success = true;
-            }
-        }
-
-        if (!success) {
-            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
-        }
-
+        next_char();
         start_scalar();
         push_indent(Indent_Type::SEQ);
         add_token(Token_Type::BLOCK_ENTRY);
@@ -73,33 +50,19 @@ namespace cyaml
 
     void Scanner::scan_key()
     {
-        bool success = false;
-        if (next() == '?') {
-            next_char();
-            if (is_delimiter(next())) {
-                success = true;
-            }
-        }
-
-        if (!success) {
-            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
-        }
-
+        next_char();
+        start_scalar();
+        push_indent(Indent_Type::MAP);
         add_token(Token_Type::KEY);
     }
 
     void Scanner::scan_value()
     {
-        bool success = false;
-        if (next() == ':') {
-            next_char();
-            if (is_delimiter(next()) || match_any_of("?[]{},#|>\'\"")) {
-                success = true;
-            }
-        }
+        next_char();
 
-        if (!success) {
-            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
+        // 复杂结构的 VALUE 后要设置标量缩进
+        if (cur_indent_ == indent_.top().len) {
+            start_scalar();
         }
 
         add_token(Token_Type::VALUE);
@@ -107,9 +70,6 @@ namespace cyaml
 
     void Scanner::scan_flow_start()
     {
-        if (next() != '{' && next() != '[')
-            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
-
         Flow_Type type = next_char() == '{' ? Flow_Type::MAP : Flow_Type::SEQ;
 
         flow_.push(type);
@@ -118,9 +78,6 @@ namespace cyaml
 
     void Scanner::scan_flow_end()
     {
-        if (next() != '}' && next() != ']')
-            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
-
         Flow_Type type = next_char() == '}' ? Flow_Type::MAP : Flow_Type::SEQ;
 
         if (type != flow_.top())
@@ -134,12 +91,7 @@ namespace cyaml
 
     void Scanner::scan_flow_entry()
     {
-        if (next() != ',')
-            throw Parse_Exception(error_msgs::SCAN_TOKEN_ERROR, mark_);
-
         next_char();
-
-        // 连续两个 FLOW_ENTRY 中间补充 null
         add_token(Token_Type::FLOW_ENTRY);
     }
 
@@ -212,7 +164,7 @@ namespace cyaml
 
             // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
             if (match(":", true) ||
-                !in_block() && match(":", std::string("[]{},#|>\'\""))) {
+                !in_block() && match(":", std::string("]},"))) {
                 can_be_key = true;
                 break;
             }
@@ -272,10 +224,9 @@ namespace cyaml
                 }
 
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-                if (next() == ':') {
+                if (!in_special() && next() == ':') {
                     if (match(":", true) ||
-                        !in_block() &&
-                                match(":", std::string("[]{},#|>\'\""))) {
+                        !in_block() && match(":", std::string("]},"))) {
                         can_be_key = true;
                         break;
                     }
@@ -331,7 +282,7 @@ namespace cyaml
         }
 
         // 特殊标量不可以作为 key
-        if (can_be_key && !in_special()) {
+        if (can_be_key) {
             if (in_block()) {
                 push_indent(Indent_Type::MAP);
                 start_scalar();

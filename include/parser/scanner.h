@@ -47,8 +47,6 @@ namespace cyaml
         bool append_ = false;     // 字符串末尾是否添加换行
         bool in_special_ = false; // 是否正在扫描特殊字符串
 
-        Token_Type last_token_type_; // 存放上一个 token 类型
-
     public:
         /**
          * @brief   Scanner 类构造函数
@@ -152,7 +150,7 @@ namespace cyaml
         {
             Token t(args...);
             token_.push(t);
-            last_token_type_ = t.token_type();
+            std::cout << t << std::endl;
         }
 
         /**
@@ -323,7 +321,7 @@ namespace cyaml
         void pop_all_indent()
         {
             while (!indent_.empty()) {
-                token_.push(Token(indent_.top().type, false));
+                add_token(indent_.top().type, false);
                 indent_.pop();
             }
         }
@@ -369,7 +367,7 @@ namespace cyaml
          * @brief   判断字符是否属于分隔符
          * @return  bool
          */
-        bool is_delimiter(char ch)
+        bool is_delimiter(char ch) const
         {
             return ch == ' ' || ch == '\t' || ch == '\n' || ch == -1;
         }
