@@ -43,6 +43,8 @@ TEST_F(Parser_Test, complex_key)
     EXPECT_TRUE(value.find("[4, 5]"));
     EXPECT_EQ(value["{a: 1, b: 2}"][0].as<Int>(), 3);
     EXPECT_TRUE(value["{a: 1, b: 2}"][1].is_null());
+    value["{a: 1, b: 2}"][1] = 2;
+    EXPECT_EQ(value["{a: 1, b: 2}"][1].as<String>(), "2");
     EXPECT_EQ(value["[4, 5]"]["c"].as<Int>(), 6);
     EXPECT_EQ(value["[4, 5]"]["d"].as<Int>(), 7);
 }

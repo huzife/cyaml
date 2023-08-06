@@ -50,13 +50,34 @@ namespace cyaml
         Value operator[](std::string key);
 
         /**
+         * @brief   Value 绑定引用
+         * @param   const Value &
+         * @return  Value &
+         */
+        Value &operator=(const Value &rhs);
+
+        /**
+         * @brief   Value 赋值
+         * @tparam  T           值类型
+         * @param   const T &   常量左值引用
+         * @return  void
+         */
+        template<typename T>
+        void operator=(const T &rhs)
+        {
+            ///< @todo  检查原节点，清除状态
+
+            *node_ = Convert<T>::encode(rhs);
+        }
+
+        /**
          * @brief   获取标量值
          * @tparam  T   转换类型
          * @return  T
          * @retval  转换后的标量值
          */
         template<typename T>
-        T as()
+        T as() const
         {
             T ret;
             if (Convert<T>::decode(*node_, ret))
@@ -64,6 +85,22 @@ namespace cyaml
 
             throw Convertion_Exception();
         }
+
+        /**
+         * @brief   根据字符串查找 key
+         * @param   std::string     key
+         * @return  bool
+         * @retval  该键是否存在
+         */
+        bool find(std::string key) const;
+
+        /**
+         * @brief   根据 Value 查找 key
+         * @param   const Value &   value
+         * @return  bool
+         * @retval  该键是否存在
+         */
+        bool find(const Value &value) const;
 
         /**
          * @brief   获取值的类型
@@ -117,18 +154,6 @@ namespace cyaml
          * @retval  自动判断数据类型，返回相应长度
          */
         uint32_t size() const;
-
-        /**
-         * @brief   查找 key
-         * @param   std::string     key
-         * @return  bool
-         * @retval  该键是否存在
-         */
-        bool find(std::string key) const
-        {
-            return (node_->is_map() &&
-                    node_->map_data_.find(key) != node_->map_data_.end());
-        }
     };
 } // namespace cyaml
 

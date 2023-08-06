@@ -36,6 +36,32 @@ namespace cyaml
         return Value(node_->map_data_[key]);
     }
 
+    Value &Value::operator=(const Value &rhs)
+    {
+        node_ = rhs.node_;
+
+        ///< @todo  处理 yaml 引用
+
+        return *this;
+    }
+
+    bool Value::find(std::string key) const
+    {
+        if (!is_map())
+            return false;
+
+        return node_->map_data_.find(key) != node_->map_data_.end();
+    }
+
+    bool Value::find(const Value &value) const
+    {
+        if (!is_map())
+            return false;
+
+        std::string key = value.as<String>();
+        return node_->map_data_.find(key) != node_->map_data_.end();
+    }
+
     uint32_t Value::size() const
     {
         switch (node_->type_) {
