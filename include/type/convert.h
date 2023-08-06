@@ -10,6 +10,7 @@
 
 #include "type/node.h"
 #include <string>
+#include <iostream>
 
 namespace cyaml
 {
@@ -76,18 +77,20 @@ namespace cyaml
             if (node.is_map()) {
                 bool first = true;
                 rhs = "{";
-                for (auto &i : node.map_data_) {
+                for (auto &i : node.keys_) {
                     if (first) {
                         first = false;
                     } else {
                         rhs += ", ";
                     }
 
-                    rhs += i.first;
+                    std::string key = i.second;
+                    std::string value;
+                    rhs += key;
                     rhs += ": ";
-                    std::string temp;
-                    Convert<String>::decode(*(i.second), temp);
-                    rhs += temp;
+                    Convert<String>::decode(
+                            *(node.map_data_.find(key)->second), value);
+                    rhs += value;
                 }
                 rhs += "}";
             }

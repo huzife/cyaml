@@ -9,6 +9,7 @@
 #define CYAML_TOKEN_H
 
 #include "type/indent.h"
+#include "type/mark.h"
 #include <string>
 #include <ostream>
 #include <assert.h>
@@ -51,6 +52,7 @@ namespace cyaml
     private:
         Token_Type token_type_; // token 类型
         std::string value_;     // 字面量
+        Mark mark_;             // 位置
         bool is_null_ = false;  // 是否为空节点
 
     public:
@@ -61,27 +63,20 @@ namespace cyaml
         Token();
 
         /**
-         * @brief   Token 类带缩进构造
-         * @param   Indent  缩进
-         * @param   bool    是否是一个 map 或 seq 的开始
-         */
-        Token(Indent_Type type, bool is_start);
-
-        /**
          * @brief   Token 类构造函数
          * @param   Token_Type      token 类型
-         * @param   std::string     token 字面量
+         * @param   Mark            token 位置
          * @retval  Token 对象
          */
-        Token(Token_Type type, std::string value = "");
+        Token(Token_Type type, Mark mark);
 
         /**
          * @brief   Token 类构造函数
          * @param   String_Type     字符串类型
-         * @param   std::string     token 字面量
+         * @param   Mark            token 位置
          * @retval  Token 对象
          */
-        Token(std::string value);
+        Token(std::string value, Mark mark);
 
         /**
          * @brief   判断是否为空节点
@@ -121,6 +116,16 @@ namespace cyaml
         {
             assert(has_value());
             return value_;
+        }
+
+        /**
+         * @brief   获取 token 位置
+         * @return  Mark
+         * @retval  token 在输入流中的位置
+         */
+        Mark mark() const
+        {
+            return mark_;
         }
 
         /**

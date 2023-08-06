@@ -25,6 +25,7 @@ namespace cyaml
         const char *const BAD_CONVERTION = "bad convertion";
         const char *const KEY_NOT_FOUND =
                 "omitting key in flow map is not allowed yet";
+        const char *const DUPLICATED_KEY = "duplicated key";
     } // namespace error_msgs
 } // namespace cyaml
 

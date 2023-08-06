@@ -17,25 +17,22 @@ namespace cyaml
 
     Token Parser::expect(Token_Type type)
     {
-        if (next_token_type() != type) {
+        if (next_type() != type) {
             throw_unexpected_token(type);
         }
 
-        return scanner_.next_token();
+        return next_token();
     }
 
     void Parser::throw_unexpected_token()
     {
-        Token next = scanner_.next_token();
-        Mark mark = scanner_.mark();
-        throw Parse_Exception(unexpected_token_msg(next), mark);
+        throw Parse_Exception(unexpected_token_msg(next_token()), mark());
     }
 
     void Parser::throw_unexpected_token(Token_Type expected_type)
     {
-        Token next = scanner_.next_token();
-        Mark mark = scanner_.mark();
-        throw Parse_Exception(unexpected_token_msg(expected_type, next), mark);
+        throw Parse_Exception(
+                unexpected_token_msg(expected_type, next_token()), mark());
     }
 
     void Parser::insert_key_value(
@@ -45,6 +42,13 @@ namespace cyaml
     {
         std::string key;
         Convert<String>::decode(*key_node, key);
+
+        if (node->map_data_.find(key) != node_->map_data_.end()) {
+            throw Representation_Exception(
+                    std::string(error_msgs::DUPLICATED_KEY) + " '" + key + "'",
+                    mark());
+        }
+
         node->keys_[key_node] = key;
         node->map_data_[key] = value_node;
     }
@@ -67,7 +71,7 @@ namespace cyaml
     void Parser::parse_document(Node_Ptr &node)
     {
         // DOC_START?
-        if (next_token_type() == Token_Type::DOC_START) {
+        if (next_type() == Token_Type::DOC_START) {
             expect(Token_Type::DOC_START);
         }
 
@@ -77,8 +81,8 @@ namespace cyaml
         }
 
         // DOC_END?
-        if (next_token_type() == Token_Type::DOC_END) {
-            scanner_.next_token();
+        if (next_type() == Token_Type::DOC_END) {
+            next_token();
         }
     }
 
@@ -109,9 +113,8 @@ namespace cyaml
             parse_block_collection(node);
         } else if (belong(flow_collection_set)) {
             parse_flow_collection(node);
-        } else if (next_token_type() == Token_Type::SCALAR) {
-            Token next = scanner_.next_token();
-            node = std::make_shared<Node>(next.value());
+        } else if (next_type() == Token_Type::SCALAR) {
+            node = std::make_shared<Node>(next_token().value());
         } else {
             throw_unexpected_token();
         }
@@ -121,9 +124,8 @@ namespace cyaml
     {
         if (belong(flow_collection_set)) {
             parse_flow_collection(node);
-        } else if (next_token_type() == Token_Type::SCALAR) {
-            Token next = scanner_.next_token();
-            node = std::make_shared<Node>(next.value());
+        } else if (next_type() == Token_Type::SCALAR) {
+            node = std::make_shared<Node>(next_token().value());
         } else {
             throw_unexpected_token();
         }
@@ -157,11 +159,11 @@ namespace cyaml
         expect(Token_Type::BLOCK_MAP_START);
 
         // 循环解析 key : value
-        while (next_token_type() != Token_Type::BLOCK_MAP_END) {
+        while (next_type() != Token_Type::BLOCK_MAP_END) {
             // key 部分，默认为 "null"
             auto key_node = std::make_shared<Node>("null");
-            if (next_token_type() == Token_Type::KEY) {
-                scanner_.next_token();
+            if (next_type() == Token_Type::KEY) {
+                next_token();
                 if (belong(block_node_or_indentless_seq_set)) {
                     parse_block_node_or_indentless_seq(key_node);
                 }
@@ -169,8 +171,8 @@ namespace cyaml
 
             // value 部分，默认为 null
             auto value_node = std::make_shared<Node>();
-            if (next_token_type() == Token_Type::VALUE) {
-                scanner_.next_token();
+            if (next_type() == Token_Type::VALUE) {
+                next_token();
                 if (belong(block_node_or_indentless_seq_set)) {
                     parse_block_node_or_indentless_seq(value_node);
                 }
@@ -189,7 +191,7 @@ namespace cyaml
         expect(Token_Type::BLOCK_SEQ_START);
 
         // 循环解析数组元素
-        while (next_token_type() != Token_Type::BLOCK_SEQ_END) {
+        while (next_type() != Token_Type::BLOCK_SEQ_END) {
             expect(Token_Type::BLOCK_ENTRY);
             auto value_node = std::make_shared<Node>();
             if (belong(block_node_set)) {
@@ -204,7 +206,7 @@ namespace cyaml
     void Parser::parse_indentless_seq(Node_Ptr &node)
     {
         node = std::make_shared<Node>(Node_Type::SEQ);
-        Token_Type type = next_token_type();
+        Token_Type type = next_type();
 
         // 至少一次
         expect(Token_Type::BLOCK_ENTRY);
@@ -214,8 +216,8 @@ namespace cyaml
         }
         node->seq_data_.emplace_back(value_node);
 
-        while (next_token_type() != Token_Type::KEY &&
-               next_token_type() != Token_Type::BLOCK_MAP_END) {
+        while (next_type() != Token_Type::KEY &&
+               next_type() != Token_Type::BLOCK_MAP_END) {
             expect(Token_Type::BLOCK_ENTRY);
             value_node = std::make_shared<Node>();
             if (belong(block_node_set)) {
@@ -231,7 +233,7 @@ namespace cyaml
         expect(Token_Type::FLOW_MAP_START);
 
         // 循环解析 key : value
-        while (next_token_type() != Token_Type::FLOW_MAP_END) {
+        while (next_type() != Token_Type::FLOW_MAP_END) {
             auto key_node = std::make_shared<Node>("null");
             auto value_node = std::make_shared<Node>();
 
@@ -242,7 +244,7 @@ namespace cyaml
             // 插入键值对
             insert_key_value(node, key_node, value_node);
 
-            if (next_token_type() != Token_Type::FLOW_MAP_END) {
+            if (next_type() != Token_Type::FLOW_MAP_END) {
                 expect(Token_Type::FLOW_ENTRY);
             }
         }
@@ -256,14 +258,14 @@ namespace cyaml
         expect(Token_Type::FLOW_SEQ_START);
 
         // 循环解析数组元素
-        while (next_token_type() != Token_Type::FLOW_SEQ_END) {
+        while (next_type() != Token_Type::FLOW_SEQ_END) {
             auto value_node = std::make_shared<Node>();
             if (belong(flow_seq_entry_set)) {
                 parse_flow_seq_entry(value_node);
             }
             node->seq_data_.emplace_back(value_node);
 
-            if (next_token_type() != Token_Type::FLOW_SEQ_END) {
+            if (next_type() != Token_Type::FLOW_SEQ_END) {
                 expect(Token_Type::FLOW_ENTRY);
             }
         }
@@ -275,14 +277,14 @@ namespace cyaml
     {
         if (belong(flow_node_set)) {
             parse_flow_node(key_node);
-        } else if (next_token_type() == Token_Type::KEY) {
-            scanner_.next_token();
+        } else if (next_type() == Token_Type::KEY) {
+            next_token();
             if (belong(flow_node_set)) {
                 parse_flow_node(key_node);
             }
 
-            if (next_token_type() == Token_Type::VALUE) {
-                scanner_.next_token();
+            if (next_type() == Token_Type::VALUE) {
+                next_token();
                 if (belong(flow_node_set)) {
                     parse_flow_node(value_node);
                 }
@@ -296,8 +298,8 @@ namespace cyaml
     {
         if (belong(flow_node_set)) {
             parse_flow_node(node);
-        } else if (next_token_type() == Token_Type::KEY) {
-            scanner_.next_token();
+        } else if (next_type() == Token_Type::KEY) {
+            next_token();
             // [] 中的键值对需要单独放到一个 {} 中
             node = std::make_shared<Node>(Node_Type::MAP);
 
@@ -307,8 +309,8 @@ namespace cyaml
             }
 
             auto value_node = std::make_shared<Node>();
-            if (next_token_type() == Token_Type::VALUE) {
-                scanner_.next_token();
+            if (next_type() == Token_Type::VALUE) {
+                next_token();
                 if (belong(flow_node_set)) {
                     parse_flow_node(value_node);
                 }

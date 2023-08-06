@@ -90,7 +90,7 @@ namespace cyaml
         Flow_Type type = next_char() == '}' ? Flow_Type::MAP : Flow_Type::SEQ;
 
         if (type != flow_.top())
-            throw Parse_Exception(error_msgs::INVALID_FLOW_END, mark_);
+            throw Parse_Exception(error_msgs::INVALID_FLOW_END, token_mark());
 
         flow_.pop();
         add_token(from_flow_type(type, false));
@@ -120,7 +120,7 @@ namespace cyaml
             append_ = true;
         } else {
             // 报错：
-            throw Parse_Exception(error_msgs::NO_NEWLINE, mark_);
+            throw Parse_Exception(error_msgs::NO_NEWLINE, mark());
         }
 
         in_special_ = true;
@@ -137,7 +137,7 @@ namespace cyaml
         // 循环读取字符，直到 ' 或 "
         while (next() != end_char) {
             if (next() == -1) {
-                throw Parse_Exception(error_msgs::EOF_IN_SCALAR, mark_);
+                throw Parse_Exception(error_msgs::EOF_IN_SCALAR, mark());
             } else if (next() == '\\' && end_char == '\"') {
                 // 转义字符处理
                 value_ += escape();

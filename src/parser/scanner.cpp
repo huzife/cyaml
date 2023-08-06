@@ -141,13 +141,14 @@ namespace cyaml
         if (!is_delimiter(next()) && !match_any_of(",[]{}#&*!|>\'\"%@`"))
             return scan_normal_scalar();
 
-        throw Parse_Exception(error_msgs::UNKNOWN_TOKEN, mark_);
+        throw Parse_Exception(error_msgs::UNKNOWN_TOKEN, token_mark());
     }
 
     void Scanner::update_indent()
     {
         ignore_tab_ = false;
         cur_indent_ = get_cur_indent();
+        token_mark_ = mark();
     }
 
     char Scanner::escape()
@@ -160,13 +161,13 @@ namespace cyaml
             return iter->second;
         }
 
-        throw Parse_Exception(error_msgs::UNKNOWN_ESCAPE, mark_);
+        throw Parse_Exception(error_msgs::UNKNOWN_ESCAPE, mark());
     }
 
     void Scanner::push_indent(Indent_Type type)
     {
         if (indent_.empty() || cur_indent_ > indent_.top().len) {
-            add_token(type, true);
+            add_token(from_indent_type(type, true));
             indent_.push({type, cur_indent_});
         }
     }
@@ -177,12 +178,12 @@ namespace cyaml
             return;
 
         while (!indent_.empty() && cur_indent_ < indent_.top().len) {
-            add_token(indent_.top().type, false);
+            add_token(from_indent_type(indent_.top().type, false));
             indent_.pop();
         }
 
         if (indent_.empty() || cur_indent_ != indent_.top().len)
-            throw Parse_Exception(error_msgs::INVALID_INDENT, mark_);
+            throw Parse_Exception(error_msgs::INVALID_INDENT, token_mark());
     }
 
     bool Scanner::match(std::string pattern, bool end_with_delimiter)

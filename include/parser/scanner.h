@@ -27,13 +27,14 @@ namespace cyaml
     private:
         std::istream &input_stream_; // 输入流
 
-        Mark mark_ = Mark(1, 1);  // 当前输入位置
-        uint32_t tab_cnt_ = 0;    // 该行'\t'个数
-        uint32_t cur_indent_ = 0; // 当前 token 的缩进长度
-        uint32_t min_indent_ = 0; // 用于限制多行字符串缩进
-        bool ignore_tab_ = true;  // 是否忽略 '\t'，用于计算缩进
-        bool input_end_ = false;  // 记录是否读取完输入流
-        bool scan_end_ = false;   // 记录是否解析完所有 token
+        Mark mark_ = Mark(1, 1);       // 当前输入位置
+        Mark token_mark_ = Mark(1, 1); // 当前 token 位置
+        uint32_t tab_cnt_ = 0;         // 该行'\t'个数
+        uint32_t cur_indent_ = 0;      // 当前 token 的缩进长度
+        uint32_t min_indent_ = 0;      // 用于限制多行字符串缩进
+        bool ignore_tab_ = true; // 是否忽略 '\t'，用于计算缩进
+        bool input_end_ = false; // 记录是否读取完输入流
+        bool scan_end_ = false;  // 记录是否解析完所有 token
 
         std::stack<Indent> indent_;  // 缩进状态栈
         std::stack<Flow_Type> flow_; // 流状态栈
@@ -77,29 +78,19 @@ namespace cyaml
          * @return  Mark
          * @retval  词法分析器当前读取输入的位置结构体
          */
-        Mark mark()
+        Mark mark() const
         {
             return mark_;
         }
 
         /**
-         * @brief   返回当前字符行号
-         * @return  uint32_t
-         * @retval  词法分析器当前读取位置的行号
+         * @brief   返回当前 token 位置
+         * @return  Mark
+         * @retval  当前正在扫描（或最后一个）token 的位置
          */
-        uint32_t line()
+        Mark token_mark() const
         {
-            return mark_.line;
-        }
-
-        /**
-         * @brief   返回当前字符列号
-         * @return  uint32_t
-         * @retval  词法分析器当前读取位置的列号
-         */
-        uint32_t col()
-        {
-            return mark_.column;
+            return token_mark_;
         }
 
         /**
@@ -148,7 +139,7 @@ namespace cyaml
         template<typename... Args>
         void add_token(Args... args)
         {
-            Token t(args...);
+            Token t(args..., token_mark_);
             token_.push(t);
         }
 
@@ -320,7 +311,7 @@ namespace cyaml
         void pop_all_indent()
         {
             while (!indent_.empty()) {
-                add_token(indent_.top().type, false);
+                add_token(from_indent_type(indent_.top().type, false));
                 indent_.pop();
             }
         }

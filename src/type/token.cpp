@@ -12,20 +12,12 @@ namespace cyaml
 {
     Token::Token(): token_type_(Token_Type::NONE) {}
 
-    Token::Token(Indent_Type type, bool is_start)
-        : token_type_(from_indent_type(type, is_start))
-    {
-    }
+    Token::Token(Token_Type type, Mark mark): token_type_(type), mark_(mark) {}
 
-    Token::Token(Token_Type type, std::string value)
-        : token_type_(type),
-          value_(value)
-    {
-    }
-
-    Token::Token(std::string value)
+    Token::Token(std::string value, Mark mark)
         : token_type_(Token_Type::SCALAR),
-          value_(value)
+          value_(value),
+          mark_(mark)
     {
     }
 

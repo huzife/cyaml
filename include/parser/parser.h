@@ -9,6 +9,7 @@
 #define CYAML_PARSER_H
 
 #include "parser/scanner.h"
+#include "type/mark.h"
 #include "type/node.h"
 #include "type/value.h"
 #include "type/tables.h"
@@ -26,6 +27,8 @@ namespace cyaml
     private:
         Scanner scanner_;
         Node_Ptr node_ = std::make_shared<Node>();
+
+        mutable Mark mark_ = Mark(1, 1); // 当前 token 位置
 
     public:
         /**
@@ -45,6 +48,37 @@ namespace cyaml
 
     private:
         /**
+         * @brief   获取下一个 token
+         * @return  Token
+         */
+        Token next_token()
+        {
+            Token ret = scanner_.next_token();
+            mark_ = ret.mark();
+            return ret;
+        }
+
+        /**
+         * @brief   查看下一个 token
+         * @return  Token
+         */
+        Token lookahead() const
+        {
+            Token ret = scanner_.lookahead();
+            mark_ = ret.mark();
+            return ret;
+        }
+
+        /**
+         * @brief   获取当前 token 位置
+         * @return  Mark
+         */
+        Mark mark() const
+        {
+            return mark_;
+        }
+
+        /**
          * @brief   尝试接收一个目标 token
          * @details 从 Scanner 中获取一个 token，并判断其类型是否符合传入类型
          * @return  Token
@@ -59,7 +93,7 @@ namespace cyaml
          */
         bool belong(const First_Set &first_set) const
         {
-            auto type = next_token_type();
+            auto type = next_type();
             return first_set.find(type) != first_set.end();
         }
 
@@ -67,9 +101,9 @@ namespace cyaml
          * @brief   获取下个 token 类型
          * @return  Token_Type
          */
-        Token_Type next_token_type() const
+        Token_Type next_type() const
         {
-            return scanner_.lookahead().token_type();
+            return lookahead().token_type();
         }
 
         /**
