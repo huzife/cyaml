@@ -57,6 +57,7 @@ namespace cyaml
             mark_.column = 1;
             tab_cnt_ = 0;
             ignore_tab_ = true;
+            after_anchor_ = false;
             break;
 
         // yaml 不允许制表符缩进，需要记录
@@ -108,6 +109,13 @@ namespace cyaml
 
         if (mark_.column == 1 && match("...", true))
             return scan_doc_end();
+
+        // ANCHOR, ALIAS
+        if (next() == '&')
+            return scan_anchor();
+
+        if (next() == '*')
+            return scan_alias();
 
         // BLOCK_ENTRY
         if (match("-", true))
@@ -166,9 +174,10 @@ namespace cyaml
 
     void Scanner::push_indent(Indent_Type type)
     {
-        if (indent_.empty() || cur_indent_ > indent_.top().len) {
+        uint32_t len = after_anchor_ ? anchor_indent_ : cur_indent_;
+        if (indent_.empty() || len > indent_.top().len) {
             add_token(from_indent_type(type, true));
-            indent_.push({type, cur_indent_});
+            indent_.push({type, len});
         }
     }
 
@@ -177,12 +186,13 @@ namespace cyaml
         if (indent_.empty())
             return;
 
-        while (!indent_.empty() && cur_indent_ < indent_.top().len) {
+        uint32_t len = after_anchor_ ? anchor_indent_ : cur_indent_;
+        while (!indent_.empty() && len < indent_.top().len) {
             add_token(from_indent_type(indent_.top().type, false));
             indent_.pop();
         }
 
-        if (indent_.empty() || cur_indent_ != indent_.top().len)
+        if (indent_.empty() || len != indent_.top().len)
             throw Parse_Exception(error_msgs::INVALID_INDENT, token_mark());
     }
 

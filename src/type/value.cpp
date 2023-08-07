@@ -24,7 +24,7 @@ namespace cyaml
         return Value(node_->seq_data_[index]);
     }
 
-    Value Value::operator[](std::string key)
+    Value Value::operator[](const std::string &key)
     {
         if (!node_->is_map())
             throw Dereference_Exception();
@@ -34,6 +34,18 @@ namespace cyaml
             throw Dereference_Exception();
 
         return Value(node_->map_data_[key]);
+    }
+
+    Value Value::operator[](const Value &key)
+    {
+        if (!node_->is_map())
+            throw Dereference_Exception();
+
+        ///< @todo  key_not_found exception
+        if (!find(key))
+            throw Dereference_Exception();
+
+        return Value(node_->map_data_[key.as<std::string>()]);
     }
 
     Value &Value::operator=(const Value &rhs)
@@ -58,7 +70,7 @@ namespace cyaml
         if (!is_map())
             return false;
 
-        std::string key = value.as<String>();
+        std::string key = value.as<std::string>();
         return node_->map_data_.find(key) != node_->map_data_.end();
     }
 

@@ -48,6 +48,9 @@ namespace cyaml
         bool append_ = false;     // 字符串末尾是否添加换行
         bool in_special_ = false; // 是否正在扫描特殊字符串
 
+        uint32_t anchor_indent_ = 0; // 锚点缩进
+        bool after_anchor_ = false;  // 是否位于同一行的锚点后
+
     public:
         /**
          * @brief   Scanner 类构造函数
@@ -213,6 +216,18 @@ namespace cyaml
          * @return  void
          */
         void scan_doc_end();
+
+        /**
+         * @brief   扫描 ANCHOR
+         * @return  void
+         */
+        void scan_anchor();
+
+        /**
+         * @brief   扫描 ALIAS
+         * @return  void
+         */
+        void scan_alias();
 
         /**
          * @brief   扫描 FLOW_MAP_START 或 FLOW_SEQ_START

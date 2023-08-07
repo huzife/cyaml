@@ -42,7 +42,7 @@ namespace cyaml
 
     // string
     template<>
-    struct Convert<String>
+    struct Convert<std::string>
     {
         static Node encode(const std::string &rhs)
         {
@@ -67,7 +67,7 @@ namespace cyaml
                     }
 
                     std::string temp;
-                    Convert<String>::decode(*i, temp);
+                    Convert<std::string>::decode(*i, temp);
                     rhs += temp;
                 }
                 rhs += "]";
@@ -84,12 +84,13 @@ namespace cyaml
                         rhs += ", ";
                     }
 
-                    std::string key = i.second;
+                    std::string key;
                     std::string value;
+                    Convert<std::string>::decode(*i, key);
+                    Convert<std::string>::decode(
+                            *(node.map_data_.find(key)->second), value);
                     rhs += key;
                     rhs += ": ";
-                    Convert<String>::decode(
-                            *(node.map_data_.find(key)->second), value);
                     rhs += value;
                 }
                 rhs += "}";
@@ -104,7 +105,7 @@ namespace cyaml
 
     // int
     template<>
-    struct Convert<Int>
+    struct Convert<int>
     {
         static Node encode(const int &rhs)
         {
@@ -118,24 +119,24 @@ namespace cyaml
         }
     };
 
-    // real
+    // float
     template<>
-    struct Convert<Real>
+    struct Convert<float>
     {
-        static Node encode(const double &rhs)
+        static Node encode(const float &rhs)
         {
             return Node(std::to_string(rhs));
         }
 
-        static bool decode(const Node &node, double &rhs)
+        static bool decode(const Node &node, float &rhs)
         {
-            rhs = std::stod(node.scalar_data_);
+            rhs = std::stof(node.scalar_data_);
             return true;
         }
     };
 
     template<>
-    struct Convert<Bool>
+    struct Convert<bool>
     {
         static Node encode(const bool &rhs)
         {

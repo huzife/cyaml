@@ -38,13 +38,10 @@ namespace cyaml
             }
         };
 
-        using Key_Map = std::map<Node_Ptr, std::string, Key_Map_Cmp>;
+        // using Key_Map = std::map<Node_Ptr, std::string, Key_Map_Cmp>;
+        using Node_List = std::vector<Node_Ptr>;
         using Map = std::unordered_map<std::string, Node_Ptr>;
         using Sequence = std::vector<Node_Ptr>;
-        using Int = int;
-        using Real = double;
-        using String = std::string;
-        using Bool = bool;
 
     } // namespace type
 

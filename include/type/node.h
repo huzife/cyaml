@@ -31,11 +31,11 @@ namespace cyaml
     class Node: public std::enable_shared_from_this<Node>
     {
     public:
-        Node_Type type_;
-        type::Key_Map keys_;
-        type::Map map_data_;
-        type::Sequence seq_data_;
-        std::string scalar_data_;
+        Node_Type type_;          // 节点类型
+        type::Map map_data_;      // 映射数据
+        type::Sequence seq_data_; // 序列数据
+        std::string scalar_data_; // 标量数据
+        type::Node_List keys_;    // 键
 
         /**
          * @brief   Node 类构造函数，默认为空节点

@@ -23,24 +23,25 @@ namespace cyaml
     enum class Token_Type
     {
         NONE,
-        STREAM_START,   // 输入流开始
-        STREAM_END,     // 输入流结束
-        DOC_START,      // ---
-        DOC_END,        // ...
-        BLOCK_ENTRY,    // -
-        FLOW_ENTRY,     // ,
-        FLOW_MAP_START, // {
-        FLOW_MAP_END,   // }
-        FLOW_SEQ_START, // [
-        FLOW_SEQ_END,   // ]
-        KEY,            // key 标志
-        VALUE,          // value 标志
-        SCALAR,         // 标量
-
-        BLOCK_MAP_START,
-        BLOCK_MAP_END,
-        BLOCK_SEQ_START,
-        BLOCK_SEQ_END
+        STREAM_START,    // 输入流开始
+        STREAM_END,      // 输入流结束
+        DOC_START,       // ---
+        DOC_END,         // ...
+        BLOCK_ENTRY,     // -
+        BLOCK_MAP_START, // 进入 block_map
+        BLOCK_MAP_END,   // 退出 block_map
+        BLOCK_SEQ_START, // 进入 block_seq
+        BLOCK_SEQ_END,   // 退出 block_seq
+        FLOW_ENTRY,      // ,
+        FLOW_MAP_START,  // {
+        FLOW_MAP_END,    // }
+        FLOW_SEQ_START,  // [
+        FLOW_SEQ_END,    // ]
+        KEY,             // key 标志
+        VALUE,           // value 标志
+        SCALAR,          // 标量
+        ANCHOR,          // &
+        ALIAS,           // *
     };
 
     /**
@@ -50,10 +51,10 @@ namespace cyaml
     class Token
     {
     private:
-        Token_Type token_type_; // token 类型
-        std::string value_;     // 字面量
-        Mark mark_;             // 位置
-        bool is_null_ = false;  // 是否为空节点
+        Token_Type token_type_;  // token 类型
+        std::string value_;      // 字面量
+        Mark mark_;              // 位置
+        bool has_value_ = false; // 是否有值
 
     public:
         /**
@@ -72,20 +73,12 @@ namespace cyaml
 
         /**
          * @brief   Token 类构造函数
-         * @param   String_Type     字符串类型
+         * @param   Token_Type      token 类型
+         * @param   std::string     token 字面量
          * @param   Mark            token 位置
          * @retval  Token 对象
          */
-        Token(std::string value, Mark mark);
-
-        /**
-         * @brief   判断是否为空节点
-         * @return  bool
-         */
-        bool is_null() const
-        {
-            return is_null_;
-        }
+        Token(Token_Type type, std::string value, Mark mark);
 
         /**
          * @brief   获取 token 类型
@@ -104,7 +97,7 @@ namespace cyaml
          */
         bool has_value() const
         {
-            return token_type_ == Token_Type::SCALAR;
+            return has_value_;
         }
 
         /**

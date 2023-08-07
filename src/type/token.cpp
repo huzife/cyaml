@@ -14,10 +14,11 @@ namespace cyaml
 
     Token::Token(Token_Type type, Mark mark): token_type_(type), mark_(mark) {}
 
-    Token::Token(std::string value, Mark mark)
-        : token_type_(Token_Type::SCALAR),
+    Token::Token(Token_Type type, std::string value, Mark mark)
+        : token_type_(type),
           value_(value),
-          mark_(mark)
+          mark_(mark),
+          has_value_(true)
     {
     }
 
@@ -52,6 +53,14 @@ namespace cyaml
             return "DOC_END";
         case Token_Type::BLOCK_ENTRY:
             return "BLOCK_ENTRY";
+        case Token_Type::BLOCK_MAP_START:
+            return "BLOCK_MAP_START";
+        case Token_Type::BLOCK_MAP_END:
+            return "BLOCK_MAP_END";
+        case Token_Type::BLOCK_SEQ_START:
+            return "BLOCK_SEQ_START";
+        case Token_Type::BLOCK_SEQ_END:
+            return "BLOCK_SEQ_END";
         case Token_Type::FLOW_ENTRY:
             return "FLOW_ENTRY";
         case Token_Type::FLOW_MAP_START:
@@ -68,14 +77,10 @@ namespace cyaml
             return "VALUE";
         case Token_Type::SCALAR:
             return "SCALAR";
-        case Token_Type::BLOCK_MAP_START:
-            return "BLOCK_MAP_START";
-        case Token_Type::BLOCK_MAP_END:
-            return "BLOCK_MAP_END";
-        case Token_Type::BLOCK_SEQ_START:
-            return "BLOCK_SEQ_START";
-        case Token_Type::BLOCK_SEQ_END:
-            return "BLOCK_SEQ_END";
+        case Token_Type::ANCHOR:
+            return "ANCHOR";
+        case Token_Type::ALIAS:
+            return "ALIAS";
         }
 
         // unreachabled

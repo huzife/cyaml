@@ -41,7 +41,7 @@ namespace cyaml
             Node_Ptr &value_node)
     {
         std::string key;
-        Convert<String>::decode(*key_node, key);
+        Convert<std::string>::decode(*key_node, key);
 
         if (node->map_data_.find(key) != node_->map_data_.end()) {
             throw Representation_Exception(
@@ -49,7 +49,7 @@ namespace cyaml
                     mark());
         }
 
-        node->keys_[key_node] = key;
+        node->keys_.emplace_back(key_node);
         node->map_data_[key] = value_node;
     }
 
@@ -88,10 +88,31 @@ namespace cyaml
 
     void Parser::parse_block_node_or_indentless_seq(Node_Ptr &node)
     {
-        if (belong(block_content_set)) {
-            parse_block_content(node);
-        } else if (belong(indentless_seq_set)) {
-            parse_indentless_seq(node);
+        if (next_type() == Token_Type::ALIAS) {
+            Token alias = next_token();
+            if (anchor_map_.find(alias.value()) == anchor_map_.end()) {
+                throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark());
+            }
+            node = anchor_map_[alias.value()];
+        } else if (belong(properties_set, block_content_set,
+                          indentless_seq_set)) {
+            // 解析属性
+            std::string anchor_name;
+            if (belong(properties_set)) {
+                anchor_name = parse_properties();
+            }
+
+            // 解析节点内容
+            if (belong(block_content_set)) {
+                parse_block_content(node);
+            } else if (belong(indentless_seq_set)) {
+                parse_indentless_seq(node);
+            }
+
+            // 插入 anchor 表
+            if (!anchor_name.empty()) {
+                anchor_map_[anchor_name] = node;
+            }
         } else {
             throw_unexpected_token();
         }
@@ -99,12 +120,67 @@ namespace cyaml
 
     void Parser::parse_block_node(Node_Ptr &node)
     {
-        parse_block_content(node);
+        if (next_type() == Token_Type::ALIAS) {
+            Token alias = next_token();
+            if (anchor_map_.find(alias.value()) == anchor_map_.end()) {
+                throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark());
+            }
+            node = anchor_map_[alias.value()];
+        } else if (belong(properties_set, block_content_set)) {
+            // 解析属性
+            std::string anchor_name;
+            if (belong(properties_set)) {
+                anchor_name = parse_properties();
+            }
+
+            // 解析节点内容
+            if (belong(block_content_set)) {
+                parse_block_content(node);
+            }
+
+            // 插入 anchor 表
+            if (!anchor_name.empty()) {
+                anchor_map_[anchor_name] = node;
+            }
+        } else {
+            throw_unexpected_token();
+        }
     }
 
     void Parser::parse_flow_node(Node_Ptr &node)
     {
-        parse_flow_content(node);
+        if (next_type() == Token_Type::ALIAS) {
+            Token alias = next_token();
+            if (anchor_map_.find(alias.value()) == anchor_map_.end()) {
+                throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark());
+            }
+            node = anchor_map_[alias.value()];
+        } else if (belong(properties_set, flow_content_set)) {
+            // 解析属性
+            std::string anchor_name;
+            if (belong(properties_set)) {
+                anchor_name = parse_properties();
+            }
+
+            // 解析节点内容
+            if (belong(flow_content_set)) {
+                parse_flow_content(node);
+            }
+
+            // 插入 anchor 表
+            if (!anchor_name.empty()) {
+                anchor_map_[anchor_name] = node;
+            }
+        } else {
+            throw_unexpected_token();
+        }
+    }
+
+    std::string Parser::parse_properties()
+    {
+        // 目前只有 anchor，未实现 tag
+        Token anchor = expect(Token_Type::ANCHOR);
+        return anchor.value();
     }
 
     void Parser::parse_block_content(Node_Ptr &node)

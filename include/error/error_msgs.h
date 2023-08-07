@@ -15,6 +15,15 @@ namespace cyaml
         const char *const SCAN_TOKEN_ERROR = "scan token error";
         const char *const UNKNOWN_TOKEN = "unknown token";
         const char *const UNKNOWN_ESCAPE = "unknown escape";
+        const char *const UNKNOWN_ANCHOR = "unknown anchor";
+        const char *const EMPTY_ANCHOR =
+                "anchor name should contain at least one character";
+        const char *const EMPTY_ALIAS =
+                "alias name should contain at least one character";
+        const char *const END_OF_ANCHOR =
+                "illegal character at the end of anchor name";
+        const char *const END_OF_ALIAS =
+                "illegal character at the end of alias name";
         const char *const EOF_IN_SCALAR = "illegal EOF in scalar";
         const char *const NO_MAP_END = "missing end of map";
         const char *const NO_SEQ_END = "missing end of sequence";
@@ -23,8 +32,6 @@ namespace cyaml
         const char *const INVALID_FLOW_END = "invalid flow end";
         const char *const BAD_DEREFERENCE = "bad dereference";
         const char *const BAD_CONVERTION = "bad convertion";
-        const char *const KEY_NOT_FOUND =
-                "omitting key in flow map is not allowed yet";
         const char *const DUPLICATED_KEY = "duplicated key";
     } // namespace error_msgs
 } // namespace cyaml

@@ -43,11 +43,20 @@ namespace cyaml
         Value operator[](uint32_t index);
 
         /**
-         * @brief   获取映射(对象)元素
+         * @brief   查找映射值
          * @param   std::string     键
-         * @retval  由传入键对应元素封装的 Value
+         * @return  Value
+         * @retval  对应元素的 Value
          */
-        Value operator[](std::string key);
+        Value operator[](const std::string &key);
+
+        /**
+         * @brief   查找映射值
+         * @param   const Value &   键
+         * @return  Value
+         * @retval  对应元素的 Value
+         */
+        Value operator[](const Value &key);
 
         /**
          * @brief   Value 绑定引用

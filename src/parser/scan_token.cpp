@@ -40,6 +40,62 @@ namespace cyaml
         add_token(Token_Type::DOC_END);
     }
 
+    void Scanner::scan_anchor()
+    {
+        // '&'
+        next_char();
+
+        while (!input_end_) {
+            if (is_delimiter(next()) || match_any_of("[]{},"))
+                break;
+            value_ += next_char();
+        }
+
+        if (value_.empty()) {
+            throw Parse_Exception(error_msgs::EMPTY_ANCHOR, mark());
+        }
+
+        if (!is_delimiter(next()) && !match_any_of("?:,]}%@`")) {
+            throw Parse_Exception(error_msgs::END_OF_ANCHOR, mark());
+        }
+
+        // 记录当前缩进
+        anchor_indent_ = cur_indent_;
+        after_anchor_ = true;
+
+        add_token(Token_Type::ANCHOR, value_);
+    }
+
+    void Scanner::scan_alias()
+    {
+        // '*'
+        next_char();
+
+        while (!input_end_) {
+            if (is_delimiter(next()) || match_any_of("[]{},"))
+                break;
+            value_ += next_char();
+        }
+
+        if (value_.empty()) {
+            throw Parse_Exception(error_msgs::EMPTY_ALIAS, mark());
+        }
+
+        if (!is_delimiter(next()) && !match_any_of("?:,]}%@`")) {
+            throw Parse_Exception(error_msgs::END_OF_ANCHOR, mark());
+        }
+
+        skip_blank();
+        if (match(":", true)) {
+            push_indent(Indent_Type::MAP);
+            pop_indent();
+            start_scalar();
+            add_token(Token_Type::KEY);
+        }
+
+        add_token(Token_Type::ALIAS, value_);
+    }
+
     void Scanner::scan_block_entry()
     {
         next_char();
@@ -187,9 +243,9 @@ namespace cyaml
                 start_scalar();
             }
             add_token(Token_Type::KEY);
-            add_token(value_);
+            add_token(Token_Type::SCALAR, value_);
         } else {
-            add_token(value_);
+            add_token(Token_Type::SCALAR, value_);
             end_scalar();
         }
     }
@@ -216,7 +272,7 @@ namespace cyaml
             // 扫描字符串直到换行
             while (!input_end_ && next() != '\n') {
                 // 遇到注释停止
-                if (!in_special() && next() == '#') {
+                if (!in_special() && match(" #")) {
                     hit_comment = true;
                     break;
                 }
@@ -290,11 +346,11 @@ namespace cyaml
                 start_scalar();
             }
             add_token(Token_Type::KEY);
-            add_token(value_);
+            add_token(Token_Type::SCALAR, value_);
         } else {
             // 特殊字符串不作为 null
             if (value_ != "~" && value_ != "null" || in_special()) {
-                add_token(value_);
+                add_token(Token_Type::SCALAR, value_);
             }
             reset_scalar_flags();
             end_scalar();

@@ -58,6 +58,12 @@ public:
 };
 
 #ifdef CYAML_TEST
+// 锚点和引用测试
+TEST_F(Scanner_Test, anchor_alias)
+{
+    scan_test("anchor_alias");
+}
+
 // 基本 token 解析测试
 TEST_F(Scanner_Test, token1)
 {

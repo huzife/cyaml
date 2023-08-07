@@ -27,6 +27,7 @@ namespace cyaml
     private:
         Scanner scanner_;
         Node_Ptr node_ = std::make_shared<Node>();
+        std::unordered_map<std::string, Node_Ptr> anchor_map_;
 
         mutable Mark mark_ = Mark(1, 1); // 当前 token 位置
 
@@ -87,7 +88,7 @@ namespace cyaml
         Token expect(Token_Type type);
 
         /**
-         * @brief   判断下一个字符是否属于某个 first 集
+         * @brief   判断下一个 token 是否属于某一个 first 集
          * @param   const First_Set &
          * @return  bool
          */
@@ -95,6 +96,24 @@ namespace cyaml
         {
             auto type = next_type();
             return first_set.find(type) != first_set.end();
+        }
+
+        /**
+         * @brief   belong 边界
+         */
+        constexpr bool belong() const
+        {
+            return false;
+        }
+
+        /**
+         * @brief   判断下一个 token 是否属于某多个 first 集
+         * @return  bool
+         */
+        template<typename... Args>
+        bool belong(const First_Set &first_set, Args... sets) const
+        {
+            return belong(first_set) || belong(sets...);
         }
 
         /**
@@ -119,9 +138,9 @@ namespace cyaml
 
         /**
          * @brief   插入键值对
-         * @param   Node_Ptr &  当前节点
-         * @param   Node_Ptr &  KEY 节点
-         * @param   Node_Ptr &  VALUE 节点
+         * @param   Node_Ptr &      当前节点
+         * @param   Node_Ptr &      KEY 节点
+         * @param   Node_Ptr &      VALUE 节点
          * @return  void
          */
         void insert_key_value(
@@ -134,6 +153,7 @@ namespace cyaml
         void parse_block_node_or_indentless_seq(Node_Ptr &node);
         void parse_block_node(Node_Ptr &node);
         void parse_flow_node(Node_Ptr &node);
+        std::string parse_properties();
         void parse_block_content(Node_Ptr &node);
         void parse_flow_content(Node_Ptr &node);
         void parse_block_collection(Node_Ptr &node);
