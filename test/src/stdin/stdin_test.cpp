@@ -1,5 +1,5 @@
 #include "parser/parser.h"
-#include "type/value.h"
+#include "type/node.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -21,7 +21,7 @@ public:
         std::cout << "parser test finish" << std::endl;
     }
 
-    void parse(cyaml::Value &value)
+    void parse(cyaml::Node &value)
     {
         cyaml::Parser parser(std::cin);
         value = parser.parse();
@@ -31,21 +31,21 @@ public:
 #ifdef CYAML_TEST
 TEST_F(Stdin_Test, empty_document1)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse(value);
     EXPECT_EQ(value.size(), 0);
 }
 
 TEST_F(Stdin_Test, empty_document2)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse(value);
     EXPECT_EQ(value.size(), 0);
 }
 
 TEST_F(Stdin_Test, flow)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse(value);
 
     EXPECT_EQ(value.type(), cyaml::Node_Type::MAP);
@@ -58,7 +58,7 @@ TEST_F(Stdin_Test, flow)
 
 TEST_F(Stdin_Test, nested_flow)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse(value);
 
     EXPECT_EQ(value.type(), cyaml::Node_Type::MAP);
@@ -77,7 +77,7 @@ TEST_F(Stdin_Test, nested_flow)
 
 TEST_F(Stdin_Test, flow_in_line)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse(value);
 
     EXPECT_EQ(value["a"].type(), cyaml::Node_Type::MAP);
@@ -94,7 +94,7 @@ TEST_F(Stdin_Test, flow_in_line)
 
 TEST_F(Stdin_Test, value)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse(value);
 
     EXPECT_EQ(value.type(), cyaml::Node_Type::MAP);

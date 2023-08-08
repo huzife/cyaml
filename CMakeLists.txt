@@ -16,7 +16,7 @@ set(PARSER_SRC
 set(TYPE_SRC
     src/type/token.cpp
     src/type/node.cpp
-    src/type/value.cpp
+    src/type/node_data.cpp
     src/type/mark.cpp
 )
 

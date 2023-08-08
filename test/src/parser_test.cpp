@@ -1,5 +1,5 @@
 #include "parser/parser.h"
-#include "type/value.h"
+#include "type/node.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -23,7 +23,7 @@ public:
         std::cout << "parser test finish" << std::endl;
     }
 
-    void parse(std::string test_name, cyaml::Value &value)
+    void parse(std::string test_name, cyaml::Node &value)
     {
         std::ifstream input_in(test_case_dirname + test_name + ".in");
         EXPECT_TRUE(input_in.is_open());
@@ -36,7 +36,7 @@ public:
 #ifdef CYAML_TEST
 TEST_F(Parser_Test, anchor_alias)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse("anchor_alias", value);
     EXPECT_EQ(value.size(), 3);
     EXPECT_EQ(value["a"].as<int>(), 1);
@@ -45,14 +45,14 @@ TEST_F(Parser_Test, anchor_alias)
     EXPECT_TRUE(value.find("{b1: 2, b2: 1}"));
     EXPECT_EQ(value["{b1: 2, b2: 1}"].as<int>(), 3);
 
-    cyaml::Value b = value["b"];
+    cyaml::Node b = value["b"];
     EXPECT_TRUE(value.find(b));
     EXPECT_EQ(value[b].as<int>(), 3);
 }
 
 TEST_F(Parser_Test, complex_key)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse("complex_key", value);
     EXPECT_EQ(value.size(), 2);
     EXPECT_TRUE(value.find("{a: 1, b: 2}"));
@@ -67,21 +67,21 @@ TEST_F(Parser_Test, complex_key)
 
 TEST_F(Parser_Test, empty_document1)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse("empty_document1", value);
     EXPECT_EQ(value.size(), 0);
 }
 
 TEST_F(Parser_Test, empty_document2)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse("empty_document2", value);
     EXPECT_EQ(value.size(), 0);
 }
 
 TEST_F(Parser_Test, flow)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse("flow", value);
 
     EXPECT_EQ(value.type(), cyaml::Node_Type::MAP);
@@ -94,7 +94,7 @@ TEST_F(Parser_Test, flow)
 
 TEST_F(Parser_Test, nested_flow)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse("nested_flow", value);
 
     EXPECT_EQ(value.type(), cyaml::Node_Type::MAP);
@@ -113,7 +113,7 @@ TEST_F(Parser_Test, nested_flow)
 
 TEST_F(Parser_Test, flow_in_line)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse("flow_in_line", value);
 
     EXPECT_EQ(value["a"].type(), cyaml::Node_Type::MAP);
@@ -130,7 +130,7 @@ TEST_F(Parser_Test, flow_in_line)
 
 TEST_F(Parser_Test, value)
 {
-    cyaml::Value value;
+    cyaml::Node value;
     parse("value", value);
 
     EXPECT_EQ(value.type(), cyaml::Node_Type::MAP);

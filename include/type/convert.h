@@ -8,7 +8,7 @@
 #ifndef CYAML_CONVERT_H
 #define CYAML_CONVERT_H
 
-#include "type/node.h"
+#include "type/node_data.h"
 #include <string>
 #include <iostream>
 
@@ -16,22 +16,22 @@ namespace cyaml
 {
     /**
      * @struct  Convert
-     * @brief   Node 与指定类型的转换模板类
+     * @brief   Node_Data 与指定类型的转换模板类
      * @tparam  T   转换类型
      */
     template<typename T>
     struct Convert;
 
-    // Node
+    // Node_Data
     template<>
-    struct Convert<Node>
+    struct Convert<Node_Data>
     {
-        static Node encode(const Node &rhs)
+        static Node_Data encode(const Node_Data &rhs)
         {
             return rhs;
         }
 
-        static bool decode(const Node &node, Node &rhs)
+        static bool decode(const Node_Data &node, Node_Data &rhs)
         {
             rhs = node;
             return true;
@@ -44,12 +44,12 @@ namespace cyaml
     template<>
     struct Convert<std::string>
     {
-        static Node encode(const std::string &rhs)
+        static Node_Data encode(const std::string &rhs)
         {
-            return Node(rhs);
+            return Node_Data(rhs);
         }
 
-        static bool decode(const Node &node, std::string &rhs)
+        static bool decode(const Node_Data &node, std::string &rhs)
         {
             if (node.is_null()) {
                 rhs = "null";
@@ -107,12 +107,12 @@ namespace cyaml
     template<>
     struct Convert<int>
     {
-        static Node encode(const int &rhs)
+        static Node_Data encode(const int &rhs)
         {
-            return Node(std::to_string(rhs));
+            return Node_Data(std::to_string(rhs));
         }
 
-        static bool decode(const Node &node, int &rhs)
+        static bool decode(const Node_Data &node, int &rhs)
         {
             rhs = std::stoi(node.scalar_data_);
             return true;
@@ -123,12 +123,12 @@ namespace cyaml
     template<>
     struct Convert<float>
     {
-        static Node encode(const float &rhs)
+        static Node_Data encode(const float &rhs)
         {
-            return Node(std::to_string(rhs));
+            return Node_Data(std::to_string(rhs));
         }
 
-        static bool decode(const Node &node, float &rhs)
+        static bool decode(const Node_Data &node, float &rhs)
         {
             rhs = std::stof(node.scalar_data_);
             return true;
@@ -138,15 +138,15 @@ namespace cyaml
     template<>
     struct Convert<bool>
     {
-        static Node encode(const bool &rhs)
+        static Node_Data encode(const bool &rhs)
         {
             if (rhs)
-                return Node("true");
+                return Node_Data("true");
             else
-                return Node("false");
+                return Node_Data("false");
         }
 
-        static bool decode(const Node &node, bool &rhs)
+        static bool decode(const Node_Data &node, bool &rhs)
         {
             if (!node.is_scalar())
                 return false;

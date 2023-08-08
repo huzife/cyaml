@@ -36,9 +36,9 @@ namespace cyaml
     }
 
     void Parser::insert_key_value(
-            Node_Ptr &node,
-            Node_Ptr &key_node,
-            Node_Ptr &value_node)
+            Node_Data_Ptr &node,
+            Node_Data_Ptr &key_node,
+            Node_Data_Ptr &value_node)
     {
         std::string key;
         Convert<std::string>::decode(*key_node, key);
@@ -54,21 +54,21 @@ namespace cyaml
     }
 
     // 解析部分
-    Value Parser::parse()
+    Node Parser::parse()
     {
         parse_stream(node_);
 
-        return Value(node_);
+        return Node(node_);
     }
 
-    void Parser::parse_stream(Node_Ptr &node)
+    void Parser::parse_stream(Node_Data_Ptr &node)
     {
         expect(Token_Type::STREAM_START);
         parse_document(node);
         expect(Token_Type::STREAM_END);
     }
 
-    void Parser::parse_document(Node_Ptr &node)
+    void Parser::parse_document(Node_Data_Ptr &node)
     {
         // DOC_START?
         if (next_type() == Token_Type::DOC_START) {
@@ -86,7 +86,7 @@ namespace cyaml
         }
     }
 
-    void Parser::parse_block_node_or_indentless_seq(Node_Ptr &node)
+    void Parser::parse_block_node_or_indentless_seq(Node_Data_Ptr &node)
     {
         if (next_type() == Token_Type::ALIAS) {
             Token alias = next_token();
@@ -118,7 +118,7 @@ namespace cyaml
         }
     }
 
-    void Parser::parse_block_node(Node_Ptr &node)
+    void Parser::parse_block_node(Node_Data_Ptr &node)
     {
         if (next_type() == Token_Type::ALIAS) {
             Token alias = next_token();
@@ -147,7 +147,7 @@ namespace cyaml
         }
     }
 
-    void Parser::parse_flow_node(Node_Ptr &node)
+    void Parser::parse_flow_node(Node_Data_Ptr &node)
     {
         if (next_type() == Token_Type::ALIAS) {
             Token alias = next_token();
@@ -183,31 +183,31 @@ namespace cyaml
         return anchor.value();
     }
 
-    void Parser::parse_block_content(Node_Ptr &node)
+    void Parser::parse_block_content(Node_Data_Ptr &node)
     {
         if (belong(block_collection_set)) {
             parse_block_collection(node);
         } else if (belong(flow_collection_set)) {
             parse_flow_collection(node);
         } else if (next_type() == Token_Type::SCALAR) {
-            node = std::make_shared<Node>(next_token().value());
+            node = std::make_shared<Node_Data>(next_token().value());
         } else {
             throw_unexpected_token();
         }
     }
 
-    void Parser::parse_flow_content(Node_Ptr &node)
+    void Parser::parse_flow_content(Node_Data_Ptr &node)
     {
         if (belong(flow_collection_set)) {
             parse_flow_collection(node);
         } else if (next_type() == Token_Type::SCALAR) {
-            node = std::make_shared<Node>(next_token().value());
+            node = std::make_shared<Node_Data>(next_token().value());
         } else {
             throw_unexpected_token();
         }
     }
 
-    void Parser::parse_block_collection(Node_Ptr &node)
+    void Parser::parse_block_collection(Node_Data_Ptr &node)
     {
         if (belong(block_map_set)) {
             parse_block_map(node);
@@ -218,7 +218,7 @@ namespace cyaml
         }
     }
 
-    void Parser::parse_flow_collection(Node_Ptr &node)
+    void Parser::parse_flow_collection(Node_Data_Ptr &node)
     {
         if (belong(flow_map_set)) {
             parse_flow_map(node);
@@ -229,15 +229,15 @@ namespace cyaml
         }
     }
 
-    void Parser::parse_block_map(Node_Ptr &node)
+    void Parser::parse_block_map(Node_Data_Ptr &node)
     {
-        node = std::make_shared<Node>(Node_Type::MAP);
+        node = std::make_shared<Node_Data>(Node_Type::MAP);
         expect(Token_Type::BLOCK_MAP_START);
 
         // 循环解析 key : value
         while (next_type() != Token_Type::BLOCK_MAP_END) {
             // key 部分，默认为 "null"
-            auto key_node = std::make_shared<Node>("null");
+            auto key_node = std::make_shared<Node_Data>("null");
             if (next_type() == Token_Type::KEY) {
                 next_token();
                 if (belong(block_node_or_indentless_seq_set)) {
@@ -246,7 +246,7 @@ namespace cyaml
             }
 
             // value 部分，默认为 null
-            auto value_node = std::make_shared<Node>();
+            auto value_node = std::make_shared<Node_Data>();
             if (next_type() == Token_Type::VALUE) {
                 next_token();
                 if (belong(block_node_or_indentless_seq_set)) {
@@ -261,15 +261,15 @@ namespace cyaml
         expect(Token_Type::BLOCK_MAP_END);
     }
 
-    void Parser::parse_block_seq(Node_Ptr &node)
+    void Parser::parse_block_seq(Node_Data_Ptr &node)
     {
-        node = std::make_shared<Node>(Node_Type::SEQ);
+        node = std::make_shared<Node_Data>(Node_Type::SEQ);
         expect(Token_Type::BLOCK_SEQ_START);
 
         // 循环解析数组元素
         while (next_type() != Token_Type::BLOCK_SEQ_END) {
             expect(Token_Type::BLOCK_ENTRY);
-            auto value_node = std::make_shared<Node>();
+            auto value_node = std::make_shared<Node_Data>();
             if (belong(block_node_set)) {
                 parse_block_node(value_node);
             }
@@ -279,14 +279,14 @@ namespace cyaml
         expect(Token_Type::BLOCK_SEQ_END);
     }
 
-    void Parser::parse_indentless_seq(Node_Ptr &node)
+    void Parser::parse_indentless_seq(Node_Data_Ptr &node)
     {
-        node = std::make_shared<Node>(Node_Type::SEQ);
+        node = std::make_shared<Node_Data>(Node_Type::SEQ);
         Token_Type type = next_type();
 
         // 至少一次
         expect(Token_Type::BLOCK_ENTRY);
-        auto value_node = std::make_shared<Node>();
+        auto value_node = std::make_shared<Node_Data>();
         if (belong(block_node_set)) {
             parse_block_node(value_node);
         }
@@ -295,7 +295,7 @@ namespace cyaml
         while (next_type() != Token_Type::KEY &&
                next_type() != Token_Type::BLOCK_MAP_END) {
             expect(Token_Type::BLOCK_ENTRY);
-            value_node = std::make_shared<Node>();
+            value_node = std::make_shared<Node_Data>();
             if (belong(block_node_set)) {
                 parse_block_node(value_node);
             }
@@ -303,15 +303,15 @@ namespace cyaml
         }
     }
 
-    void Parser::parse_flow_map(Node_Ptr &node)
+    void Parser::parse_flow_map(Node_Data_Ptr &node)
     {
-        node = std::make_shared<Node>(Node_Type::MAP);
+        node = std::make_shared<Node_Data>(Node_Type::MAP);
         expect(Token_Type::FLOW_MAP_START);
 
         // 循环解析 key : value
         while (next_type() != Token_Type::FLOW_MAP_END) {
-            auto key_node = std::make_shared<Node>("null");
-            auto value_node = std::make_shared<Node>();
+            auto key_node = std::make_shared<Node_Data>("null");
+            auto value_node = std::make_shared<Node_Data>();
 
             if (belong(flow_map_entry_set)) {
                 parse_flow_map_entry(key_node, value_node);
@@ -328,14 +328,14 @@ namespace cyaml
         expect(Token_Type::FLOW_MAP_END);
     }
 
-    void Parser::parse_flow_seq(Node_Ptr &node)
+    void Parser::parse_flow_seq(Node_Data_Ptr &node)
     {
-        node = std::make_shared<Node>(Node_Type::SEQ);
+        node = std::make_shared<Node_Data>(Node_Type::SEQ);
         expect(Token_Type::FLOW_SEQ_START);
 
         // 循环解析数组元素
         while (next_type() != Token_Type::FLOW_SEQ_END) {
-            auto value_node = std::make_shared<Node>();
+            auto value_node = std::make_shared<Node_Data>();
             if (belong(flow_seq_entry_set)) {
                 parse_flow_seq_entry(value_node);
             }
@@ -349,7 +349,7 @@ namespace cyaml
         expect(Token_Type::FLOW_SEQ_END);
     }
 
-    void Parser::parse_flow_map_entry(Node_Ptr &key_node, Node_Ptr &value_node)
+    void Parser::parse_flow_map_entry(Node_Data_Ptr &key_node, Node_Data_Ptr &value_node)
     {
         if (belong(flow_node_set)) {
             parse_flow_node(key_node);
@@ -370,21 +370,21 @@ namespace cyaml
         }
     }
 
-    void Parser::parse_flow_seq_entry(Node_Ptr &node)
+    void Parser::parse_flow_seq_entry(Node_Data_Ptr &node)
     {
         if (belong(flow_node_set)) {
             parse_flow_node(node);
         } else if (next_type() == Token_Type::KEY) {
             next_token();
             // [] 中的键值对需要单独放到一个 {} 中
-            node = std::make_shared<Node>(Node_Type::MAP);
+            node = std::make_shared<Node_Data>(Node_Type::MAP);
 
-            auto key_node = std::make_shared<Node>("null");
+            auto key_node = std::make_shared<Node_Data>("null");
             if (belong(flow_node_set)) {
                 parse_flow_node(key_node);
             }
 
-            auto value_node = std::make_shared<Node>();
+            auto value_node = std::make_shared<Node_Data>();
             if (next_type() == Token_Type::VALUE) {
                 next_token();
                 if (belong(flow_node_set)) {

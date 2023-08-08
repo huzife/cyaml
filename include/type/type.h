@@ -17,15 +17,15 @@
 
 namespace cyaml
 {
-    class Node;
-    using Node_Ptr = std::shared_ptr<Node>;
+    class Node_Data;
+    using Node_Data_Ptr = std::shared_ptr<Node_Data>;
 
     namespace type
     {
         class Key_Map_Cmp
         {
         public:
-            bool operator()(const Node_Ptr &n1, const Node_Ptr &n2) const
+            bool operator()(const Node_Data_Ptr &n1, const Node_Data_Ptr &n2) const
             {
                 static bool ret = false;
 
@@ -38,10 +38,10 @@ namespace cyaml
             }
         };
 
-        // using Key_Map = std::map<Node_Ptr, std::string, Key_Map_Cmp>;
-        using Node_List = std::vector<Node_Ptr>;
-        using Map = std::unordered_map<std::string, Node_Ptr>;
-        using Sequence = std::vector<Node_Ptr>;
+        // using Key_Map = std::map<Node_Data_Ptr, std::string, Key_Map_Cmp>;
+        using Node_List = std::vector<Node_Data_Ptr>;
+        using Map = std::unordered_map<std::string, Node_Data_Ptr>;
+        using Sequence = std::vector<Node_Data_Ptr>;
 
     } // namespace type
 
