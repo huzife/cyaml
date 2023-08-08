@@ -6,9 +6,24 @@
  */
 
 #include "type/node_data.h"
+#include "type/node.h"
 
 namespace cyaml
 {
+    size_t node_hash(const Node_Ptr &node)
+    {
+        return node_hash(*node);
+    }
+
+    size_t node_hash(const Node &node)
+    {
+        if (node.is_scalar()) {
+            return std::hash<std::string>()(node.scalar());
+        }
+
+        return std::hash<Node_Data_Ptr>()(node.data_);
+    }
+
     Node_Data::Node_Data(std::string value): scalar(value) {}
 
 } // namespace cyaml

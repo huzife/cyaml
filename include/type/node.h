@@ -43,6 +43,8 @@ namespace cyaml
         Node(const std::string &scalar);
         Node(const Node &) = default;
 
+        friend size_t node_hash(const Node &);
+
         /**
          * @brief   获取值的类型
          * @return  Node_Type
@@ -212,6 +214,9 @@ namespace cyaml
          * @retbal  是否添加成功
          */
         bool push_back(const Node &node);
+
+        friend bool operator==(const Node &n1, const Node &n2);
+        friend bool operator==(const Node_Ptr &n1, const Node_Ptr &n2);
     };
 } // namespace cyaml
 

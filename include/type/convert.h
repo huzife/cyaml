@@ -11,6 +11,7 @@
 #include "type/node.h"
 #include <string>
 #include <iostream>
+#include <assert.h>
 
 namespace cyaml
 {
@@ -88,7 +89,7 @@ namespace cyaml
                     std::string value;
                     Convert<std::string>::decode(*i, key);
                     Convert<std::string>::decode(
-                            *(node.map().find(key)->second), value);
+                            *(node.map().find(i)->second), value);
                     rhs += key;
                     rhs += ": ";
                     rhs += value;
@@ -96,8 +97,9 @@ namespace cyaml
                 rhs += "}";
             }
 
-            if (node.is_scalar())
+            if (node.is_scalar()) {
                 rhs = node.scalar();
+            }
 
             return true;
         }

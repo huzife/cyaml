@@ -19,7 +19,7 @@ namespace cyaml
     {
     }
 
-    Node::Node(const Node_Ptr &node): data_(node->data_) {}
+    Node::Node(const Node_Ptr &node): type_(node->type_), data_(node->data_) {}
 
     Node::Node(Node_Type type, const Node_Data_Ptr &data)
         : type_(type),
@@ -32,8 +32,6 @@ namespace cyaml
           data_(std::make_shared<Node_Data>(scalar))
     {
     }
-
-    // Node::Node(const Node &node): type_(node.type_), data_(node.data_) {}
 
     uint32_t Node::size() const
     {
@@ -57,10 +55,10 @@ namespace cyaml
             throw Dereference_Exception();
 
         ///< @todo  out_of_range exception
-        if (index >= seq().size())
+        if (index >= data_->seq.size())
             throw Dereference_Exception();
 
-        return *(seq()[index]);
+        return *(data_->seq[index]);
     }
 
     Node &Node::operator[](const std::string &key)
@@ -68,10 +66,11 @@ namespace cyaml
         if (!is_map())
             throw Dereference_Exception();
 
+        auto key_node = std::make_shared<Node>(key);
         if (!find(key))
-            data_->map[key] = std::make_shared<Node>();
+            data_->map[key_node] = std::make_shared<Node>();
 
-        return *(data_->map[key]);
+        return *(data_->map[key_node]);
     }
 
     Node &Node::operator[](const Node &key)
@@ -79,10 +78,12 @@ namespace cyaml
         if (!is_map())
             throw Dereference_Exception();
 
-        if (!find(key))
-            data_->map[key.as<std::string>()] = std::make_shared<Node>();
+        auto key_node = std::make_shared<Node>(key);
+        if (!find(key)) {
+            data_->map[key_node] = std::make_shared<Node>();
+        }
 
-        return *(data_->map[key.as<std::string>()]);
+        return *(data_->map[key_node]);
     }
 
     Node &Node::operator=(const Node &rhs)
@@ -100,16 +101,17 @@ namespace cyaml
         if (!is_map())
             return false;
 
-        return map().find(key) != map().end();
+        auto key_node = std::make_shared<Node>(key);
+        return data_->map.find(key_node) != data_->map.end();
     }
 
-    bool Node::find(const Node &value) const
+    bool Node::find(const Node &key) const
     {
         if (!is_map())
             return false;
 
-        std::string key = value.as<std::string>();
-        return map().find(key) != map().end();
+        auto key_node = std::make_shared<Node>(key);
+        return data_->map.find(key_node) != data_->map.end();
     }
 
     bool Node::insert(const Node &key, const Node &value)
@@ -117,8 +119,9 @@ namespace cyaml
         if (!is_map())
             return false;
 
-        data_->keys.emplace_back(std::make_shared<Node>(key));
-        data_->map[key.as<std::string>()] = std::make_shared<Node>(value);
+        auto key_node = std::make_shared<Node>(key);
+        data_->keys.emplace_back(key_node);
+        data_->map[key_node] = std::make_shared<Node>(value);
         return true;
     }
 
@@ -129,6 +132,22 @@ namespace cyaml
 
         data_->seq.emplace_back(std::make_shared<Node>(node));
         return true;
+    }
+
+    bool operator==(const Node &n1, const Node &n2)
+    {
+        if (n1.is_null() && n2.is_null())
+            return true;
+
+        if (n1.is_scalar() && n2.is_scalar())
+            return (n1.scalar() == n2.scalar());
+
+        return (n1.type() == n2.type() && n1.data_ == n2.data_);
+    }
+
+    bool operator==(const Node_Ptr &n1, const Node_Ptr &n2)
+    {
+        return (*n1 == *n2);
     }
 
 } // namespace cyaml
