@@ -9,11 +9,6 @@
 
 namespace cyaml
 {
-    
-
-    Node_Data::Node_Data(std::string value)
-        : scalar_data_(value)
-    {
-    }
+    Node_Data::Node_Data(std::string value): scalar(value) {}
 
 } // namespace cyaml

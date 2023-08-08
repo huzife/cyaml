@@ -36,45 +36,21 @@ namespace cyaml
 
 namespace cyaml
 {
-
     /**
-     * @class   Node
+     * @struct  Node_Data
      * @brief   YAML 数据节点
      */
-    class Node_Data
+    struct Node_Data
     {
-    private:
-        type::Map map_data_;      // 映射数据
-        type::Sequence seq_data_; // 序列数据
-        std::string scalar_data_; // 标量数据
-        type::Node_List keys_;    // 键
+        type::Map map;        // 映射数据
+        type::Sequence seq;   // 序列数据
+        std::string scalar;   // 标量数据
+        type::Node_List keys; // 键(用于实现顺序读取)
 
-    public:
         Node_Data() = default;
         Node_Data(std::string value);
         Node_Data(const Node_Data &) = default;
         Node_Data &operator=(const Node_Data &) = default;
-
-        // 访问函数
-        type::Map &map()
-        {
-            return map_data_;
-        }
-
-        type::Sequence &seq()
-        {
-            return seq_data_;
-        }
-
-        std::string &scalar()
-        {
-            return scalar_data_;
-        }
-
-        type::Node_List &keys()
-        {
-            return keys_;
-        }
     };
 
 } // namespace cyaml

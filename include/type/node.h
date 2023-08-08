@@ -99,37 +99,37 @@ namespace cyaml
         /**
          * @brief   获取 map
          */
-        type::Map map() const
+        const type::Map map() const
         {
             assert(data_);
-            return data_->map();
+            return data_->map;
         }
 
         /**
          * @brief   获取 sequence
          */
-        type::Sequence seq() const
+        const type::Sequence seq() const
         {
             assert(data_);
-            return data_->seq();
+            return data_->seq;
         }
 
         /**
          * @brief   获取标量
          */
-        std::string scalar() const
+        const std::string scalar() const
         {
             assert(data_);
-            return data_->scalar();
+            return data_->scalar;
         }
 
         /**
          * @brief   获取 keys
          */
-        type::Node_List keys() const
+        const type::Node_List keys() const
         {
             assert(data_);
-            return data_->keys();
+            return data_->keys;
         }
 
         /**
@@ -137,7 +137,7 @@ namespace cyaml
          * @param   uint32_t    元素索引值
          * @retval  由传入索引对应元素封装的 Node
          */
-        Node operator[](uint32_t index);
+        Node &operator[](uint32_t index);
 
         /**
          * @brief   查找映射值
@@ -145,7 +145,7 @@ namespace cyaml
          * @return  Node
          * @retval  对应元素的 Node
          */
-        Node operator[](const std::string &key);
+        Node &operator[](const std::string &key);
 
         /**
          * @brief   查找映射值
@@ -153,7 +153,7 @@ namespace cyaml
          * @return  Node
          * @retval  对应元素的 Node
          */
-        Node operator[](const Node &key);
+        Node &operator[](const Node &key);
 
         /**
          * @brief   Node 绑定引用
@@ -182,7 +182,7 @@ namespace cyaml
 
         /**
          * @brief   根据字符串查找 key
-         * @param   std::string     key
+         * @param   std::string     键
          * @return  bool
          * @retval  该键是否存在
          */
@@ -190,11 +190,11 @@ namespace cyaml
 
         /**
          * @brief   根据 Node 查找 key
-         * @param   const Node &   value
+         * @param   const Node &    键
          * @return  bool
          * @retval  该键是否存在
          */
-        bool find(const Node &value) const;
+        bool find(const Node &key) const;
 
         /**
          * @brief   插入键值对

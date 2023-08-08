@@ -61,8 +61,8 @@ TEST_F(Parser_Test, complex_key)
     EXPECT_TRUE(node.find("[4, 5]"));
     EXPECT_EQ(node["{a: 1, b: 2}"][0].as<int>(), 3);
     EXPECT_TRUE(node["{a: 1, b: 2}"][1].is_null());
-    // node["{a: 1, b: 2}"][1] = 2;
-    // EXPECT_EQ(node["{a: 1, b: 2}"][1].as<std::string>(), "2");
+    node["{a: 1, b: 2}"][1] = 2;
+    EXPECT_EQ(node["{a: 1, b: 2}"][1].as<std::string>(), "2");
     EXPECT_EQ(node["[4, 5]"]["c"].as<int>(), 6);
     EXPECT_EQ(node["[4, 5]"]["d"].as<int>(), 7);
 }

@@ -51,7 +51,7 @@ namespace cyaml
         return 0;
     }
 
-    Node Node::operator[](uint32_t index)
+    Node &Node::operator[](uint32_t index)
     {
         if (!is_seq())
             throw Dereference_Exception();
@@ -63,28 +63,26 @@ namespace cyaml
         return *(seq()[index]);
     }
 
-    Node Node::operator[](const std::string &key)
+    Node &Node::operator[](const std::string &key)
     {
         if (!is_map())
             throw Dereference_Exception();
 
-        ///< @todo  key_not_found exception
         if (!find(key))
-            throw Dereference_Exception();
+            data_->map[key] = std::make_shared<Node>();
 
-        return *(map()[key]);
+        return *(data_->map[key]);
     }
 
-    Node Node::operator[](const Node &key)
+    Node &Node::operator[](const Node &key)
     {
         if (!is_map())
             throw Dereference_Exception();
 
-        ///< @todo  key_not_found exception
         if (!find(key))
-            throw Dereference_Exception();
+            data_->map[key.as<std::string>()] = std::make_shared<Node>();
 
-        return *(map()[key.as<std::string>()]);
+        return *(data_->map[key.as<std::string>()]);
     }
 
     Node &Node::operator=(const Node &rhs)
@@ -119,8 +117,8 @@ namespace cyaml
         if (!is_map())
             return false;
 
-        data_->keys().emplace_back(std::make_shared<Node>(key));
-        data_->map()[key.as<std::string>()] = std::make_shared<Node>(value);
+        data_->keys.emplace_back(std::make_shared<Node>(key));
+        data_->map[key.as<std::string>()] = std::make_shared<Node>(value);
         return true;
     }
 
@@ -129,7 +127,7 @@ namespace cyaml
         if (!is_seq())
             return false;
 
-        data_->seq().emplace_back(std::make_shared<Node>(node));
+        data_->seq.emplace_back(std::make_shared<Node>(node));
         return true;
     }
 
