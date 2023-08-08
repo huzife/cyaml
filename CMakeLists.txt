@@ -14,10 +14,10 @@ set(PARSER_SRC
 )
 
 set(TYPE_SRC
-    src/type/token.cpp
+    src/type/mark.cpp
     src/type/node.cpp
     src/type/node_data.cpp
-    src/type/mark.cpp
+    src/type/token.cpp
 )
 
 set(ERROR_SRC

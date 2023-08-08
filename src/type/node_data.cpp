@@ -9,11 +9,10 @@
 
 namespace cyaml
 {
-    Node_Data::Node_Data(Node_Type type): type_(type) {}
+    
 
     Node_Data::Node_Data(std::string value)
-        : type_(Node_Type::SCALAR),
-          scalar_data_(value)
+        : scalar_data_(value)
     {
     }
 

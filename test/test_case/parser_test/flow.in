@@ -1,8 +1,8 @@
 ---
-flow_map: {
-    key1: value1,
+flow_map:
+    key1: value1
     key2: value2
-}
+
 flow_seq: [
     "1",
     2,

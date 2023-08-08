@@ -8,87 +8,73 @@
 #ifndef CYAML_NODE_H
 #define CYAML_NODE_H
 
-#include "type/type.h"
+#include <map>
+#include <unordered_map>
+#include <vector>
+#include <memory>
+#include <string>
+#include <iostream>
+
+// 类型声明
+namespace cyaml
+{
+    class Node;
+    using Node_Ptr = std::shared_ptr<Node>;
+
+    class Node_Data;
+    using Node_Data_Ptr = std::shared_ptr<Node_Data>;
+
+    namespace type
+    {
+        using Node_List = std::vector<Node_Ptr>;
+        using Map = std::unordered_map<std::string, Node_Ptr>;
+        using Sequence = std::vector<Node_Ptr>;
+
+    } // namespace type
+
+} // namespace cyaml
 
 namespace cyaml
 {
-    /**
-     * @enum    Node_Type
-     * @brief   声明节点的数据类型
-     */
-    enum class Node_Type
-    {
-        NULL_NODE,
-        MAP,
-        SEQ,
-        SCALAR
-    };
 
     /**
      * @class   Node
      * @brief   YAML 数据节点
      */
-    class Node_Data: public std::enable_shared_from_this<Node_Data>
+    class Node_Data
     {
-    public:
-        Node_Type type_;          // 节点类型
+    private:
         type::Map map_data_;      // 映射数据
         type::Sequence seq_data_; // 序列数据
         std::string scalar_data_; // 标量数据
         type::Node_List keys_;    // 键
 
-        /**
-         * @brief   Node_Data 类构造函数，默认为空节点
-         * @param   Node_Type       该节点数据类型
-         * @retval  指定类型的节点
-         */
-        Node_Data(Node_Type type = Node_Type::NULL_NODE);
-
-        /**
-         * @brief   Scalar Node_Data 构造函数
-         * @param   std::string     标量值
-         * @retval  标量节点
-         */
+    public:
+        Node_Data() = default;
         Node_Data(std::string value);
-
-        /**
-         * @brief   判断是否为 map
-         * @return  bool
-         */
-        bool is_map() const
-        {
-            return type_ == Node_Type::MAP;
-        }
-
-        /**
-         * @brief   判断是否为 sequence
-         * @return  bool
-         */
-        bool is_seq() const
-        {
-            return type_ == Node_Type::SEQ;
-        }
-
-        /**
-         * @brief   判断是否为 scalar
-         * @return  bool
-         */
-        bool is_scalar() const
-        {
-            return type_ == Node_Type::SCALAR;
-        }
-
-        /**
-         * @brief   判断是否为 null
-         * @return  bool
-         */
-        bool is_null() const
-        {
-            return type_ == Node_Type::NULL_NODE;
-        }
-
         Node_Data(const Node_Data &) = default;
         Node_Data &operator=(const Node_Data &) = default;
+
+        // 访问函数
+        type::Map &map()
+        {
+            return map_data_;
+        }
+
+        type::Sequence &seq()
+        {
+            return seq_data_;
+        }
+
+        std::string &scalar()
+        {
+            return scalar_data_;
+        }
+
+        type::Node_List &keys()
+        {
+            return keys_;
+        }
     };
 
 } // namespace cyaml
