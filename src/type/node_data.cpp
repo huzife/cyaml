@@ -17,11 +17,24 @@ namespace cyaml
 
     size_t node_hash(const Node &node)
     {
-        if (node.is_scalar()) {
-            return std::hash<std::string>()(node.scalar());
+        size_t ret = 0;
+
+        if (node.is_null()) {
+            ret = std::hash<size_t>()(0);
+        } else if (node.is_map()) {
+            for (auto &key : node.data_->keys) {
+                ret ^= (node_hash(key) ^ node_hash(node.data_->map[key]));
+            }
+        } else if (node.is_seq()) {
+            for (auto &i : node.data_->seq) {
+                ret ^= node_hash(i);
+            }
+        }
+        else if (node.is_scalar()) {
+            ret = std::hash<std::string>()(node.scalar());
         }
 
-        return std::hash<Node_Data_Ptr>()(node.data_);
+        return ret;
     }
 
     Node_Data::Node_Data(std::string value): scalar(value) {}

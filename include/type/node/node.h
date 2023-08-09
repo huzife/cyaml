@@ -29,7 +29,7 @@ namespace cyaml
      * @class   Node
      * @brief   YAML 数据类
      */
-    class Node
+    class Node: public std::enable_shared_from_this<Node>
     {
     private:
         Node_Type type_;     // 节点类型
@@ -42,6 +42,13 @@ namespace cyaml
         Node(Node_Type type, const Node_Data_Ptr &data);
         Node(const std::string &scalar);
         Node(const Node &) = default;
+
+        friend bool operator==(const Node &n1, const Node &n2);
+        friend bool operator==(const Node_Ptr &n1, const Node_Ptr &n2);
+        friend bool operator!=(const Node &n1, const Node &n2);
+        friend bool operator!=(const Node_Ptr &n1, const Node_Ptr &n2);
+
+        friend std::ostream &operator<<(std::ostream &out, const Node &node);
 
         friend size_t node_hash(const Node &);
 
@@ -203,7 +210,7 @@ namespace cyaml
          * @param   const Node &    键
          * @param   const Node &    值
          * @return  bool
-         * @retbal  是否插入成功
+         * @retval  是否插入成功
          */
         bool insert(const Node &key, const Node &value);
 
@@ -211,12 +218,9 @@ namespace cyaml
          * @brief   添加数组元素
          * @param   const Node &
          * @return  bool
-         * @retbal  是否添加成功
+         * @retval  是否添加成功
          */
         bool push_back(const Node &node);
-
-        friend bool operator==(const Node &n1, const Node &n2);
-        friend bool operator==(const Node_Ptr &n1, const Node_Ptr &n2);
 
         /**
          * @brief   克隆节点
@@ -224,6 +228,27 @@ namespace cyaml
          * @return  Node
          */
         Node clone() const;
+
+        /**
+         * @brief   清空节点
+         * @return  void
+         */
+        void clear()
+        {
+            data_ = std::make_shared<Node_Data>();
+        }
+
+    private:
+        /**
+         * @brief   重置节点
+         * @param   Node_Type   重置节点类型
+         * @return  void
+         */
+        void reset(Node_Type type = Node_Type::NULL_NODE)
+        {
+            type_ = type;
+            data_ = std::make_shared<Node_Data>();
+        }
     };
 } // namespace cyaml
 

@@ -20,6 +20,7 @@ namespace cyaml
 {
     class Node;
     using Node_Ptr = std::shared_ptr<Node>;
+    using P_Node_Ptr = std::weak_ptr<Node>;
 
     class Node_Data;
     using Node_Data_Ptr = std::shared_ptr<Node_Data>;
