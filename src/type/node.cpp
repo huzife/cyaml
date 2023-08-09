@@ -5,7 +5,7 @@
  * @date        2023-7-26
  */
 
-#include "type/node.h"
+#include "type/node/node.h"
 #include "error/exceptions.h"
 #include <iostream>
 

@@ -8,7 +8,7 @@
 #ifndef CYAML_CONVERT_H
 #define CYAML_CONVERT_H
 
-#include "type/node.h"
+#include "type/node/node.h"
 #include <string>
 #include <iostream>
 #include <assert.h>
@@ -57,50 +57,10 @@ namespace cyaml
                 return true;
             }
 
-            if (node.is_seq()) {
-                bool first = true;
-                rhs = "[";
-                for (auto &i : node.seq()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        rhs += ", ";
-                    }
+            if (!node.is_scalar())
+                return false;
 
-                    std::string temp;
-                    Convert<std::string>::decode(*i, temp);
-                    rhs += temp;
-                }
-                rhs += "]";
-                return true;
-            }
-
-            if (node.is_map()) {
-                bool first = true;
-                rhs = "{";
-                for (auto &i : node.keys()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        rhs += ", ";
-                    }
-
-                    std::string key;
-                    std::string value;
-                    Convert<std::string>::decode(*i, key);
-                    Convert<std::string>::decode(
-                            *(node.map().find(i)->second), value);
-                    rhs += key;
-                    rhs += ": ";
-                    rhs += value;
-                }
-                rhs += "}";
-            }
-
-            if (node.is_scalar()) {
-                rhs = node.scalar();
-            }
-
+            rhs = node.scalar();
             return true;
         }
     };

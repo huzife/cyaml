@@ -1,10 +1,8 @@
-#include "parser/parser.h"
-#include "type/node.h"
-#include "type/node_impl.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <exception>
+#include "cyaml.h"
 #include "gtest/gtest.h"
 
 using namespace cyaml::type;
@@ -48,11 +46,15 @@ TEST_F(Parser_Test, anchor_alias)
     EXPECT_EQ(node["a"].as<int>(), 1);
     EXPECT_EQ(node["b"]["b1"].as<int>(), 2);
     EXPECT_EQ(node["b"]["b2"].as<int>(), 1);
-    // EXPECT_TRUE(node.find("{b1: 2, b2: 1}"));
-    // EXPECT_EQ(node["{b1: 2, b2: 1}"].as<int>(), 3);
 
     cyaml::Node b = node["b"];
-    EXPECT_TRUE(node.find(b));
+    ASSERT_TRUE(node.find(b));
+    EXPECT_EQ(node[b].as<int>(), 3);
+
+    b["b3"] = 3;
+    ASSERT_TRUE(node["b"].find("b3"));
+    EXPECT_EQ(node["b"]["b3"].as<int>(), 3);
+
     EXPECT_EQ(node[b].as<int>(), 3);
 }
 

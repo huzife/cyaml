@@ -8,8 +8,8 @@
 #ifndef CYAML_NODE_IMPL_H
 #define CYAML_NODE_IMPL_H
 
-#include "type/node.h"
-#include "type/convert.h"
+#include "type/node/node.h"
+#include "type/node/convert.h"
 #include <string>
 
 namespace cyaml

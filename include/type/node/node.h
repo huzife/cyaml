@@ -8,7 +8,7 @@
 #ifndef CYAML_VALUE_H
 #define CYAML_VALUE_H
 
-#include "type/node_data.h"
+#include "type/node/node_data.h"
 #include "error/exceptions.h"
 
 namespace cyaml
@@ -217,6 +217,13 @@ namespace cyaml
 
         friend bool operator==(const Node &n1, const Node &n2);
         friend bool operator==(const Node_Ptr &n1, const Node_Ptr &n2);
+
+        /**
+         * @brief   克隆节点
+         * @details 用于赋值时传递节点的值而非引用
+         * @return  Node
+         */
+        Node clone() const;
     };
 } // namespace cyaml
 

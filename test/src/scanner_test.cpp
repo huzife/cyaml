@@ -1,7 +1,7 @@
-#include "parser/scanner.h"
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "cyaml.h"
 #include "gtest/gtest.h"
 
 class Scanner_Test: public testing::Test

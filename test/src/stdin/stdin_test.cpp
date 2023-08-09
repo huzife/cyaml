@@ -1,9 +1,8 @@
-#include "parser/parser.h"
-#include "type/node.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <exception>
+#include "cyaml.h"
 #include "gtest/gtest.h"
 
 using namespace cyaml::type;

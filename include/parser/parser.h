@@ -10,8 +10,8 @@
 
 #include "parser/scanner.h"
 #include "type/mark.h"
-#include "type/node.h"
-#include "type/node_impl.h"
+#include "type/node/node.h"
+#include "type/node/node_impl.h"
 #include "type/tables.h"
 #include <unordered_map>
 #include <unordered_set>
