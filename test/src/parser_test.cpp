@@ -5,8 +5,6 @@
 #include "cyaml.h"
 #include "gtest/gtest.h"
 
-using namespace cyaml::type;
-
 class Parser_Test: public testing::Test
 {
 public:
@@ -35,10 +33,6 @@ public:
 #ifdef CYAML_TEST
 TEST_F(Parser_Test, anchor_alias)
 {
-    auto n1 = cyaml::Node("a");
-    auto n2 = std::make_shared<cyaml::Node>("a");
-    EXPECT_EQ(cyaml::node_hash(n1), cyaml::node_hash(n2));
-
     cyaml::Node node;
     parse("anchor_alias", node);
     EXPECT_EQ(node.type(), cyaml::Node_Type::MAP);
@@ -47,30 +41,26 @@ TEST_F(Parser_Test, anchor_alias)
     EXPECT_EQ(node["b"]["b1"].as<int>(), 2);
     EXPECT_EQ(node["b"]["b2"].as<int>(), 1);
 
+    cyaml::Node b = node["b"];
+    ASSERT_TRUE(node.contain(b));
+    EXPECT_EQ(node[b].as<int>(), 3);
+
+    b["b3"] = 3;
+    ASSERT_TRUE(node["b"].contain("b3"));
+    EXPECT_EQ(node["b"]["b3"].as<int>(), 3);
 
     cyaml::Node bb;
     bb["b1"] = 2;
-    // bb["b2"] = 1;
-    // ASSERT_TRUE(node.find(bb));
-    // EXPECT_EQ(node[bb].as<int>(), 3);
+    bb["b2"] = 1;
+    bb["b3"] = 3;
+    ASSERT_TRUE(node.contain(bb));
+    EXPECT_EQ(node[bb].as<int>(), 3);
 
-    // cyaml::Node b = node["b"];
-    // ASSERT_TRUE(node.find(b));
-    // EXPECT_EQ(node[b].as<int>(), 3);
-
-    // b["b3"] = 3;
-    // std::cout << node << std::endl;
-    // ASSERT_TRUE(node["b"].find("b3"));
-    // EXPECT_EQ(node["b"]["b3"].as<int>(), 3);
-
-    // cyaml::Node c;
-    // c["c1"] = 1;
-    // c["c2"] = 2;
-    // EXPECT_TRUE(node.find(c));
-    // EXPECT_EQ(node[c].as<int>(), 4);
-
-    // auto key_b = node.keys()[2];
-    // ASSERT_TRUE(node.find(key_b));
+    cyaml::Node c;
+    c["c1"] = 1;
+    c["c2"] = 2;
+    ASSERT_TRUE(node.contain(c));
+    EXPECT_EQ(node[c].as<int>(), 4);
 }
 
 TEST_F(Parser_Test, complex_key)
@@ -78,8 +68,8 @@ TEST_F(Parser_Test, complex_key)
     cyaml::Node node;
     parse("complex_key", node);
     EXPECT_EQ(node.size(), 2);
-    // EXPECT_TRUE(node.find("{a: 1, b: 2}"));
-    // EXPECT_TRUE(node.find("[4, 5]"));
+    // EXPECT_TRUE(node.contain("{a: 1, b: 2}"));
+    // EXPECT_TRUE(node.contain("[4, 5]"));
     // EXPECT_EQ(node["{a: 1, b: 2}"][0].as<int>(), 3);
     // EXPECT_TRUE(node["{a: 1, b: 2}"][1].is_null());
     // node["{a: 1, b: 2}"][1] = 2;
@@ -159,7 +149,7 @@ TEST_F(Parser_Test, node)
     EXPECT_EQ(node.type(), cyaml::Node_Type::MAP);
     EXPECT_EQ(node.size(), 3);
     EXPECT_EQ(node["scalar"].as<std::string>(), "a");
-    EXPECT_FALSE(node.find("seqq"));
+    EXPECT_FALSE(node.contain("seqq"));
     EXPECT_EQ(node["map"].type(), cyaml::Node_Type::MAP);
     EXPECT_EQ(node["seq"].type(), cyaml::Node_Type::SEQ);
     EXPECT_DOUBLE_EQ(node["seq"][1]["seq_map"].as<float>(), 123.0);

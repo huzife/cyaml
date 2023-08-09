@@ -36,6 +36,14 @@ namespace cyaml
             Token wrong_token);
 
     /**
+     * @brief   生成 DUPLICATED KEY 错误信息
+     * @param   std::string     key
+     * @return  std::string
+     * @retval  生成的错误信息
+     */
+    std::string duplicated_key_msg(std::string key);
+
+    /**
      * @class   Exception
      * @brief   cyaml 异常类
      * @extends std::runtime_error

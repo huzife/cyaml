@@ -25,17 +25,9 @@ namespace cyaml
     class Node_Data;
     using Node_Data_Ptr = std::shared_ptr<Node_Data>;
 
-    using Node_Hash = size_t (*)(const Node_Ptr &);
-    size_t node_hash(const Node_Ptr &node);
-    size_t node_hash(const Node &node);
-
-    namespace type
-    {
-        using Node_List = std::vector<Node_Ptr>;
-        using Map = std::unordered_map<Node_Ptr, Node_Ptr, Node_Hash>;
-        using Sequence = std::vector<Node_Ptr>;
-
-    } // namespace type
+    using KV_Pair = std::pair<Node_Ptr, Node_Ptr>;
+    using Map = std::vector<KV_Pair>;
+    using Sequence = std::vector<Node_Ptr>;
 
 } // namespace cyaml
 
@@ -47,10 +39,9 @@ namespace cyaml
      */
     struct Node_Data
     {
-        type::Map map = type::Map(0, node_hash); // 映射数据
-        type::Sequence seq;                      // 序列数据
-        std::string scalar;                      // 标量数据
-        type::Node_List keys; // 键(用于实现顺序读取)
+        Map map;      // 映射数据
+        Sequence seq; // 序列数据
+        std::string scalar; // 标量数据
 
         Node_Data() = default;
         Node_Data(std::string value);

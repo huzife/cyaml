@@ -48,8 +48,6 @@ namespace cyaml
         friend bool operator!=(const Node &n1, const Node &n2);
         friend bool operator!=(const Node_Ptr &n1, const Node_Ptr &n2);
 
-        friend std::ostream &operator<<(std::ostream &out, const Node &node);
-
         friend size_t node_hash(const Node &);
 
         /**
@@ -106,39 +104,12 @@ namespace cyaml
         }
 
         /**
-         * @brief   获取 map
-         */
-        const type::Map map() const
-        {
-            assert(data_);
-            return data_->map;
-        }
-
-        /**
-         * @brief   获取 sequence
-         */
-        const type::Sequence seq() const
-        {
-            assert(data_);
-            return data_->seq;
-        }
-
-        /**
          * @brief   获取标量
          */
         const std::string scalar() const
         {
             assert(data_);
             return data_->scalar;
-        }
-
-        /**
-         * @brief   获取 keys
-         */
-        const type::Node_List keys() const
-        {
-            assert(data_);
-            return data_->keys;
         }
 
         /**
@@ -195,7 +166,7 @@ namespace cyaml
          * @return  bool
          * @retval  该键是否存在
          */
-        bool find(std::string key) const;
+        bool contain(std::string key) const;
 
         /**
          * @brief   根据 Node 查找 key
@@ -203,7 +174,7 @@ namespace cyaml
          * @return  bool
          * @retval  该键是否存在
          */
-        bool find(const Node &key) const;
+        bool contain(const Node &key) const;
 
         /**
          * @brief   插入键值对
@@ -221,6 +192,14 @@ namespace cyaml
          * @retval  是否添加成功
          */
         bool push_back(const Node &node);
+
+        /**
+         * @brief   删除元素
+         * @param   const Node &    键
+         * @return  bool
+         * @retval  是否删除成功
+         */
+        bool erase(const Node &key);
 
         /**
          * @brief   克隆节点
@@ -248,6 +227,27 @@ namespace cyaml
         {
             type_ = type;
             data_ = std::make_shared<Node_Data>();
+        }
+
+        /**
+         * @brief   查找 map
+         * @param   const Node_Ptr &    键
+         * @return  Map::iterator
+         * @retval  查找成功： 对应元素节点的迭代器
+         *          查找失败： map.end()
+         */
+        Map::iterator find(const Node_Ptr &key) const;
+
+        /**
+         * @brief   插入键值对
+         * @param   const Node_Ptr &    键
+         * @param   const Node_Ptr &    值
+         * @return  void
+         */
+        void insert(const Node_Ptr &key, const Node_Ptr &value)
+        {
+            assert(!contain(key));
+            data_->map.emplace_back(key, value);
         }
     };
 } // namespace cyaml

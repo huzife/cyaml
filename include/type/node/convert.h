@@ -39,8 +39,6 @@ namespace cyaml
         }
     };
 
-    using namespace cyaml::type;
-
     // string
     template<>
     struct Convert<std::string>

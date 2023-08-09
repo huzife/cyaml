@@ -40,11 +40,10 @@ namespace cyaml
             Node_Ptr &key_node,
             Node_Ptr &value_node)
     {
-        if (node->find(key_node)) {
+        if (node->contain(key_node)) {
+            std::string key_name = key_node->as<std::string>();
             throw Representation_Exception(
-                    std::string(error_msgs::DUPLICATED_KEY) + " '" +
-                            key_node->as<std::string>() + "'",
-                    mark());
+                    duplicated_key_msg(key_name), mark());
         }
 
         node->insert(*key_node, *value_node);

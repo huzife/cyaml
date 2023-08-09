@@ -7,6 +7,7 @@
 
 #include "type/node/node.h"
 #include "error/exceptions.h"
+#include <algorithm>
 #include <iostream>
 
 namespace cyaml
@@ -52,9 +53,9 @@ namespace cyaml
                 return false;
 
             for (int i = 0; i < n1.size(); i++) {
-                auto key1 = n1.data_->keys[i];
-                auto key2 = n2.data_->keys[i];
-                if (key1 != key2 || n1.data_->map[key1] != n2.data_->map[key2])
+                auto &m1 = n1.data_->map;
+                auto &m2 = n2.data_->map;
+                if (m1[i].first != m2[i].first || m1[i].second != m2[i].second)
                     return false;
             }
 
@@ -91,41 +92,17 @@ namespace cyaml
         return !(n1 == n2);
     }
 
-    std::ostream &operator<<(std::ostream &out, const Node &node)
-    {
-        if (node.is_null() || node.is_scalar()) {
-            out << node.scalar();
-        } else if (node.is_map()) {
-            for (auto &key : node.keys()) {
-                bool complex = key->is_map() || key->is_seq();
-                if (complex) {
-                    out << "? " << std::endl;
-                }
-                out << *key;
-                out << ": ";
-                out << *node.map().find(key)->second;
-                out << std::endl;
-            }
-        } else if (node.is_seq()) {
-            for (auto &i : node.seq()) {
-                out << "- " << *i;
-                out << std::endl;
-            }
-        }
-        return out;
-    }
-
     uint32_t Node::size() const
     {
         switch (type_) {
         case Node_Type::NULL_NODE:
             return 0;
         case Node_Type::MAP:
-            return map().size();
+            return data_->map.size();
         case Node_Type::SEQ:
-            return seq().size();
+            return data_->seq.size();
         case Node_Type::SCALAR:
-            return scalar().size();
+            return data_->scalar.size();
         }
 
         return 0;
@@ -157,11 +134,14 @@ namespace cyaml
             throw Dereference_Exception();
 
         auto key_node = std::make_shared<Node>(key);
-        if (!find(key)) {
-            insert(key, Node());
+        auto iter = find(key_node);
+        if (iter == data_->map.end()) {
+            auto value_node = std::make_shared<Node>();
+            insert(key_node, value_node);
+            return *value_node;
         }
 
-        return *(data_->map[key_node]);
+        return *(iter->second);
     }
 
     Node &Node::operator[](const Node &key)
@@ -174,11 +154,14 @@ namespace cyaml
             throw Dereference_Exception();
 
         auto key_node = std::make_shared<Node>(key);
-        if (!find(key)) {
-            insert(key, Node());
+        auto iter = find(key_node);
+        if (iter == data_->map.end()) {
+            auto value_node = std::make_shared<Node>();
+            insert(key_node, value_node);
+            return *value_node;
         }
 
-        return *(data_->map[key_node]);
+        return *(iter->second);
     }
 
     Node &Node::operator=(const Node &rhs)
@@ -189,22 +172,31 @@ namespace cyaml
         return *this;
     }
 
-    bool Node::find(std::string key) const
+    bool Node::contain(std::string key) const
     {
         if (!is_map())
             return false;
 
         auto key_node = std::make_shared<Node>(key);
-        return data_->map.find(key_node) != data_->map.end();
+        return (find(key_node) != data_->map.end());
     }
 
-    bool Node::find(const Node &key) const
+    bool Node::contain(const Node &key) const
     {
         if (!is_map())
             return false;
 
         auto key_node = std::make_shared<Node>(key);
-        return data_->map.find(key_node) != data_->map.end();
+        return find(key_node) != data_->map.end();
+    }
+
+    Map::iterator Node::find(const Node_Ptr &key) const
+    {
+        auto iter = std::find_if(
+                data_->map.begin(), data_->map.end(), [&](const KV_Pair &p) {
+                    return p.first == key;
+                });
+        return iter;
     }
 
     bool Node::insert(const Node &key, const Node &value)
@@ -219,8 +211,7 @@ namespace cyaml
         // 插入节点
         auto key_node = std::make_shared<Node>(key);
         auto value_node = std::make_shared<Node>(value);
-        data_->keys.emplace_back(key_node);
-        data_->map[key_node] = value_node;
+        insert(key_node, value_node);
 
         return true;
     }
@@ -237,6 +228,20 @@ namespace cyaml
         data_->seq.emplace_back(std::make_shared<Node>(node));
 
         return true;
+    }
+
+    bool Node::erase(const Node &key)
+    {
+        if (!is_map())
+            return false;
+
+        auto key_node = std::make_shared<Node>(key);
+        if (auto iter = find(key_node); iter != data_->map.end()) {
+            data_->map.erase(iter);
+            return true;
+        }
+
+        return false;
     }
 
 } // namespace cyaml

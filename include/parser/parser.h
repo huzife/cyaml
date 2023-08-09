@@ -1,6 +1,6 @@
 /**
  * @file        parser.h
- * @brief       YAML 解析器词法分析部分 Parser 类头文件
+ * @brief       YAML 解析器语法分析部分 Parser 类头文件
  * @details     主要包含 YAML 的 Parser 类声明
  * @date        2023-7-25
  */

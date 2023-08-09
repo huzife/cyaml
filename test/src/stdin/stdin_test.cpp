@@ -5,8 +5,6 @@
 #include "cyaml.h"
 #include "gtest/gtest.h"
 
-using namespace cyaml::type;
-
 class Stdin_Test: public testing::Test
 {
 public:
@@ -99,7 +97,7 @@ TEST_F(Stdin_Test, value)
     EXPECT_EQ(value.type(), cyaml::Node_Type::MAP);
     EXPECT_EQ(value.size(), 3);
     EXPECT_EQ(value["scalar"].as<std::string>(), "a");
-    EXPECT_FALSE(value.find("seqq"));
+    EXPECT_FALSE(value.contain("seqq"));
     EXPECT_EQ(value["map"].type(), cyaml::Node_Type::MAP);
     EXPECT_EQ(value["seq"].type(), cyaml::Node_Type::SEQ);
     EXPECT_DOUBLE_EQ(value["seq"][1]["seq_map"].as<float>(), 123.0);
