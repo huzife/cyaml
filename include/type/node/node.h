@@ -145,7 +145,7 @@ namespace cyaml
         /**
          * @brief   Node 赋值
          * @tparam  T           值类型
-         * @param   const T &   常量左值引用
+         * @param   const T &   值
          * @return  void
          */
         template<typename T>
@@ -194,6 +194,16 @@ namespace cyaml
         bool push_back(const Node &node);
 
         /**
+         * @brief   添加数组元素
+         * @tparam  T           值类型
+         * @param   const T &   值
+         * @return  bool
+         * @retval  是否添加成功
+         */
+        template<typename T>
+        bool push_back(const T &rhs);
+
+        /**
          * @brief   删除元素
          * @param   const Node &    键
          * @return  bool
@@ -206,7 +216,12 @@ namespace cyaml
          * @details 用于赋值时传递节点的值而非引用
          * @return  Node
          */
-        Node clone() const;
+        Node clone() const
+        {
+            Node_Ptr node;
+            clone(node);
+            return *node;
+        }
 
         /**
          * @brief   清空节点
@@ -228,6 +243,13 @@ namespace cyaml
             type_ = type;
             data_ = std::make_shared<Node_Data>();
         }
+
+        /**
+         * @brief   克隆节点内部实现
+         * @param   Node_Ptr &  节点指针
+         * @return  void
+         */
+        void clone(Node_Ptr &node) const;
 
         /**
          * @brief   查找 map

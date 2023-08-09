@@ -244,4 +244,31 @@ namespace cyaml
         return false;
     }
 
+    void Node::clone(Node_Ptr &node) const
+    {
+        node = std::make_shared<Node>(type());
+
+        if (is_scalar()) {
+            node->data_->scalar = data_->scalar;
+        }
+
+        if (is_map()) {
+            for (auto &[key, value] : data_->map) {
+                Node_Ptr key_node;
+                Node_Ptr value_node;
+                key->clone(key_node);
+                key->clone(value_node);
+                node->insert(key_node, value_node);
+            }
+        }
+
+        if (is_seq()) {
+            for (auto &i : data_->seq) {
+                Node_Ptr next_node;
+                i->clone(next_node);
+                node->data_->seq.emplace_back(next_node);
+            }
+        }
+    }
+
 } // namespace cyaml

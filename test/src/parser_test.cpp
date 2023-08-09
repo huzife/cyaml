@@ -68,14 +68,29 @@ TEST_F(Parser_Test, complex_key)
     cyaml::Node node;
     parse("complex_key", node);
     EXPECT_EQ(node.size(), 2);
-    // EXPECT_TRUE(node.contain("{a: 1, b: 2}"));
-    // EXPECT_TRUE(node.contain("[4, 5]"));
-    // EXPECT_EQ(node["{a: 1, b: 2}"][0].as<int>(), 3);
-    // EXPECT_TRUE(node["{a: 1, b: 2}"][1].is_null());
-    // node["{a: 1, b: 2}"][1] = 2;
-    // EXPECT_EQ(node["{a: 1, b: 2}"][1].as<std::string>(), "2");
-    // EXPECT_EQ(node["[4, 5]"]["c"].as<int>(), 6);
-    // EXPECT_EQ(node["[4, 5]"]["d"].as<int>(), 7);
+
+    cyaml::Node m_node;
+    m_node["a"] = 1;
+    m_node["b"] = 2;
+
+    cyaml::Node s_node;
+    s_node.push_back(4);
+    s_node.push_back(5);
+    EXPECT_TRUE(node.contain(m_node));
+    EXPECT_TRUE(node.contain(s_node));
+    EXPECT_EQ(node[m_node][0].as<int>(), 3);
+    EXPECT_TRUE(node[m_node][1].is_null());
+    EXPECT_EQ(node[s_node]["c"].as<int>(), 6);
+
+    cyaml::Node s = s_node.clone();
+    EXPECT_EQ(s_node, s);
+    s_node.push_back(6);
+    EXPECT_NE(s_node, s);
+    EXPECT_TRUE(node.contain(s));
+    EXPECT_EQ(s.size(), 2);
+
+    s.clear();
+    EXPECT_EQ(s.size(), 0);
 }
 
 TEST_F(Parser_Test, empty_document1)

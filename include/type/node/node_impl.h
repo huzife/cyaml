@@ -32,6 +32,13 @@ namespace cyaml
 
         throw Convertion_Exception();
     }
+
+    template<typename T>
+    bool Node::push_back(const T &rhs)
+    {
+        Node node = Convert<T>::encode(rhs);
+        return push_back(node);
+    }
 } // namespace cyaml
 
 #endif // CYAML_NODE_IMPL_H
