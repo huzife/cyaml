@@ -39,8 +39,8 @@ namespace cyaml
      */
     struct Node_Data
     {
-        Map map;      // 映射数据
-        Sequence seq; // 序列数据
+        Map map;            // 映射数据
+        Sequence seq;       // 序列数据
         std::string scalar; // 标量数据
 
         Node_Data() = default;

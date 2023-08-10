@@ -63,6 +63,36 @@ namespace cyaml
         }
     };
 
+    // const char *
+    template<>
+    struct Convert<const char *>
+    {
+        static Node encode(const char *rhs)
+        {
+            return Node(rhs);
+        }
+    };
+
+    // char *
+    template<>
+    struct Convert<char *>
+    {
+        static Node encode(const char *rhs)
+        {
+            return Node(rhs);
+        }
+    };
+
+    // char[]
+    template<std::size_t N>
+    struct Convert<char[N]>
+    {
+        static Node encode(const char *rhs)
+        {
+            return Node(rhs);
+        }
+    };
+
     // int
     template<>
     struct Convert<int>

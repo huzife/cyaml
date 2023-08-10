@@ -13,6 +13,7 @@
 #include "error/exceptions.h"
 
 // parser
+#include "parser/serializer.h"
 #include "parser/parser.h"
 #include "parser/scanner.h"
 

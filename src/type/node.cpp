@@ -20,17 +20,17 @@ namespace cyaml
     {
     }
 
-    Node::Node(const Node_Ptr &node): type_(node->type_), data_(node->data_) {}
-
-    Node::Node(Node_Type type, const Node_Data_Ptr &data)
-        : type_(type),
-          data_(data)
+    Node::Node(const Node_Ptr &node)
+        : type_(node->type_),
+          data_(node->data_),
+          style_(node->style_)
     {
     }
 
     Node::Node(const std::string &scalar)
         : type_(Node_Type::SCALAR),
-          data_(std::make_shared<Node_Data>(scalar))
+          data_(std::make_shared<Node_Data>(scalar)),
+          style_(Node_Style::BLOCK)
     {
     }
 
@@ -108,6 +108,16 @@ namespace cyaml
         return 0;
     }
 
+    std::vector<Node> Node::keys() const
+    {
+        std::vector<Node> ret;
+        for (auto &i : data_->map) {
+            ret.emplace_back(*(i.first));
+        }
+
+        return ret;
+    }
+
     Node &Node::operator[](uint32_t index)
     {
         if (is_null()) {
@@ -124,24 +134,23 @@ namespace cyaml
         return *(data_->seq[index]);
     }
 
+    const Node &Node::operator[](uint32_t index) const
+    {
+        if (!is_seq() || index >= data_->seq.size()) {
+            throw Dereference_Exception();
+        }
+
+        return *(data_->seq[index]);
+    }
+
     Node &Node::operator[](const std::string &key)
     {
-        if (is_null()) {
-            reset(Node_Type::MAP);
-        }
+        return (*this)[Node(key)];
+    }
 
-        if (!is_map())
-            throw Dereference_Exception();
-
-        auto key_node = std::make_shared<Node>(key);
-        auto iter = find(key_node);
-        if (iter == data_->map.end()) {
-            auto value_node = std::make_shared<Node>();
-            insert(key_node, value_node);
-            return *value_node;
-        }
-
-        return *(iter->second);
+    const Node &Node::operator[](const std::string &key) const
+    {
+        return (*this)[Node(key)];
     }
 
     Node &Node::operator[](const Node &key)
@@ -162,6 +171,16 @@ namespace cyaml
         }
 
         return *(iter->second);
+    }
+
+    const Node &Node::operator[](const Node &key) const
+    {
+        if (!is_map() || !contain(key)) {
+            throw Dereference_Exception();
+        }
+
+        auto key_node = std::make_shared<Node>(key);
+        return *(find(key_node)->second);
     }
 
     Node &Node::operator=(const Node &rhs)

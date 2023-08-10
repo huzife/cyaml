@@ -11,6 +11,7 @@ set(PARSER_SRC
     src/parser/scanner.cpp
     src/parser/scan_token.cpp
     src/parser/parser.cpp
+    src/parser/emitter.cpp
 )
 
 set(TYPE_SRC
@@ -46,12 +47,14 @@ if (GTest_FOUND)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYAML_TEST_OUTPUT_PATH})
     add_executable(scanner_test test/src/scanner_test.cpp)
     add_executable(parser_test test/src/parser_test.cpp)
+    add_executable(emitter_test test/src/emitter_test.cpp)
 
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CYAML_TEST_OUTPUT_PATH}/stdin)
     add_executable(stdin_test test/src/stdin/stdin_test.cpp)
 
     target_link_libraries(scanner_test cyaml pthread libgtest.so)
     target_link_libraries(parser_test cyaml pthread libgtest.so)
+    target_link_libraries(emitter_test cyaml pthread libgtest.so)
     target_link_libraries(stdin_test cyaml pthread libgtest.so)
 else()
     message(WARNING "GTest not found, abort building test")

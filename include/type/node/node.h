@@ -26,6 +26,16 @@ namespace cyaml
     };
 
     /**
+     * @enum    Node_Style
+     * @brief   节点样式
+     */
+    enum class Node_Style
+    {
+        BLOCK,
+        FLOW
+    };
+
+    /**
      * @class   Node
      * @brief   YAML 数据类
      */
@@ -35,11 +45,12 @@ namespace cyaml
         Node_Type type_;     // 节点类型
         Node_Data_Ptr data_; // 节点数据
 
+        Node_Style style_ = Node_Style::BLOCK; // 节点样式
+
     public:
         Node();
         Node(Node_Type type);
         Node(const Node_Ptr &node);
-        Node(Node_Type type, const Node_Data_Ptr &data);
         Node(const std::string &scalar);
         Node(const Node &) = default;
 
@@ -47,8 +58,6 @@ namespace cyaml
         friend bool operator==(const Node_Ptr &n1, const Node_Ptr &n2);
         friend bool operator!=(const Node &n1, const Node &n2);
         friend bool operator!=(const Node_Ptr &n1, const Node_Ptr &n2);
-
-        friend size_t node_hash(const Node &);
 
         /**
          * @brief   获取值的类型
@@ -58,6 +67,25 @@ namespace cyaml
         Node_Type type() const
         {
             return type_;
+        }
+
+        /**
+         * @brief   获取节点样式
+         * @return  Node_Style
+         */
+        Node_Style style() const
+        {
+            return style_;
+        }
+
+        /**
+         * @brief   设置节点样式
+         * @param   Node_Style
+         * @return  void
+         */
+        void set_style(Node_Style style)
+        {
+            style_ = style;
         }
 
         /**
@@ -78,7 +106,7 @@ namespace cyaml
 
         /**
          * @brief   判断是否为 map
-         * @return bool
+         * @return  bool
          */
         bool is_map() const
         {
@@ -87,7 +115,7 @@ namespace cyaml
 
         /**
          * @brief   判断是否为 sequence
-         * @return bool
+         * @return  bool
          */
         bool is_seq() const
         {
@@ -96,7 +124,7 @@ namespace cyaml
 
         /**
          * @brief   判断是否为 scalar
-         * @return bool
+         * @return  bool
          */
         bool is_scalar() const
         {
@@ -106,11 +134,16 @@ namespace cyaml
         /**
          * @brief   获取标量
          */
-        const std::string scalar() const
+        std::string scalar() const
         {
             assert(data_);
             return data_->scalar;
         }
+
+        /**
+         * @brief   获取所有 key
+         */
+        std::vector<Node> keys() const;
 
         /**
          * @brief   获取序列(数组)元素
@@ -118,6 +151,7 @@ namespace cyaml
          * @retval  由传入索引对应元素封装的 Node
          */
         Node &operator[](uint32_t index);
+        const Node &operator[](uint32_t index) const;
 
         /**
          * @brief   查找映射值
@@ -126,6 +160,7 @@ namespace cyaml
          * @retval  对应元素的 Node
          */
         Node &operator[](const std::string &key);
+        const Node &operator[](const std::string &key) const;
 
         /**
          * @brief   查找映射值
@@ -134,6 +169,7 @@ namespace cyaml
          * @retval  对应元素的 Node
          */
         Node &operator[](const Node &key);
+        const Node &operator[](const Node &key) const;
 
         /**
          * @brief   Node 绑定引用
