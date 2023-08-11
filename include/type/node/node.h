@@ -123,6 +123,15 @@ namespace cyaml
         }
 
         /**
+         * @brief   判断是否为集合
+         * @return  bool
+         */
+        bool is_collection() const
+        {
+            return is_map() || is_seq();
+        }
+
+        /**
          * @brief   判断是否为 scalar
          * @return  bool
          */

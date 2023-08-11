@@ -19,12 +19,11 @@ namespace cyaml
         return *this;
     }
 
-    void Serializer::fill_blank_to(Mark dest)
+    void Serializer::fill_blank(uint32_t indent)
     {
-        if (!on_begin()) {
-            write_new_line(dest.line - mark_.line);
+        if (column() < indent + 1) {
+            write_space(indent + 1 - column());
         }
-        write_space(dest.column - mark_.column);
     }
 
     void Serializer::write(std::string str)
@@ -60,39 +59,105 @@ namespace cyaml
 
     void Serializer::write_node(const Node &node, uint32_t indent)
     {
+        if (node.style() == Node_Style::BLOCK) {
+            write_block_node(node, indent);
+        } else {
+            write_flow_node(node);
+        }
+    }
+
+    void Serializer::write_block_node(const Node &node, uint32_t indent)
+    {
         if (node.is_map()) {
-            write_map(node, indent);
+            write_block_map(node, indent);
         } else if (node.is_seq()) {
-            write_seq(node, indent);
+            write_block_seq(node, indent);
         } else if (node.is_scalar()) {
             write(node.scalar());
         }
     }
 
-    void Serializer::write_map(const Node &node, uint32_t indent)
+    void Serializer::write_flow_node(const Node &node)
     {
-        auto keys = node.keys();
-        for (int i = 0; i < keys.size(); i++) {
-            fill_blank_to(Mark(line() + 1, indent + 1));
-            auto key = keys[i];
-            if (key.is_map() || key.is_seq()) {
-                write("? ");
-                write_node(key, indent + indent_inc_);
-                fill_blank_to(Mark(line() + 1, indent + 1));
-            } else {
-                write_node(key, indent + indent_inc_);
-            }
-            write(": ");
-            write_node(node[key], indent + indent_inc_);
+        if (node.is_map()) {
+            write_flow_map(node);
+        } else if (node.is_seq()) {
+            write_flow_seq(node);
+        } else {
+            write(node.scalar());
         }
     }
 
-    void Serializer::write_seq(const Node &node, uint32_t indent)
+    void Serializer::write_block_map(const Node &node, uint32_t indent)
+    {
+        auto keys = node.keys();
+        for (int i = 0; i < keys.size(); i++) {
+            write_key(keys[i], indent);
+            write_value(node[keys[i]], indent);
+        }
+    }
+
+    void Serializer::write_block_seq(const Node &node, uint32_t indent)
     {
         for (int i = 0; i < node.size(); i++) {
-            fill_blank_to(Mark(line() + 1, indent + 1));
+            fill_blank(indent);
             write("- ");
-            write_node(node[i], indent + indent_inc_);
+            if (!line_style(node[i])) {
+                write_new_line();
+                write_node(node[i], increase(indent));
+            } else {
+                write_node(node[i], increase(indent));
+                write_new_line();
+            }
+        }
+    }
+
+    void Serializer::write_flow_map(const Node &node)
+    {
+        write("{");
+        auto keys = node.keys();
+        for (int i = 0; i < keys.size(); i++) {
+            if (i > 0) {
+                write(", ");
+            }
+            write_flow_node(keys[i]);
+            write(": ");
+            write_flow_node(node[keys[i]]);
+        }
+        write("}");
+    }
+
+    void Serializer::write_flow_seq(const Node &node)
+    {
+        write("[");
+        for (int i = 0; i < node.size(); i++) {
+            if (i > 0) {
+                write(", ");
+            }
+            write_flow_node(node[i]);
+        }
+        write("]");
+    }
+
+    void Serializer::write_key(const Node &node, uint32_t indent)
+    {
+        fill_blank(indent);
+        if (!line_style(node)) {
+            write("? ");
+        }
+        write_node(node, increase(indent));
+    }
+
+    void Serializer::write_value(const Node &node, uint32_t indent)
+    {
+        fill_blank(indent);
+        write(": ");
+        if (column() > increase(indent) + 1 && !line_style(node)) {
+            write_new_line();
+        }
+        write_node(node, increase(indent));
+        if (line_style(node)) {
+            write_new_line();
         }
     }
 
