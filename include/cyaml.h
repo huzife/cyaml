@@ -9,19 +9,12 @@
 #define CYAML_H
 
 // error
-#include "error/error_msgs.h"
 #include "error/exceptions.h"
 
 // parser
 #include "parser/serializer.h"
 #include "parser/parser.h"
-#include "parser/scanner.h"
-
-// type
-#include "type/indent.h"
-#include "type/mark.h"
-#include "type/tables.h"
-#include "type/token.h"
+#include "parser/api.h"
 
 // node
 #include "type/node/node.h"

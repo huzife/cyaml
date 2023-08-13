@@ -8,6 +8,7 @@ add_compile_definitions(CYAML_DEBUG)
 include_directories(include)
 
 set(PARSER_SRC
+    src/parser/api.cpp
     src/parser/scanner.cpp
     src/parser/scan_token.cpp
     src/parser/parser.cpp

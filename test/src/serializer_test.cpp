@@ -45,9 +45,8 @@ TEST_F(Serializer_Test, temp)
 
     node.push_back(7);
 
-    cyaml::Serializer out(std::cout);
-    out << node;
-    std::cout << std::endl;
+    std::cout << node << std::endl;
+    cyaml::dump("test.yaml", node);
 }
 
 #ifdef CYAML_TEST
