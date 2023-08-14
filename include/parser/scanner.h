@@ -51,6 +51,8 @@ namespace cyaml
         uint32_t anchor_indent_ = 0; // 锚点缩进
         bool after_anchor_ = false;  // 是否位于同一行的锚点后
 
+        bool can_be_json = false; // 判断能否作为 json
+
     public:
         /**
          * @brief   Scanner 类构造函数
@@ -396,6 +398,22 @@ namespace cyaml
         bool match_any_of(std::string pattern) const
         {
             return pattern.find(next()) != -1;
+        }
+
+        /**
+         * @brief   VALUE 进入状态检查
+         * @return  bool
+         */
+        bool match_value()
+        {
+            if (match(":", true))
+                return true;
+
+            if (in_block())
+                return false;
+
+            return can_be_json ? next() == ':'
+                               : match(":", std::string("]},"));
         }
     };
 

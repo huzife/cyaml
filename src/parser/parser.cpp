@@ -232,7 +232,7 @@ namespace cyaml
         // 循环解析 key : value
         while (next_type() != Token_Type::BLOCK_MAP_END) {
             // key 部分，默认为 "null"
-            auto key_node = std::make_shared<Node>("null");
+            auto key_node = std::make_shared<Node>();
             if (next_type() == Token_Type::KEY) {
                 next_token();
                 if (belong(block_node_or_indentless_seq_set)) {
@@ -305,7 +305,7 @@ namespace cyaml
 
         // 循环解析 key : value
         while (next_type() != Token_Type::FLOW_MAP_END) {
-            auto key_node = std::make_shared<Node>("null");
+            auto key_node = std::make_shared<Node>();
             auto value_node = std::make_shared<Node>();
 
             if (belong(flow_map_entry_set)) {

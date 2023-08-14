@@ -137,7 +137,7 @@ namespace cyaml
             return scan_key();
 
         // VALUE
-        if (match(":", true) || !in_block() && match(":", std::string("]},")))
+        if (match_value())
             return scan_value();
 
         if (in_block() && (next() == '|' || next() == '>'))

@@ -159,7 +159,7 @@ TEST_F(Parser_Test, flow_in_line)
 TEST_F(Parser_Test, node)
 {
     cyaml::Node node;
-    parse("value", node);
+    parse("node", node);
 
     EXPECT_EQ(node.type(), cyaml::Node_Type::MAP);
     EXPECT_EQ(node.size(), 3);
@@ -171,6 +171,27 @@ TEST_F(Parser_Test, node)
     EXPECT_TRUE(node["seq"][2][0].is_null());
     EXPECT_TRUE(node["seq"][2][1].as<bool>());
     EXPECT_TRUE(node["seq"][2][2].is_null());
+}
+
+TEST_F(Parser_Test, json_style)
+{
+    cyaml::Node node;
+    parse("json_style", node);
+
+    EXPECT_FALSE(node["a"]["a2"][2].is_null());
+    EXPECT_EQ(node["a"]["a2"][2].as<std::string>(), "null");
+    EXPECT_TRUE(node["a"]["a3"].is_null());
+}
+
+TEST_F(Parser_Test, json)
+{
+    cyaml::Node node;
+    parse("json", node);
+
+    EXPECT_EQ(
+            node["teststeps"][0]["request"]["params"]["city"]
+                    .as<std::string>(),
+            "济南");
 }
 #endif
 

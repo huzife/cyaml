@@ -13,6 +13,8 @@ namespace cyaml
 {
     void Scanner::stream_end()
     {
+        can_be_json = false;
+
         // 匹配剩下的缩进
         pop_all_indent();
 
@@ -22,6 +24,8 @@ namespace cyaml
 
     void Scanner::scan_doc_start()
     {
+        can_be_json = false;
+
         for (auto i = 0; i < 3; i++) {
             next_char();
         }
@@ -31,6 +35,8 @@ namespace cyaml
 
     void Scanner::scan_doc_end()
     {
+        can_be_json = false;
+
         pop_all_indent();
 
         for (int i = 0; i < 3; i++) {
@@ -42,6 +48,8 @@ namespace cyaml
 
     void Scanner::scan_anchor()
     {
+        can_be_json = false;
+
         // '&'
         next_char();
 
@@ -68,6 +76,8 @@ namespace cyaml
 
     void Scanner::scan_alias()
     {
+        can_be_json = false;
+
         // '*'
         next_char();
 
@@ -98,6 +108,8 @@ namespace cyaml
 
     void Scanner::scan_block_entry()
     {
+        can_be_json = false;
+
         next_char();
         push_indent(Indent_Type::SEQ);
         pop_indent();
@@ -107,6 +119,8 @@ namespace cyaml
 
     void Scanner::scan_key()
     {
+        can_be_json = false;
+
         next_char();
         push_indent(Indent_Type::MAP);
         pop_indent();
@@ -116,6 +130,8 @@ namespace cyaml
 
     void Scanner::scan_value()
     {
+        can_be_json = false;
+
         next_char();
 
         // 处理复杂 key 的缩进，普通 key 不处理
@@ -135,6 +151,8 @@ namespace cyaml
 
     void Scanner::scan_flow_start()
     {
+        can_be_json = false;
+
         Flow_Type type = next_char() == '{' ? Flow_Type::MAP : Flow_Type::SEQ;
 
         flow_.push(type);
@@ -143,6 +161,8 @@ namespace cyaml
 
     void Scanner::scan_flow_end()
     {
+        can_be_json = false;
+
         Flow_Type type = next_char() == '}' ? Flow_Type::MAP : Flow_Type::SEQ;
 
         if (type != flow_.top())
@@ -155,12 +175,16 @@ namespace cyaml
 
     void Scanner::scan_flow_entry()
     {
+        can_be_json = false;
+
         next_char();
         add_token(Token_Type::FLOW_ENTRY);
     }
 
     void Scanner::scan_special_scalar()
     {
+        can_be_json = false;
+
         assert(next() == '|' || next() == '>');
 
         // 换行替换字符
@@ -187,6 +211,8 @@ namespace cyaml
     ///< @todo 处理带引号字符串为key的情况
     void Scanner::scan_quote_scalar()
     {
+        can_be_json = true;
+
         assert(next() == '\'' || next() == '\"');
         char end_char = next_char();
 
@@ -226,9 +252,9 @@ namespace cyaml
             if (!is_delimiter(next()) && next() != ':')
                 break;
 
+
             // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-            if (match(":", true) ||
-                !in_block() && match(":", std::string("]},"))) {
+            if (match_value()) {
                 can_be_key = true;
                 break;
             }
@@ -252,6 +278,8 @@ namespace cyaml
 
     void Scanner::scan_normal_scalar()
     {
+        can_be_json = false;
+
         bool can_be_key = false;
         bool hit_comment = false;
         bool hit_stop_char = false;
@@ -285,8 +313,7 @@ namespace cyaml
 
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
                 if (!in_special() && next() == ':') {
-                    if (match(":", true) ||
-                        !in_block() && match(":", std::string("]},"))) {
+                    if (match_value()) {
                         can_be_key = true;
                         break;
                     }

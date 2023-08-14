@@ -68,23 +68,35 @@ namespace cyaml
 
     void Serializer::write_block_node(const Node &node, uint32_t indent)
     {
-        if (node.is_map()) {
+        if (node.is_null()) {
+            write("null");
+        } else if (node.is_map()) {
             write_block_map(node, indent);
         } else if (node.is_seq()) {
             write_block_seq(node, indent);
         } else if (node.is_scalar()) {
-            write(node.scalar());
+            std::string str = node.scalar();
+            if (str.empty() || str == "~" || str == "null") {
+                str = '"' + str + '"';
+            }
+            write(str);
         }
     }
 
     void Serializer::write_flow_node(const Node &node)
     {
-        if (node.is_map()) {
+        if (node.is_null()) {
+            write("null");
+        } else if (node.is_map()) {
             write_flow_map(node);
         } else if (node.is_seq()) {
             write_flow_seq(node);
-        } else {
-            write(node.scalar());
+        } else if (node.is_scalar()) {
+            std::string str = node.scalar();
+            if (str.empty() || str == "~" || str == "null") {
+                str = '"' + str + '"';
+            }
+            write(str);
         }
     }
 
