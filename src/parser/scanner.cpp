@@ -198,59 +198,41 @@ namespace cyaml
 
     bool Scanner::match(std::string pattern, bool end_with_delimiter)
     {
-        bool ret = true;
-        std::stack<char> temp_chars;
-        for (char ch : pattern) {
-            if (!input_stream_.eof() && !chars_.empty())
-                chars_.push_back(input_stream_.get());
-
-            if (ch != next()) {
-                ret = false;
-                break;
-            }
-
-            temp_chars.push(next());
-            chars_.pop_front();
+        int size = pattern.size() + (end_with_delimiter ? 1 : 0);
+        while (chars_.size() < size && !input_stream_.eof()) {
+            chars_.push_back(input_stream_.get());
         }
 
-        if (end_with_delimiter && !is_delimiter(next()))
-            ret = false;
+        if (chars_.size() < size)
+            return false;
 
-        while (!temp_chars.empty()) {
-            char ch = temp_chars.top();
-            chars_.push_front(ch);
-            temp_chars.pop();
+        for (int i = 0; i < pattern.size(); i++) {
+            if (chars_[i] != pattern[i])
+                return false;
         }
 
-        return ret;
+        if (end_with_delimiter && !is_delimiter(chars_[size - 1]))
+            return false;
+
+        return true;
     }
 
     bool Scanner::match(std::string pattern1, std::string pattern2)
     {
-        bool ret = true;
-        std::stack<char> temp_chars;
-        for (char ch : pattern1) {
-            if (!input_stream_.eof() && !chars_.empty())
-                chars_.push_back(input_stream_.get());
-
-            if (ch != next()) {
-                ret = false;
-                break;
-            }
-
-            temp_chars.push(next());
-            chars_.pop_front();
+        int size = pattern1.size() + 1;
+        while (chars_.size() < size && !input_stream_.eof()) {
+            chars_.push_back(input_stream_.get());
         }
 
-        ret &= match_any_of(pattern2);
+        if (chars_.size() < size)
+            return false;
 
-        while (!temp_chars.empty()) {
-            char ch = temp_chars.top();
-            chars_.push_front(ch);
-            temp_chars.pop();
+        for (int i = 0; i < pattern1.size(); i++) {
+            if (chars_[i] != pattern1[i])
+                return false;
         }
 
-        return ret;
+        return pattern2.find(chars_[size - 1]) != -1;
     }
 
 } // namespace cyaml
