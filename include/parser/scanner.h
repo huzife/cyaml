@@ -8,7 +8,7 @@
 #ifndef CYAML_SCANNER_H
 #define CYAML_SCANNER_H
 
-#include "parser/token.h"
+#include "type/token.h"
 #include <istream>
 #include <stack>
 
