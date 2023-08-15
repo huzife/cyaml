@@ -17,7 +17,7 @@ namespace cyaml
     Scanner::Scanner(std::istream &in): input_stream_(in)
     {
         chars_.push_back(input_stream_.get());
-        add_token(Token_Type::STREAM_START);
+        scan();
     }
 
     Token Scanner::next_token()

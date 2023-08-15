@@ -43,10 +43,6 @@ namespace cyaml
         switch (type) {
         case Token_Type::NONE:
             return "NONE";
-        case Token_Type::STREAM_START:
-            return "STREAM_START";
-        case Token_Type::STREAM_END:
-            return "STREAM_END";
         case Token_Type::DOC_START:
             return "DOC_START";
         case Token_Type::DOC_END:

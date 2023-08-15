@@ -40,17 +40,14 @@ namespace cyaml
     }
 
     // 解析部分
-    void Parser::parse()
+    bool Parser::parse_next_document()
     {
-        parse_stream();
-        anchor_map_.clear();
-    }
+        if (scanner_.end())
+            return false;
 
-    void Parser::parse_stream()
-    {
-        expect(Token_Type::STREAM_START);
         parse_document();
-        expect(Token_Type::STREAM_END);
+        anchor_map_.clear();
+        return true;
     }
 
     void Parser::parse_document()

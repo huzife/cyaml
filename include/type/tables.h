@@ -21,8 +21,6 @@ namespace cyaml
 
     using First_Set = std::unordered_set<Token_Type>;
 
-    static const First_Set stream_set = {Token_Type::STREAM_START};
-
     static const First_Set document_set = {
             Token_Type::ANCHOR,          Token_Type::ALIAS,
             Token_Type::SCALAR,          Token_Type::BLOCK_MAP_START,

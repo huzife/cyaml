@@ -18,7 +18,7 @@ namespace cyaml
     Node load(std::istream &input)
     {
         Node_Builder builder;
-        Parser(input, builder).parse();
+        Parser(input, builder).parse_next_document();
         return builder.root();
     }
 
@@ -27,7 +27,7 @@ namespace cyaml
         std::stringstream ss;
         ss << input;
         Node_Builder builder;
-        Parser(ss, builder).parse();
+        Parser(ss, builder).parse_next_document();
         return builder.root();
     }
 
@@ -36,7 +36,7 @@ namespace cyaml
         std::stringstream ss;
         ss << input;
         Node_Builder builder;
-        Parser(ss, builder).parse();
+        Parser(ss, builder).parse_next_document();
         return builder.root();
     }
 
@@ -49,7 +49,7 @@ namespace cyaml
         }
 
         Node_Builder builder;
-        Parser(ifs, builder).parse();
+        Parser(ifs, builder).parse_next_document();
         Node ret = builder.root();
         ifs.close();
 

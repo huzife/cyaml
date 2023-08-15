@@ -23,8 +23,6 @@ namespace cyaml
     enum class Token_Type
     {
         NONE,
-        STREAM_START,    // 输入流开始
-        STREAM_END,      // 输入流结束
         DOC_START,       // ---
         DOC_END,         // ...
         BLOCK_ENTRY,     // -

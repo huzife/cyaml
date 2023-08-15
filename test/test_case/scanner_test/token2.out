@@ -1,4 +1,3 @@
-(STREAM_START)#
 (DOC_START)#
 (BLOCK_MAP_START)#
 (KEY)#
@@ -67,4 +66,3 @@ can auto
 convert line breaks
 to save space)#
 (BLOCK_MAP_END)#
-(STREAM_END)#

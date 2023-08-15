@@ -42,11 +42,11 @@ namespace cyaml
         Parser(std::istream &in, Event_Handler &handler);
 
         /**
-         * @brief   YAML 解析接口
-         * @details 使用递归下降解析 YAML 文本流
-         * @return  void
+         * @brief   解析下一个 yaml 文档
+         * @details 一个 yaml 文件可以存在多个文档，由 "---" 和 "..." 分隔
+         * @return  bool
          */
-        void parse();
+        bool parse_next_document();
 
     private:
         /**
@@ -149,7 +149,6 @@ namespace cyaml
                 Node_Ptr &key_node,
                 Node_Ptr &value_node);
 
-        void parse_stream();
         void parse_document();
         void parse_block_node_or_indentless_seq();
         void parse_block_node();

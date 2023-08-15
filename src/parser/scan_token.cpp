@@ -17,9 +17,6 @@ namespace cyaml
 
         // 匹配剩下的缩进
         pop_all_indent();
-
-        // 添加 STREAM_END
-        add_token(Token_Type::STREAM_END);
     }
 
     void Scanner::scan_doc_start()
