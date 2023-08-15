@@ -12,26 +12,40 @@
 
 namespace cyaml
 {
-    Node::Node(): type_(Node_Type::NULL_NODE) {}
-
     Node::Node(Node_Type type)
         : type_(type),
           data_(std::make_shared<Node_Data>())
     {
+        data_->insert_ref(this);
+    }
+
+    Node::Node(const Node &node)
+        : type_(node.type_),
+          style_(node.style_),
+          data_(node.data_)
+    {
+        data_->insert_ref(this);
     }
 
     Node::Node(const Node_Ptr &node)
         : type_(node->type_),
-          data_(node->data_),
-          style_(node->style_)
+          style_(node->style_),
+          data_(node->data_)
     {
+        data_->insert_ref(this);
     }
 
     Node::Node(const std::string &scalar)
         : type_(Node_Type::SCALAR),
-          data_(std::make_shared<Node_Data>(scalar)),
-          style_(Node_Style::BLOCK)
+          style_(Node_Style::BLOCK),
+          data_(std::make_shared<Node_Data>(scalar))
     {
+        data_->insert_ref(this);
+    }
+
+    Node::~Node()
+    {
+        data_->remove_ref(this);
     }
 
     bool operator==(const Node &n1, const Node &n2)
@@ -185,8 +199,14 @@ namespace cyaml
 
     Node &Node::operator=(const Node &rhs)
     {
-        type_ = rhs.type();
-        data_ = rhs.data_;
+        auto refs = data_->refs;
+        for (auto *ref : refs) {
+            ref->type_ = rhs.type_;
+            ref->style_ = rhs.style_;
+            ref->data_ = rhs.data_;
+            rhs.data_->insert_ref(ref);
+        }
+        refs.clear();
 
         return *this;
     }
@@ -288,6 +308,15 @@ namespace cyaml
                 node->data_->seq.emplace_back(next_node);
             }
         }
+    }
+
+    void Node::assign(Node_Data_Ptr data)
+    {
+        for (auto *node : data_->refs) {
+            node->data_ = data;
+            data->insert_ref(node);
+        }
+        data_->refs.clear();
     }
 
 } // namespace cyaml

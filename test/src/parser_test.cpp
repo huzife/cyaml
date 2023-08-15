@@ -61,6 +61,10 @@ TEST_F(Parser_Test, anchor_alias)
     c["c2"] = 2;
     ASSERT_TRUE(node.contain(c));
     EXPECT_EQ(node[c].as<int>(), 4);
+
+    b = "c";
+    ASSERT_TRUE(node.contain("c"));
+    EXPECT_EQ(node["c"].as<int>(), 3);
 }
 
 TEST_F(Parser_Test, complex_key)

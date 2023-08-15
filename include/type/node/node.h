@@ -48,11 +48,11 @@ namespace cyaml
         Node_Style style_ = Node_Style::BLOCK; // 节点样式
 
     public:
-        Node();
-        Node(Node_Type type);
+        Node(Node_Type type = Node_Type::NULL_NODE);
+        Node(const Node &node);
         Node(const Node_Ptr &node);
         Node(const std::string &scalar);
-        Node(const Node &) = default;
+        ~Node();
 
         friend bool operator==(const Node &n1, const Node &n2);
         friend bool operator==(const Node_Ptr &n1, const Node_Ptr &n2);
@@ -274,7 +274,7 @@ namespace cyaml
          */
         void clear()
         {
-            data_ = std::make_shared<Node_Data>();
+            reset(type_);
         }
 
     private:
@@ -286,7 +286,10 @@ namespace cyaml
         void reset(Node_Type type = Node_Type::NULL_NODE)
         {
             type_ = type;
-            data_ = std::make_shared<Node_Data>();
+            if (!is_null()) {
+                data_->remove_ref(this);
+                data_ = std::make_shared<Node_Data>();
+            }
         }
 
         /**
@@ -316,6 +319,12 @@ namespace cyaml
             assert(!contain(key));
             data_->map.emplace_back(key, value);
         }
+
+        /**
+         * @brief   重置节点指向数据
+         * @return  void
+         */
+        void assign(Node_Data_Ptr data);
     };
 } // namespace cyaml
 

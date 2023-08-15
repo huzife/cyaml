@@ -12,4 +12,20 @@ namespace cyaml
 {
     Node_Data::Node_Data(std::string value): scalar(value) {}
 
+    void Node_Data::insert_ref(const Node *node)
+    {
+        Node *n = const_cast<Node *>(node);
+        if (refs.find(n) == refs.end()) {
+            refs.insert(n);
+        }
+    }
+
+    void Node_Data::remove_ref(const Node *node)
+    {
+        Node *n = const_cast<Node *>(node);
+        if (refs.find(n) != refs.end()) {
+            refs.erase(n);
+        }
+    }
+
 } // namespace cyaml

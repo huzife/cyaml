@@ -53,6 +53,7 @@ namespace cyaml
     Node Parser::parse()
     {
         parse_stream(root_node_);
+        anchor_map_.clear();
         return *root_node_;
     }
 
@@ -85,10 +86,11 @@ namespace cyaml
     {
         if (next_type() == Token_Type::ALIAS) {
             Token alias = next_token();
-            if (anchor_map_.find(alias.value()) == anchor_map_.end()) {
+            auto iter = anchor_map_.find(alias.value());
+            if (iter == anchor_map_.end()) {
                 throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark());
             }
-            node = anchor_map_[alias.value()];
+            *node = *(iter->second);
         } else if (belong(properties_set, block_content_set,
                           indentless_seq_set)) {
             // 解析属性
@@ -117,10 +119,11 @@ namespace cyaml
     {
         if (next_type() == Token_Type::ALIAS) {
             Token alias = next_token();
-            if (anchor_map_.find(alias.value()) == anchor_map_.end()) {
+            auto iter = anchor_map_.find(alias.value());
+            if (iter == anchor_map_.end()) {
                 throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark());
             }
-            node = anchor_map_[alias.value()];
+            *node = *(iter->second);
         } else if (belong(properties_set, block_content_set)) {
             // 解析属性
             std::string anchor_name;
@@ -146,10 +149,11 @@ namespace cyaml
     {
         if (next_type() == Token_Type::ALIAS) {
             Token alias = next_token();
-            if (anchor_map_.find(alias.value()) == anchor_map_.end()) {
+            auto iter = anchor_map_.find(alias.value());
+            if (iter == anchor_map_.end()) {
                 throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark());
             }
-            node = anchor_map_[alias.value()];
+            *node = *(iter->second);
         } else if (belong(properties_set, flow_content_set)) {
             // 解析属性
             std::string anchor_name;

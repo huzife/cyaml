@@ -18,8 +18,16 @@ namespace cyaml
     Node &Node::operator=(const T &rhs)
     {
         Node node = Convert<T>::encode(rhs);
-        type_ = node.type_;
-        data_ = node.data_;
+
+        auto refs = data_->refs;
+        for (auto *ref : refs) {
+            ref->type_ = node.type_;
+            ref->style_ = node.style_;
+            ref->data_ = node.data_;
+            node.data_->insert_ref(ref);
+        }
+        refs.clear();
+
         return *this;
     }
 
