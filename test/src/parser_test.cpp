@@ -25,8 +25,7 @@ public:
         std::ifstream input_in(test_case_dirname + test_name + ".in");
         EXPECT_TRUE(input_in.is_open());
 
-        cyaml::Parser parser(input_in);
-        node = parser.parse();
+        node = cyaml::load(input_in);
     }
 };
 
@@ -128,7 +127,6 @@ TEST_F(Parser_Test, nested_flow)
 {
     cyaml::Node node;
     parse("nested_flow", node);
-
     EXPECT_EQ(node.type(), cyaml::Node_Type::MAP);
     EXPECT_EQ(node.size(), 5);
     EXPECT_EQ(node["a"].as<std::string>(), "hello");

@@ -13,7 +13,11 @@
 
 namespace cyaml
 {
-    Parser::Parser(std::istream &in): scanner_(in) {}
+    Parser::Parser(std::istream &in, Event_Handler &handler)
+        : scanner_(in),
+          handler_(handler)
+    {
+    }
 
     Token Parser::expect(Token_Type type)
     {
@@ -35,62 +39,47 @@ namespace cyaml
                 unexpected_token_msg(expected_type, next_token()), mark());
     }
 
-    void Parser::insert_key_value(
-            Node_Ptr &node,
-            Node_Ptr &key_node,
-            Node_Ptr &value_node)
-    {
-        if (node->contain(key_node)) {
-            std::string key_name = key_node->as<std::string>();
-            throw Representation_Exception(
-                    duplicated_key_msg(key_name), mark());
-        }
-
-        node->insert(*key_node, *value_node);
-    }
-
     // 解析部分
-    Node Parser::parse()
+    void Parser::parse()
     {
-        parse_stream(root_node_);
+        parse_stream();
         anchor_map_.clear();
-        return *root_node_;
     }
 
-    void Parser::parse_stream(Node_Ptr &node)
+    void Parser::parse_stream()
     {
         expect(Token_Type::STREAM_START);
-        parse_document(node);
+        parse_document();
         expect(Token_Type::STREAM_END);
     }
 
-    void Parser::parse_document(Node_Ptr &node)
+    void Parser::parse_document()
     {
         // DOC_START?
         if (next_type() == Token_Type::DOC_START) {
-            expect(Token_Type::DOC_START);
+            next_token();
+            handler_.on_document_start(mark());
         }
 
         // block_node
         if (belong(block_node_set)) {
-            parse_block_node(node);
+            parse_block_node();
+        } else {
+            handler_.on_null(mark(), "");
         }
 
         // DOC_END?
         if (next_type() == Token_Type::DOC_END) {
             next_token();
+            handler_.on_document_end();
         }
     }
 
-    void Parser::parse_block_node_or_indentless_seq(Node_Ptr &node)
+    void Parser::parse_block_node_or_indentless_seq()
     {
         if (next_type() == Token_Type::ALIAS) {
             Token alias = next_token();
-            auto iter = anchor_map_.find(alias.value());
-            if (iter == anchor_map_.end()) {
-                throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark());
-            }
-            *node = *(iter->second);
+            handler_.on_alias(mark(), alias.value());
         } else if (belong(properties_set, block_content_set,
                           indentless_seq_set)) {
             // 解析属性
@@ -101,29 +90,20 @@ namespace cyaml
 
             // 解析节点内容
             if (belong(block_content_set)) {
-                parse_block_content(node);
+                parse_block_content(anchor_name);
             } else if (belong(indentless_seq_set)) {
-                parse_indentless_seq(node);
-            }
-
-            // 插入 anchor 表
-            if (!anchor_name.empty()) {
-                anchor_map_[anchor_name] = node;
+                parse_indentless_seq(anchor_name);
             }
         } else {
             throw_unexpected_token();
         }
     }
 
-    void Parser::parse_block_node(Node_Ptr &node)
+    void Parser::parse_block_node()
     {
         if (next_type() == Token_Type::ALIAS) {
             Token alias = next_token();
-            auto iter = anchor_map_.find(alias.value());
-            if (iter == anchor_map_.end()) {
-                throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark());
-            }
-            *node = *(iter->second);
+            handler_.on_alias(mark(), alias.value());
         } else if (belong(properties_set, block_content_set)) {
             // 解析属性
             std::string anchor_name;
@@ -133,27 +113,18 @@ namespace cyaml
 
             // 解析节点内容
             if (belong(block_content_set)) {
-                parse_block_content(node);
-            }
-
-            // 插入 anchor 表
-            if (!anchor_name.empty()) {
-                anchor_map_[anchor_name] = node;
+                parse_block_content(anchor_name);
             }
         } else {
             throw_unexpected_token();
         }
     }
 
-    void Parser::parse_flow_node(Node_Ptr &node)
+    void Parser::parse_flow_node()
     {
         if (next_type() == Token_Type::ALIAS) {
             Token alias = next_token();
-            auto iter = anchor_map_.find(alias.value());
-            if (iter == anchor_map_.end()) {
-                throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark());
-            }
-            *node = *(iter->second);
+            handler_.on_alias(mark(), alias.value());
         } else if (belong(properties_set, flow_content_set)) {
             // 解析属性
             std::string anchor_name;
@@ -163,13 +134,240 @@ namespace cyaml
 
             // 解析节点内容
             if (belong(flow_content_set)) {
-                parse_flow_content(node);
+                parse_flow_content(anchor_name);
+            }
+        } else {
+            throw_unexpected_token();
+        }
+    }
+
+    void Parser::parse_block_content(std::string anchor)
+    {
+        if (belong(block_collection_set)) {
+            parse_block_collection(anchor);
+        } else if (belong(flow_collection_set)) {
+            parse_flow_collection(anchor);
+        } else if (next_type() == Token_Type::SCALAR) {
+            handler_.on_scalar(mark(), anchor, next_token().value());
+        } else {
+            throw_unexpected_token();
+        }
+    }
+
+    void Parser::parse_flow_content(std::string anchor)
+    {
+        if (belong(flow_collection_set)) {
+            parse_flow_collection(anchor);
+        } else if (next_type() == Token_Type::SCALAR) {
+            handler_.on_scalar(mark(), anchor, next_token().value());
+        } else {
+            throw_unexpected_token();
+        }
+    }
+
+    void Parser::parse_block_collection(std::string anchor)
+    {
+        if (belong(block_map_set)) {
+            parse_block_map(anchor);
+        } else if (belong(block_seq_set)) {
+            parse_block_seq(anchor);
+        } else {
+            throw_unexpected_token();
+        }
+    }
+
+    void Parser::parse_flow_collection(std::string anchor)
+    {
+        if (belong(flow_map_set)) {
+            parse_flow_map(anchor);
+        } else if (belong(flow_seq_set)) {
+            parse_flow_seq(anchor);
+        } else {
+            throw_unexpected_token();
+        }
+    }
+
+    void Parser::parse_block_map(std::string anchor)
+    {
+        expect(Token_Type::BLOCK_MAP_START);
+        handler_.on_map_start(mark(), anchor, Node_Style::BLOCK);
+
+        // 循环解析 key : value
+        while (next_type() != Token_Type::BLOCK_MAP_END) {
+            // key 部分，默认为 "null"
+            bool null = true;
+            if (next_type() == Token_Type::KEY) {
+                next_token();
+                if (belong(block_node_or_indentless_seq_set)) {
+                    parse_block_node_or_indentless_seq();
+                    null = false;
+                }
             }
 
-            // 插入 anchor 表
-            if (!anchor_name.empty()) {
-                anchor_map_[anchor_name] = node;
+            if (null) {
+                handler_.on_null(mark(), "");
             }
+
+            // value 部分，默认为 null
+            null = true;
+            if (next_type() == Token_Type::VALUE) {
+                next_token();
+                if (belong(block_node_or_indentless_seq_set)) {
+                    parse_block_node_or_indentless_seq();
+                    null = false;
+                }
+            }
+
+            if (null) {
+                handler_.on_null(mark(), "");
+            }
+        }
+
+        expect(Token_Type::BLOCK_MAP_END);
+        handler_.on_map_end();
+    }
+
+    void Parser::parse_block_seq(std::string anchor)
+    {
+        expect(Token_Type::BLOCK_SEQ_START);
+        handler_.on_seq_start(mark(), anchor, Node_Style::BLOCK);
+
+        // 循环解析数组元素
+        while (next_type() != Token_Type::BLOCK_SEQ_END) {
+            expect(Token_Type::BLOCK_ENTRY);
+            if (belong(block_node_set)) {
+                parse_block_node();
+            } else {
+                handler_.on_null(mark(), "");
+            }
+        }
+
+        expect(Token_Type::BLOCK_SEQ_END);
+        handler_.on_seq_end();
+    }
+
+    void Parser::parse_indentless_seq(std::string anchor)
+    {
+        Token_Type type = next_type();
+        handler_.on_seq_start(mark(), anchor, Node_Style::BLOCK);
+
+        // 至少一次
+        do {
+            expect(Token_Type::BLOCK_ENTRY);
+            if (belong(block_node_set)) {
+                parse_block_node();
+            } else {
+                handler_.on_null(mark(), "");
+            }
+        } while (next_type() != Token_Type::KEY &&
+                 next_type() != Token_Type::BLOCK_MAP_END);
+
+        handler_.on_seq_end();
+    }
+
+    void Parser::parse_flow_map(std::string anchor)
+    {
+        expect(Token_Type::FLOW_MAP_START);
+        handler_.on_map_start(mark(), anchor, Node_Style::FLOW);
+
+        // 循环解析 key : value
+        while (next_type() != Token_Type::FLOW_MAP_END) {
+            if (belong(flow_map_entry_set)) {
+                parse_flow_map_entry();
+            } else {
+                handler_.on_null(mark(), "");
+                handler_.on_null(mark(), "");
+            }
+
+            if (next_type() != Token_Type::FLOW_MAP_END) {
+                expect(Token_Type::FLOW_ENTRY);
+            }
+        }
+
+        expect(Token_Type::FLOW_MAP_END);
+        handler_.on_map_end();
+    }
+
+    void Parser::parse_flow_seq(std::string anchor)
+    {
+        expect(Token_Type::FLOW_SEQ_START);
+        handler_.on_seq_start(mark(), anchor, Node_Style::FLOW);
+
+        // 循环解析数组元素
+        while (next_type() != Token_Type::FLOW_SEQ_END) {
+            if (belong(flow_seq_entry_set)) {
+                parse_flow_seq_entry();
+            } else {
+                handler_.on_null(mark(), "");
+            }
+
+            if (next_type() != Token_Type::FLOW_SEQ_END) {
+                expect(Token_Type::FLOW_ENTRY);
+            }
+        }
+
+        expect(Token_Type::FLOW_SEQ_END);
+        handler_.on_seq_end();
+    }
+
+    void Parser::parse_flow_map_entry()
+    {
+        if (belong(flow_node_set)) {
+            parse_flow_node();
+            handler_.on_null(mark(), "");
+        } else if (next_type() == Token_Type::KEY) {
+            next_token();
+            if (belong(flow_node_set)) {
+                parse_flow_node();
+            } else {
+                handler_.on_null(mark(), "");
+            }
+
+            bool null = true;
+            if (next_type() == Token_Type::VALUE) {
+                next_token();
+                if (belong(flow_node_set)) {
+                    parse_flow_node();
+                    null = false;
+                }
+            }
+            if (null) {
+                handler_.on_null(mark(), "");
+            }
+        } else {
+            throw_unexpected_token();
+        }
+    }
+
+    void Parser::parse_flow_seq_entry()
+    {
+        if (belong(flow_node_set)) {
+            parse_flow_node();
+        } else if (next_type() == Token_Type::KEY) {
+            next_token();
+
+            // [] 中的键值对需要单独放到一个 {} 中
+            handler_.on_map_start(mark(), "", Node_Style::FLOW);
+
+            if (belong(flow_node_set)) {
+                parse_flow_node();
+            } else {
+                handler_.on_null(mark(), "");
+            }
+
+            bool null = true;
+            if (next_type() == Token_Type::VALUE) {
+                next_token();
+                if (belong(flow_node_set)) {
+                    parse_flow_node();
+                    null = false;
+                }
+            }
+            if (null) {
+                handler_.on_null(mark(), "");
+            }
+
+            handler_.on_map_end();
         } else {
             throw_unexpected_token();
         }
@@ -180,222 +378,6 @@ namespace cyaml
         // 目前只有 anchor，未实现 tag
         Token anchor = expect(Token_Type::ANCHOR);
         return anchor.value();
-    }
-
-    void Parser::parse_block_content(Node_Ptr &node)
-    {
-        if (belong(block_collection_set)) {
-            parse_block_collection(node);
-        } else if (belong(flow_collection_set)) {
-            parse_flow_collection(node);
-        } else if (next_type() == Token_Type::SCALAR) {
-            node = std::make_shared<Node>(next_token().value());
-        } else {
-            throw_unexpected_token();
-        }
-    }
-
-    void Parser::parse_flow_content(Node_Ptr &node)
-    {
-        if (belong(flow_collection_set)) {
-            parse_flow_collection(node);
-        } else if (next_type() == Token_Type::SCALAR) {
-            node = std::make_shared<Node>(next_token().value());
-        } else {
-            throw_unexpected_token();
-        }
-    }
-
-    void Parser::parse_block_collection(Node_Ptr &node)
-    {
-        if (belong(block_map_set)) {
-            parse_block_map(node);
-        } else if (belong(block_seq_set)) {
-            parse_block_seq(node);
-        } else {
-            throw_unexpected_token();
-        }
-    }
-
-    void Parser::parse_flow_collection(Node_Ptr &node)
-    {
-        if (belong(flow_map_set)) {
-            parse_flow_map(node);
-        } else if (belong(flow_seq_set)) {
-            parse_flow_seq(node);
-        } else {
-            throw_unexpected_token();
-        }
-    }
-
-    void Parser::parse_block_map(Node_Ptr &node)
-    {
-        node = std::make_shared<Node>(Node_Type::MAP);
-        expect(Token_Type::BLOCK_MAP_START);
-
-        // 循环解析 key : value
-        while (next_type() != Token_Type::BLOCK_MAP_END) {
-            // key 部分，默认为 "null"
-            auto key_node = std::make_shared<Node>();
-            if (next_type() == Token_Type::KEY) {
-                next_token();
-                if (belong(block_node_or_indentless_seq_set)) {
-                    parse_block_node_or_indentless_seq(key_node);
-                }
-            }
-
-            // value 部分，默认为 null
-            auto value_node = std::make_shared<Node>();
-            if (next_type() == Token_Type::VALUE) {
-                next_token();
-                if (belong(block_node_or_indentless_seq_set)) {
-                    parse_block_node_or_indentless_seq(value_node);
-                }
-            }
-
-            // 插入键值对
-            insert_key_value(node, key_node, value_node);
-        }
-
-        expect(Token_Type::BLOCK_MAP_END);
-    }
-
-    void Parser::parse_block_seq(Node_Ptr &node)
-    {
-        node = std::make_shared<Node>(Node_Type::SEQ);
-        expect(Token_Type::BLOCK_SEQ_START);
-
-        // 循环解析数组元素
-        while (next_type() != Token_Type::BLOCK_SEQ_END) {
-            expect(Token_Type::BLOCK_ENTRY);
-            auto value_node = std::make_shared<Node>();
-            if (belong(block_node_set)) {
-                parse_block_node(value_node);
-            }
-            node->push_back(*value_node);
-        }
-
-        expect(Token_Type::BLOCK_SEQ_END);
-    }
-
-    void Parser::parse_indentless_seq(Node_Ptr &node)
-    {
-        node = std::make_shared<Node>(Node_Type::SEQ);
-        Token_Type type = next_type();
-
-        // 至少一次
-        expect(Token_Type::BLOCK_ENTRY);
-        auto value_node = std::make_shared<Node>();
-        if (belong(block_node_set)) {
-            parse_block_node(value_node);
-        }
-        node->push_back(*value_node);
-
-        while (next_type() != Token_Type::KEY &&
-               next_type() != Token_Type::BLOCK_MAP_END) {
-            expect(Token_Type::BLOCK_ENTRY);
-            value_node = std::make_shared<Node>();
-            if (belong(block_node_set)) {
-                parse_block_node(value_node);
-            }
-            node->push_back(*value_node);
-        }
-    }
-
-    void Parser::parse_flow_map(Node_Ptr &node)
-    {
-        node = std::make_shared<Node>(Node_Type::MAP);
-        expect(Token_Type::FLOW_MAP_START);
-
-        // 循环解析 key : value
-        while (next_type() != Token_Type::FLOW_MAP_END) {
-            auto key_node = std::make_shared<Node>();
-            auto value_node = std::make_shared<Node>();
-
-            if (belong(flow_map_entry_set)) {
-                parse_flow_map_entry(key_node, value_node);
-            }
-
-            // 插入键值对
-            insert_key_value(node, key_node, value_node);
-
-            if (next_type() != Token_Type::FLOW_MAP_END) {
-                expect(Token_Type::FLOW_ENTRY);
-            }
-        }
-
-        expect(Token_Type::FLOW_MAP_END);
-    }
-
-    void Parser::parse_flow_seq(Node_Ptr &node)
-    {
-        node = std::make_shared<Node>(Node_Type::SEQ);
-        expect(Token_Type::FLOW_SEQ_START);
-
-        // 循环解析数组元素
-        while (next_type() != Token_Type::FLOW_SEQ_END) {
-            auto value_node = std::make_shared<Node>();
-            if (belong(flow_seq_entry_set)) {
-                parse_flow_seq_entry(value_node);
-            }
-            node->push_back(*value_node);
-
-            if (next_type() != Token_Type::FLOW_SEQ_END) {
-                expect(Token_Type::FLOW_ENTRY);
-            }
-        }
-
-        expect(Token_Type::FLOW_SEQ_END);
-    }
-
-    void Parser::parse_flow_map_entry(Node_Ptr &key_node, Node_Ptr &value_node)
-    {
-        if (belong(flow_node_set)) {
-            parse_flow_node(key_node);
-        } else if (next_type() == Token_Type::KEY) {
-            next_token();
-            if (belong(flow_node_set)) {
-                parse_flow_node(key_node);
-            }
-
-            if (next_type() == Token_Type::VALUE) {
-                next_token();
-                if (belong(flow_node_set)) {
-                    parse_flow_node(value_node);
-                }
-            }
-        } else {
-            throw_unexpected_token();
-        }
-    }
-
-    void Parser::parse_flow_seq_entry(Node_Ptr &node)
-    {
-        if (belong(flow_node_set)) {
-            parse_flow_node(node);
-        } else if (next_type() == Token_Type::KEY) {
-            next_token();
-            // [] 中的键值对需要单独放到一个 {} 中
-            node = std::make_shared<Node>(Node_Type::MAP);
-
-            auto key_node = std::make_shared<Node>("null");
-            if (belong(flow_node_set)) {
-                parse_flow_node(key_node);
-            }
-
-            auto value_node = std::make_shared<Node>();
-            if (next_type() == Token_Type::VALUE) {
-                next_token();
-                if (belong(flow_node_set)) {
-                    parse_flow_node(value_node);
-                }
-            }
-
-            // 插入键值对
-            insert_key_value(node, key_node, value_node);
-        } else {
-            throw_unexpected_token();
-        }
     }
 
 } // namespace cyaml

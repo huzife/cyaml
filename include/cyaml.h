@@ -11,6 +11,9 @@
 // error
 #include "error/exceptions.h"
 
+// event
+#include "event/event.h"
+
 // parser
 #include "parser/serializer.h"
 #include "parser/parser.h"

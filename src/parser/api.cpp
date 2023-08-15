@@ -6,6 +6,7 @@
  */
 
 #include "parser/api.h"
+#include "parser/node_builder.h"
 #include "parser/parser.h"
 #include "parser/serializer.h"
 #include "error/exceptions.h"
@@ -16,19 +17,27 @@ namespace cyaml
 {
     Node load(std::istream &input)
     {
-        return Parser(input).parse();
+        Node_Builder builder;
+        Parser(input, builder).parse();
+        return builder.root();
     }
 
     Node load(std::string input)
     {
         std::stringstream ss;
         ss << input;
-        return Parser(ss).parse();
+        Node_Builder builder;
+        Parser(ss, builder).parse();
+        return builder.root();
     }
 
     Node load(const char *input)
     {
-        return load(std::string(input));
+        std::stringstream ss;
+        ss << input;
+        Node_Builder builder;
+        Parser(ss, builder).parse();
+        return builder.root();
     }
 
     Node load_file(std::string file)
@@ -39,7 +48,9 @@ namespace cyaml
             throw Exception("Failed to open \"" + file + "\"", Mark());
         }
 
-        Node ret = Parser(ifs).parse();
+        Node_Builder builder;
+        Parser(ifs, builder).parse();
+        Node ret = builder.root();
         ifs.close();
 
         return ret;

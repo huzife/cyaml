@@ -252,7 +252,6 @@ namespace cyaml
             if (!is_delimiter(next()) && next() != ':')
                 break;
 
-
             // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
             if (match_value()) {
                 can_be_key = true;

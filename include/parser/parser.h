@@ -8,6 +8,7 @@
 #ifndef CYAML_PARSER_H
 #define CYAML_PARSER_H
 
+#include "event/event.h"
 #include "parser/scanner.h"
 #include "type/mark.h"
 #include "type/node/node.h"
@@ -26,7 +27,7 @@ namespace cyaml
     {
     private:
         Scanner scanner_;
-        Node_Ptr root_node_ = std::make_shared<Node>();
+        Event_Handler &handler_;
         std::unordered_map<std::string, Node_Ptr> anchor_map_;
 
         mutable Mark mark_ = Mark(1, 1); // 当前 token 位置
@@ -34,18 +35,18 @@ namespace cyaml
     public:
         /**
          * @brief   Parser 类构造函数
-         * @param   std::istream    标准输入流
+         * @param   in          标准输入流
+         * @param   handler     事件处理器
          * @retval  Parser 对象
          */
-        Parser(std::istream &in);
+        Parser(std::istream &in, Event_Handler &handler);
 
         /**
          * @brief   YAML 解析接口
          * @details 使用递归下降解析 YAML 文本流
-         * @return  Node
-         * @retval  YAML 解析得到的数据对象
+         * @return  void
          */
-        Node parse();
+        void parse();
 
     private:
         /**
@@ -148,23 +149,23 @@ namespace cyaml
                 Node_Ptr &key_node,
                 Node_Ptr &value_node);
 
-        void parse_stream(Node_Ptr &node);
-        void parse_document(Node_Ptr &node);
-        void parse_block_node_or_indentless_seq(Node_Ptr &node);
-        void parse_block_node(Node_Ptr &node);
-        void parse_flow_node(Node_Ptr &node);
+        void parse_stream();
+        void parse_document();
+        void parse_block_node_or_indentless_seq();
+        void parse_block_node();
+        void parse_flow_node();
+        void parse_block_content(std::string anchor);
+        void parse_flow_content(std::string anchor);
+        void parse_block_collection(std::string anchor);
+        void parse_flow_collection(std::string anchor);
+        void parse_block_map(std::string anchor);
+        void parse_block_seq(std::string anchor);
+        void parse_indentless_seq(std::string anchor);
+        void parse_flow_map(std::string anchor);
+        void parse_flow_seq(std::string anchor);
+        void parse_flow_map_entry();
+        void parse_flow_seq_entry();
         std::string parse_properties();
-        void parse_block_content(Node_Ptr &node);
-        void parse_flow_content(Node_Ptr &node);
-        void parse_block_collection(Node_Ptr &node);
-        void parse_flow_collection(Node_Ptr &node);
-        void parse_block_map(Node_Ptr &node);
-        void parse_block_seq(Node_Ptr &node);
-        void parse_indentless_seq(Node_Ptr &node);
-        void parse_flow_map(Node_Ptr &node);
-        void parse_flow_seq(Node_Ptr &node);
-        void parse_flow_map_entry(Node_Ptr &key_node, Node_Ptr &value_node);
-        void parse_flow_seq_entry(Node_Ptr &node);
     };
 
 } // namespace cyaml
