@@ -46,7 +46,6 @@ namespace cyaml
             return false;
 
         parse_document();
-        anchor_map_.clear();
         return true;
     }
 
@@ -55,8 +54,8 @@ namespace cyaml
         // DOC_START?
         if (next_type() == Token_Type::DOC_START) {
             next_token();
-            handler_.on_document_start(mark());
         }
+        handler_.on_document_start(mark());
 
         // block_node
         if (belong(block_node_set)) {
@@ -65,11 +64,11 @@ namespace cyaml
             handler_.on_null(mark(), "");
         }
 
-        // DOC_END?
-        if (next_type() == Token_Type::DOC_END) {
+        // DOC_END*
+        while (next_type() == Token_Type::DOC_END) {
             next_token();
-            handler_.on_document_end();
         }
+        handler_.on_document_end();
     }
 
     void Parser::parse_block_node_or_indentless_seq()

@@ -334,8 +334,8 @@ namespace cyaml
                 }
             }
 
-            // 检查 DOC_END
-            if (match("...", true))
+            // 检查 DOCUMENT INDICATOR
+            if (match("...", true) || match("---", true))
                 break;
 
             // 消耗下一行的空格

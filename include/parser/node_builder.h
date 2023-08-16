@@ -35,7 +35,7 @@ namespace cyaml
             mark_ = mark;
         };
 
-        void on_document_end() override{};
+        void on_document_end() override;
 
         void on_map_start(
                 const Mark &mark,

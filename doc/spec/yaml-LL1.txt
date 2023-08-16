@@ -1,7 +1,7 @@
 # The following YAML grammar is LL(1) and is parsed by a recursive descent parser.
 
 stream            ::= STREAM-START implicit_document? explicit_document* STREAM-END
-implicit_document ::= block_node DOCUMENT-END*
+implicit_document ::= block_node? DOCUMENT-END*
 explicit_document ::= DIRECTIVE* DOCUMENT-START block_node? DOCUMENT-END*
 block_node_or_indentless_sequence ::=
                     ALIAS

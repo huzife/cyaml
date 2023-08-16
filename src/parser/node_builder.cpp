@@ -13,6 +13,11 @@ namespace cyaml
 {
     Node_Builder::Node_Builder() {}
 
+    void Node_Builder::on_document_end()
+    {
+        anchor_map_.clear();
+    }
+
     void Node_Builder::on_map_start(
             const Mark &mark,
             std::string anchor,

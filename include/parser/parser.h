@@ -28,7 +28,6 @@ namespace cyaml
     private:
         Scanner scanner_;
         Event_Handler &handler_;
-        std::unordered_map<std::string, Node_Ptr> anchor_map_;
 
         mutable Mark mark_ = Mark(1, 1); // 当前 token 位置
 

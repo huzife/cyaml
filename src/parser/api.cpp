@@ -24,8 +24,7 @@ namespace cyaml
 
     Node load(std::string input)
     {
-        std::stringstream ss;
-        ss << input;
+        std::stringstream ss(input);
         Node_Builder builder;
         Parser(ss, builder).parse_next_document();
         return builder.root();
@@ -33,8 +32,7 @@ namespace cyaml
 
     Node load(const char *input)
     {
-        std::stringstream ss;
-        ss << input;
+        std::stringstream ss(input);
         Node_Builder builder;
         Parser(ss, builder).parse_next_document();
         return builder.root();
@@ -54,6 +52,63 @@ namespace cyaml
         ifs.close();
 
         return ret;
+    }
+
+    std::vector<Node> load_all(std::istream &input)
+    {
+        std::vector<Node> nodes;
+        Node_Builder builder;
+        Parser parser(input, builder);
+        while (parser.parse_next_document()) {
+            nodes.push_back(builder.root());
+        }
+
+        return nodes;
+    }
+
+    std::vector<Node> load_all(std::string input)
+    {
+        std::vector<Node> nodes;
+        Node_Builder builder;
+        std::stringstream ss(input);
+        Parser parser(ss, builder);
+        while (parser.parse_next_document()) {
+            nodes.push_back(builder.root());
+        }
+
+        return nodes;
+    }
+
+    std::vector<Node> load_all(const char *input)
+    {
+        std::vector<Node> nodes;
+        Node_Builder builder;
+        std::stringstream ss(input);
+        Parser parser(ss, builder);
+        while (parser.parse_next_document()) {
+            nodes.push_back(builder.root());
+        }
+
+        return nodes;
+    }
+
+    std::vector<Node> load_file_all(std::string file)
+    {
+        std::ifstream ifs(file);
+
+        if (!ifs.is_open()) {
+            throw Exception("Failed to open \"" + file + "\"", Mark());
+        }
+
+        std::vector<Node> nodes;
+        Node_Builder builder;
+        Parser parser(ifs, builder);
+        while (parser.parse_next_document()) {
+            nodes.push_back(builder.root());
+        }
+        ifs.close();
+
+        return nodes;
     }
 
     void dump(std::ostream &out, const Node &node)

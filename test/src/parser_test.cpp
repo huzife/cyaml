@@ -195,6 +195,18 @@ TEST_F(Parser_Test, json)
                     .as<std::string>(),
             "济南");
 }
+
+TEST_F(Parser_Test, multi_documents)
+{
+    auto nodes = cyaml::load_file_all(
+            "../test/test_case/parser_test/multi_documents.in");
+
+    ASSERT_EQ(nodes.size(), 4);
+    EXPECT_EQ(nodes[0].as<std::string>(), "first document");
+    EXPECT_EQ(nodes[1].as<std::string>(), "second document");
+    EXPECT_TRUE(nodes[2].is_null());
+    EXPECT_EQ(nodes[3].as<std::string>(), "forth document");
+}
 #endif
 
 int main(int argc, char *argv[])
