@@ -67,9 +67,8 @@ namespace cyaml
 
     void Scanner::skip_to_next_token()
     {
-        value_.clear();
         while (input_ &&
-               (is_delimiter(input_.next()) || input_.next() == '#')) {
+               (is_delimiter(input_.peek()) || input_.peek() == '#')) {
             skip_blank();
             skip_comment();
         }
@@ -81,7 +80,7 @@ namespace cyaml
         skip_to_next_token();
 
         // STREAM_END
-        if (input_.next() == -1) {
+        if (!input_) {
             scan_end_ = true;
             return stream_end();
         }
@@ -94,10 +93,10 @@ namespace cyaml
             return scan_doc_end();
 
         // ANCHOR, ALIAS
-        if (input_.next() == '&')
+        if (input_.peek() == '&')
             return scan_anchor();
 
-        if (input_.next() == '*')
+        if (input_.peek() == '*')
             return scan_alias();
 
         // BLOCK_ENTRY
@@ -105,14 +104,14 @@ namespace cyaml
             return scan_block_entry();
 
         // FLOW START AND END
-        if (input_.next() == '{' || input_.next() == '[')
+        if (input_.peek() == '{' || input_.peek() == '[')
             return scan_flow_start();
 
-        if (input_.next() == '}' || input_.next() == ']')
+        if (input_.peek() == '}' || input_.peek() == ']')
             return scan_flow_end();
 
         // FLOW_ENTRY
-        if (input_.next() == ',')
+        if (input_.peek() == ',')
             return scan_flow_entry();
 
         // KEY
@@ -123,13 +122,13 @@ namespace cyaml
         if (match_value())
             return scan_value();
 
-        if (in_block() && (input_.next() == '|' || input_.next() == '>'))
+        if (in_block() && (input_.peek() == '|' || input_.peek() == '>'))
             return scan_special_scalar();
 
-        if (input_.next() == '\'' || input_.next() == '\"')
+        if (input_.peek() == '\'' || input_.peek() == '\"')
             return scan_quote_scalar();
 
-        if (!is_delimiter(input_.next()) &&
+        if (!is_delimiter(input_.peek()) &&
             !match_any_of(",[]{}#&*!|>\'\"%@`"))
             return scan_normal_scalar();
 
@@ -148,7 +147,7 @@ namespace cyaml
         char slash = next_char();
         assert(slash == '\\');
 
-        if (auto iter = escape_map.find(input_.next());
+        if (auto iter = escape_map.find(input_.peek());
             iter != escape_map.end()) {
             next_char();
             return iter->second;
@@ -184,7 +183,7 @@ namespace cyaml
     bool Scanner::match(std::string pattern, bool end_with_delimiter)
     {
         int size = pattern.size() + (end_with_delimiter ? 1 : 0);
-        if (!input_.read(size))
+        if (!input_.read_to(size))
             return false;
 
         for (int i = 0; i < pattern.size(); i++) {
@@ -201,7 +200,7 @@ namespace cyaml
     bool Scanner::match(std::string pattern1, std::string pattern2)
     {
         int size = pattern1.size() + 1;
-        if (!input_.read(size))
+        if (!input_.read_to(size))
             return false;
 
         for (int i = 0; i < pattern1.size(); i++) {

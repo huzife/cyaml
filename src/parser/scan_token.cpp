@@ -45,22 +45,23 @@ namespace cyaml
 
     void Scanner::scan_anchor()
     {
+        std::string value;
         can_be_json = false;
 
         // '&'
         next_char();
 
         while (input_) {
-            if (is_delimiter(input_.next()) || match_any_of("[]{},"))
+            if (is_delimiter(input_.peek()) || match_any_of("[]{},"))
                 break;
-            value_ += next_char();
+            value += next_char();
         }
 
-        if (value_.empty()) {
+        if (value.empty()) {
             throw Parse_Exception(error_msgs::EMPTY_ANCHOR, input_.mark());
         }
 
-        if (!is_delimiter(input_.next()) && !match_any_of("?:,]}%@`")) {
+        if (!is_delimiter(input_.peek()) && !match_any_of("?:,]}%@`")) {
             throw Parse_Exception(error_msgs::END_OF_ANCHOR, input_.mark());
         }
 
@@ -68,27 +69,28 @@ namespace cyaml
         anchor_indent_ = cur_indent_;
         after_anchor_ = true;
 
-        add_token(Token_Type::ANCHOR, value_);
+        add_token(Token_Type::ANCHOR, value);
     }
 
     void Scanner::scan_alias()
     {
+        std::string value;
         can_be_json = false;
 
         // '*'
         next_char();
 
         while (input_) {
-            if (is_delimiter(input_.next()) || match_any_of("[]{},"))
+            if (is_delimiter(input_.peek()) || match_any_of("[]{},"))
                 break;
-            value_ += next_char();
+            value += next_char();
         }
 
-        if (value_.empty()) {
+        if (value.empty()) {
             throw Parse_Exception(error_msgs::EMPTY_ALIAS, input_.mark());
         }
 
-        if (!is_delimiter(input_.next()) && !match_any_of("?:,]}%@`")) {
+        if (!is_delimiter(input_.peek()) && !match_any_of("?:,]}%@`")) {
             throw Parse_Exception(error_msgs::END_OF_ANCHOR, input_.mark());
         }
 
@@ -100,7 +102,7 @@ namespace cyaml
             add_token(Token_Type::KEY);
         }
 
-        add_token(Token_Type::ALIAS, value_);
+        add_token(Token_Type::ALIAS, value);
     }
 
     void Scanner::scan_block_entry()
@@ -182,7 +184,7 @@ namespace cyaml
     {
         can_be_json = false;
 
-        assert(input_.next() == '|' || input_.next() == '>');
+        assert(input_.peek() == '|' || input_.peek() == '>');
 
         // 换行替换字符
         if (next_char() == '|') {
@@ -190,10 +192,11 @@ namespace cyaml
         }
 
         // 字符串末尾是否添加换行
-        if (input_.next() == '-') {
+        char next = input_.peek();
+        if (next == '-') {
             append_ = false;
             next_char();
-        } else if (is_delimiter(input_.next()) && input_.next() != -1) {
+        } else if (is_delimiter(next) && next != Stream::eof) {
             append_ = true;
         } else {
             // 报错：
@@ -208,36 +211,37 @@ namespace cyaml
     ///< @todo 处理带引号字符串为key的情况
     void Scanner::scan_quote_scalar()
     {
+        std::string value;
         can_be_json = true;
 
-        assert(input_.next() == '\'' || input_.next() == '\"');
+        assert(input_.peek() == '\'' || input_.peek() == '\"');
         char end_char = next_char();
 
         // 循环读取字符，直到 ' 或 "
-        while (input_.next() != end_char) {
-            if (input_.next() == -1) {
+        while (input_.peek() != end_char) {
+            if (input_.peek() == Stream::eof) {
                 throw Parse_Exception(
                         error_msgs::EOF_IN_SCALAR, input_.mark());
-            } else if (input_.next() == '\\' && end_char == '\"') {
+            } else if (input_.peek() == '\\' && end_char == '\"') {
                 // 转义字符处理
-                value_ += escape();
-            } else if (input_.next() == '\n') {
+                value += escape();
+            } else if (input_.peek() == '\n') {
                 // 换行处理
-                value_ += ' ';
+                value += ' ';
                 next_char();
 
                 // 连续多个换行时不替换为空格
-                while (input_.next() == '\n') {
-                    value_ += '\n';
+                while (input_.peek() == '\n') {
+                    value += '\n';
                     next_char();
                 }
 
                 // 跳过每一行前面的空格
-                while (input_.next() == ' ') {
+                while (input_.peek() == ' ') {
                     next_char();
                 }
             } else {
-                value_ += next_char();
+                value += next_char();
             }
         }
 
@@ -246,8 +250,8 @@ namespace cyaml
 
         // 检查是否为 KEY
         bool can_be_key = false;
-        while (input_ && input_.next() != '\n') {
-            if (!is_delimiter(input_.next()) && input_.next() != ':')
+        while (input_ && input_.peek() != '\n') {
+            if (!is_delimiter(input_.peek()) && input_.peek() != ':')
                 break;
 
             // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
@@ -266,15 +270,16 @@ namespace cyaml
                 start_scalar();
             }
             add_token(Token_Type::KEY);
-            add_token(Token_Type::SCALAR, value_);
+            add_token(Token_Type::SCALAR, value);
         } else {
-            add_token(Token_Type::SCALAR, value_);
+            add_token(Token_Type::SCALAR, value);
             end_scalar();
         }
     }
 
     void Scanner::scan_normal_scalar()
     {
+        std::string value;
         can_be_json = false;
 
         bool can_be_key = false;
@@ -295,7 +300,7 @@ namespace cyaml
                 break;
 
             // 扫描字符串直到换行
-            while (input_ && input_.next() != '\n') {
+            while (input_ && input_.peek() != '\n') {
                 // 遇到注释停止
                 if (!in_special() && match(" #")) {
                     hit_comment = true;
@@ -309,7 +314,7 @@ namespace cyaml
                 }
 
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-                if (!in_special() && input_.next() == ':') {
+                if (!in_special() && input_.peek() == ':') {
                     if (match_value()) {
                         can_be_key = true;
                         break;
@@ -317,20 +322,20 @@ namespace cyaml
                 }
 
                 // 接收字符
-                value_ += next_char();
+                value += next_char();
             }
 
             if (can_be_key || hit_comment || hit_stop_char)
                 break;
 
             // 消耗换行符
-            if (input_.next() == '\n') {
-                value_ += replace_;
+            if (input_.peek() == '\n') {
+                value += replace_;
                 next_char();
 
                 // 连续多个换行符不替换为空格
-                while (input_.next() == '\n') {
-                    value_ += '\n';
+                while (input_.peek() == '\n') {
+                    value += '\n';
                     next_char();
                 }
             }
@@ -344,19 +349,19 @@ namespace cyaml
         }
 
         // 跳过注释
-        if (hit_comment || input_.next() == '#') {
+        if (hit_comment || input_.peek() == '#') {
             skip_comment();
             skip_blank();
         }
 
         // 删除结尾空白字符
-        value_ = value_.substr(0, value_.find_last_not_of(" \t\n\xFF") + 1);
-        if (!value_.empty() && append_ && !can_be_key) {
-            value_ += '\n';
+        value = value.substr(0, value.find_last_not_of(" \t\n\xFF") + 1);
+        if (!value.empty() && append_ && !can_be_key) {
+            value += '\n';
         }
 
         // 跳过空字符串
-        if (value_.empty() && !in_special()) {
+        if (value.empty() && !in_special()) {
             reset_scalar_flags();
             end_scalar();
             return;
@@ -370,11 +375,11 @@ namespace cyaml
                 start_scalar();
             }
             add_token(Token_Type::KEY);
-            add_token(Token_Type::SCALAR, value_);
+            add_token(Token_Type::SCALAR, value);
         } else {
             // 特殊字符串不作为 null
-            if (value_ != "~" && value_ != "null" || in_special()) {
-                add_token(Token_Type::SCALAR, value_);
+            if (value != "~" && value != "null" || in_special()) {
+                add_token(Token_Type::SCALAR, value);
             }
             reset_scalar_flags();
             end_scalar();

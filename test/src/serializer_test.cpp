@@ -21,6 +21,7 @@ public:
     }
 };
 
+#ifdef CYAML_TEST
 TEST_F(Serializer_Test, temp)
 {
     cyaml::Node node;
@@ -48,9 +49,6 @@ TEST_F(Serializer_Test, temp)
     std::cout << node << std::endl;
     cyaml::dump("test.yaml", node);
 }
-
-#ifdef CYAML_TEST
-
 #endif
 
 int main(int argc, char *argv[])

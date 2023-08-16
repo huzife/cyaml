@@ -9,6 +9,7 @@
 #define CYAML_STREAM_H
 
 #include "type/mark.h"
+#include "parser/unicode.h"
 #include <istream>
 #include <deque>
 
@@ -20,27 +21,36 @@ namespace cyaml
      */
     class Stream
     {
-    private:
-        std::istream &input_stream_;
-        std::deque<char> chars_;
+    public:
+        static constexpr char eof = -1;
 
-        bool stream_end_ = false;
+    private:
+        std::istream &input_;
+        std::deque<char> chars_;
+        utf::Type type_;
+
         Mark mark_{1, 1};
 
     public:
         /**
          * @brief   Stream 类构造函数
-         * @param   input   标准输入流
+         * @param   input           标准输入流
+         * @param   default_type    默认编码
          */
-        Stream(std::istream &input);
+        Stream(std::istream &input, utf::Type default_type = utf::UTF_8);
 
         /**
          * @brief   判断输入流状态
          * @return  bool
          */
-        explicit operator bool() const
+        operator bool() const
         {
-            return !stream_end_;
+            return input_.good() || !chars_.empty();
+        }
+
+        bool operator!() const
+        {
+            return !static_cast<bool>(*this);
         }
 
         /**
@@ -53,7 +63,7 @@ namespace cyaml
          * @brief   查看下一个字符
          * @return  char
          */
-        char next() const;
+        char peek() const;
 
         /**
          * @brief   获取当前位置
@@ -89,7 +99,7 @@ namespace cyaml
          * @retval  true    能够获取足够字符
          * @retval  false   没有足够字符
          */
-        bool read(uint32_t count);
+        bool read_to(uint32_t count);
 
         /**
          * @brief   获取指定位置的字符
@@ -108,6 +118,37 @@ namespace cyaml
          * @return  void
          */
         void check(char ch);
+
+        /**
+         * @brief   添加一组字符
+         * @param   chars   字符数组
+         * @return  void
+         */
+        void push(std::vector<uint8_t> chars);
+
+        /**
+         * @brief   读一个 unicode 字符
+         * @return  void
+         */
+        void read();
+
+        /**
+         * @brief   读 utf8 字符
+         * @return  void
+         */
+        void read_utf8();
+
+        /**
+         * @brief   读 utf8 字符
+         * @return  void
+         */
+        void read_utf16();
+
+        /**
+         * @brief   读 utf8 字符
+         * @return  void
+         */
+        void read_utf32();
     };
 } // namespace cyaml
 

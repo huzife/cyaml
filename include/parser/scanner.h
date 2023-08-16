@@ -40,8 +40,6 @@ namespace cyaml
 
         std::queue<Token> token_; // 暂存下一个 token
 
-        std::string value_; // 当前读取的字面量
-
         char replace_ = ' ';      // 字符串换行时替换的字符
         bool append_ = false;     // 字符串末尾是否添加换行
         bool in_special_ = false; // 是否正在扫描特殊字符串
@@ -144,7 +142,7 @@ namespace cyaml
          */
         void skip_blank()
         {
-            while (input_ && is_delimiter(input_.next())) {
+            while (input_ && is_delimiter(input_.peek())) {
                 next_char();
             }
         }
@@ -155,8 +153,8 @@ namespace cyaml
          */
         void skip_comment()
         {
-            if (input_.next() == '#') {
-                while (input_ && input_.next() != '\n') {
+            if (input_.peek() == '#') {
+                while (input_ && input_.peek() != '\n') {
                     next_char();
                 }
             }
@@ -375,7 +373,7 @@ namespace cyaml
          */
         bool match_any_of(std::string pattern) const
         {
-            return pattern.find(input_.next()) != -1;
+            return pattern.find(input_.peek()) != -1;
         }
 
         /**
@@ -390,7 +388,7 @@ namespace cyaml
             if (in_block())
                 return false;
 
-            return can_be_json ? input_.next() == ':'
+            return can_be_json ? input_.peek() == ':'
                                : match(":", std::string("]},"));
         }
     };

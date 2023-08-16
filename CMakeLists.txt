@@ -15,6 +15,7 @@ set(PARSER_SRC
     src/parser/parser.cpp
     src/parser/serializer.cpp
     src/parser/stream.cpp
+    src/parser/unicode.cpp
 )
 
 set(TYPE_SRC
