@@ -14,9 +14,8 @@
 
 namespace cyaml
 {
-    Scanner::Scanner(std::istream &in): input_stream_(in)
+    Scanner::Scanner(std::istream &in): input_(in)
     {
-        chars_.push_back(input_stream_.get());
         scan();
     }
 
@@ -44,17 +43,13 @@ namespace cyaml
 
     char Scanner::next_char()
     {
-        assert(!input_end_);
+        assert(input_);
 
-        if (!input_stream_.eof())
-            chars_.push_back(input_stream_.get());
-        char ret = next();
+        char ret = input_.get();
 
         switch (ret) {
         // 换行
         case '\n':
-            mark_.line++;
-            mark_.column = 1;
             tab_cnt_ = 0;
             ignore_tab_ = true;
             after_anchor_ = false;
@@ -62,23 +57,10 @@ namespace cyaml
 
         // yaml 不允许制表符缩进，需要记录
         case '\t':
-            mark_.column++;
             if (ignore_tab_)
                 tab_cnt_++;
             break;
-
-        // 文件结束符
-        case -1:
-            input_end_ = true;
-            break;
-
-        default:
-            mark_.column++;
-            break;
         }
-
-        if (!input_end_)
-            chars_.pop_front();
 
         return ret;
     }
@@ -86,7 +68,8 @@ namespace cyaml
     void Scanner::skip_to_next_token()
     {
         value_.clear();
-        while (!input_end_ && (is_delimiter(next()) || next() == '#')) {
+        while (input_ &&
+               (is_delimiter(input_.next()) || input_.next() == '#')) {
             skip_blank();
             skip_comment();
         }
@@ -98,23 +81,23 @@ namespace cyaml
         skip_to_next_token();
 
         // STREAM_END
-        if (next() == -1) {
+        if (input_.next() == -1) {
             scan_end_ = true;
             return stream_end();
         }
 
         // DOC
-        if (mark_.column == 1 && match("---"))
+        if (input_.column() == 1 && match("---"))
             return scan_doc_start();
 
-        if (mark_.column == 1 && match("...", true))
+        if (input_.column() == 1 && match("...", true))
             return scan_doc_end();
 
         // ANCHOR, ALIAS
-        if (next() == '&')
+        if (input_.next() == '&')
             return scan_anchor();
 
-        if (next() == '*')
+        if (input_.next() == '*')
             return scan_alias();
 
         // BLOCK_ENTRY
@@ -122,14 +105,14 @@ namespace cyaml
             return scan_block_entry();
 
         // FLOW START AND END
-        if (next() == '{' || next() == '[')
+        if (input_.next() == '{' || input_.next() == '[')
             return scan_flow_start();
 
-        if (next() == '}' || next() == ']')
+        if (input_.next() == '}' || input_.next() == ']')
             return scan_flow_end();
 
         // FLOW_ENTRY
-        if (next() == ',')
+        if (input_.next() == ',')
             return scan_flow_entry();
 
         // KEY
@@ -140,13 +123,14 @@ namespace cyaml
         if (match_value())
             return scan_value();
 
-        if (in_block() && (next() == '|' || next() == '>'))
+        if (in_block() && (input_.next() == '|' || input_.next() == '>'))
             return scan_special_scalar();
 
-        if (next() == '\'' || next() == '\"')
+        if (input_.next() == '\'' || input_.next() == '\"')
             return scan_quote_scalar();
 
-        if (!is_delimiter(next()) && !match_any_of(",[]{}#&*!|>\'\"%@`"))
+        if (!is_delimiter(input_.next()) &&
+            !match_any_of(",[]{}#&*!|>\'\"%@`"))
             return scan_normal_scalar();
 
         throw Parse_Exception(error_msgs::UNKNOWN_TOKEN, token_mark());
@@ -156,7 +140,7 @@ namespace cyaml
     {
         ignore_tab_ = false;
         cur_indent_ = get_cur_indent();
-        token_mark_ = mark();
+        token_mark_ = input_.mark();
     }
 
     char Scanner::escape()
@@ -164,12 +148,13 @@ namespace cyaml
         char slash = next_char();
         assert(slash == '\\');
 
-        if (auto iter = escape_map.find(next()); iter != escape_map.end()) {
+        if (auto iter = escape_map.find(input_.next());
+            iter != escape_map.end()) {
             next_char();
             return iter->second;
         }
 
-        throw Parse_Exception(error_msgs::UNKNOWN_ESCAPE, mark());
+        throw Parse_Exception(error_msgs::UNKNOWN_ESCAPE, input_.mark());
     }
 
     void Scanner::push_indent(Indent_Type type)
@@ -199,19 +184,15 @@ namespace cyaml
     bool Scanner::match(std::string pattern, bool end_with_delimiter)
     {
         int size = pattern.size() + (end_with_delimiter ? 1 : 0);
-        while (chars_.size() < size && !input_stream_.eof()) {
-            chars_.push_back(input_stream_.get());
-        }
-
-        if (chars_.size() < size)
+        if (!input_.read(size))
             return false;
 
         for (int i = 0; i < pattern.size(); i++) {
-            if (chars_[i] != pattern[i])
+            if (input_.at(i) != pattern[i])
                 return false;
         }
 
-        if (end_with_delimiter && !is_delimiter(chars_[size - 1]))
+        if (end_with_delimiter && !is_delimiter(input_.at(size - 1)))
             return false;
 
         return true;
@@ -220,19 +201,15 @@ namespace cyaml
     bool Scanner::match(std::string pattern1, std::string pattern2)
     {
         int size = pattern1.size() + 1;
-        while (chars_.size() < size && !input_stream_.eof()) {
-            chars_.push_back(input_stream_.get());
-        }
-
-        if (chars_.size() < size)
+        if (!input_.read(size))
             return false;
 
         for (int i = 0; i < pattern1.size(); i++) {
-            if (chars_[i] != pattern1[i])
+            if (input_.at(i) != pattern1[i])
                 return false;
         }
 
-        return pattern2.find(chars_[size - 1]) != -1;
+        return pattern2.find(input_.at(size - 1)) != -1;
     }
 
 } // namespace cyaml

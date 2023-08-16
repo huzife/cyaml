@@ -50,18 +50,18 @@ namespace cyaml
         // '&'
         next_char();
 
-        while (!input_end_) {
-            if (is_delimiter(next()) || match_any_of("[]{},"))
+        while (input_) {
+            if (is_delimiter(input_.next()) || match_any_of("[]{},"))
                 break;
             value_ += next_char();
         }
 
         if (value_.empty()) {
-            throw Parse_Exception(error_msgs::EMPTY_ANCHOR, mark());
+            throw Parse_Exception(error_msgs::EMPTY_ANCHOR, input_.mark());
         }
 
-        if (!is_delimiter(next()) && !match_any_of("?:,]}%@`")) {
-            throw Parse_Exception(error_msgs::END_OF_ANCHOR, mark());
+        if (!is_delimiter(input_.next()) && !match_any_of("?:,]}%@`")) {
+            throw Parse_Exception(error_msgs::END_OF_ANCHOR, input_.mark());
         }
 
         // 记录当前缩进
@@ -78,18 +78,18 @@ namespace cyaml
         // '*'
         next_char();
 
-        while (!input_end_) {
-            if (is_delimiter(next()) || match_any_of("[]{},"))
+        while (input_) {
+            if (is_delimiter(input_.next()) || match_any_of("[]{},"))
                 break;
             value_ += next_char();
         }
 
         if (value_.empty()) {
-            throw Parse_Exception(error_msgs::EMPTY_ALIAS, mark());
+            throw Parse_Exception(error_msgs::EMPTY_ALIAS, input_.mark());
         }
 
-        if (!is_delimiter(next()) && !match_any_of("?:,]}%@`")) {
-            throw Parse_Exception(error_msgs::END_OF_ANCHOR, mark());
+        if (!is_delimiter(input_.next()) && !match_any_of("?:,]}%@`")) {
+            throw Parse_Exception(error_msgs::END_OF_ANCHOR, input_.mark());
         }
 
         skip_blank();
@@ -182,7 +182,7 @@ namespace cyaml
     {
         can_be_json = false;
 
-        assert(next() == '|' || next() == '>');
+        assert(input_.next() == '|' || input_.next() == '>');
 
         // 换行替换字符
         if (next_char() == '|') {
@@ -190,14 +190,14 @@ namespace cyaml
         }
 
         // 字符串末尾是否添加换行
-        if (next() == '-') {
+        if (input_.next() == '-') {
             append_ = false;
             next_char();
-        } else if (is_delimiter(next()) && next() != -1) {
+        } else if (is_delimiter(input_.next()) && input_.next() != -1) {
             append_ = true;
         } else {
             // 报错：
-            throw Parse_Exception(error_msgs::NO_NEWLINE, mark());
+            throw Parse_Exception(error_msgs::NO_NEWLINE, input_.mark());
         }
 
         in_special_ = true;
@@ -210,29 +210,30 @@ namespace cyaml
     {
         can_be_json = true;
 
-        assert(next() == '\'' || next() == '\"');
+        assert(input_.next() == '\'' || input_.next() == '\"');
         char end_char = next_char();
 
         // 循环读取字符，直到 ' 或 "
-        while (next() != end_char) {
-            if (next() == -1) {
-                throw Parse_Exception(error_msgs::EOF_IN_SCALAR, mark());
-            } else if (next() == '\\' && end_char == '\"') {
+        while (input_.next() != end_char) {
+            if (input_.next() == -1) {
+                throw Parse_Exception(
+                        error_msgs::EOF_IN_SCALAR, input_.mark());
+            } else if (input_.next() == '\\' && end_char == '\"') {
                 // 转义字符处理
                 value_ += escape();
-            } else if (next() == '\n') {
+            } else if (input_.next() == '\n') {
                 // 换行处理
                 value_ += ' ';
                 next_char();
 
                 // 连续多个换行时不替换为空格
-                while (next() == '\n') {
+                while (input_.next() == '\n') {
                     value_ += '\n';
                     next_char();
                 }
 
                 // 跳过每一行前面的空格
-                while (next() == ' ') {
+                while (input_.next() == ' ') {
                     next_char();
                 }
             } else {
@@ -245,8 +246,8 @@ namespace cyaml
 
         // 检查是否为 KEY
         bool can_be_key = false;
-        while (!input_end_ && next() != '\n') {
-            if (!is_delimiter(next()) && next() != ':')
+        while (input_ && input_.next() != '\n') {
+            if (!is_delimiter(input_.next()) && input_.next() != ':')
                 break;
 
             // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
@@ -289,12 +290,12 @@ namespace cyaml
                 end_chars += ']';
         }
 
-        while (!input_end_) {
+        while (input_) {
             if (in_block() && get_cur_indent() < min_indent_)
                 break;
 
             // 扫描字符串直到换行
-            while (!input_end_ && next() != '\n') {
+            while (input_ && input_.next() != '\n') {
                 // 遇到注释停止
                 if (!in_special() && match(" #")) {
                     hit_comment = true;
@@ -308,7 +309,7 @@ namespace cyaml
                 }
 
                 // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-                if (!in_special() && next() == ':') {
+                if (!in_special() && input_.next() == ':') {
                     if (match_value()) {
                         can_be_key = true;
                         break;
@@ -323,12 +324,12 @@ namespace cyaml
                 break;
 
             // 消耗换行符
-            if (next() == '\n') {
+            if (input_.next() == '\n') {
                 value_ += replace_;
                 next_char();
 
                 // 连续多个换行符不替换为空格
-                while (next() == '\n') {
+                while (input_.next() == '\n') {
                     value_ += '\n';
                     next_char();
                 }
@@ -343,7 +344,7 @@ namespace cyaml
         }
 
         // 跳过注释
-        if (hit_comment || next() == '#') {
+        if (hit_comment || input_.next() == '#') {
             skip_comment();
             skip_blank();
         }

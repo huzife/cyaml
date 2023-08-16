@@ -14,6 +14,7 @@ set(PARSER_SRC
     src/parser/scan_token.cpp
     src/parser/parser.cpp
     src/parser/serializer.cpp
+    src/parser/stream.cpp
 )
 
 set(TYPE_SRC

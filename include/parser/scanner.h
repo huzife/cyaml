@@ -11,6 +11,7 @@
 #include "type/token.h"
 #include "type/mark.h"
 #include "type/indent.h"
+#include "parser/stream.h"
 #include <istream>
 #include <stack>
 #include <queue>
@@ -25,22 +26,19 @@ namespace cyaml
     class Scanner
     {
     private:
-        std::istream &input_stream_; // 输入流
+        Stream input_;
 
-        Mark mark_ = Mark(1, 1);       // 当前输入位置
         Mark token_mark_ = Mark(1, 1); // 当前 token 位置
         uint32_t tab_cnt_ = 0;         // 该行'\t'个数
         uint32_t cur_indent_ = 0;      // 当前 token 的缩进长度
         uint32_t min_indent_ = 0;      // 用于限制多行字符串缩进
         bool ignore_tab_ = true; // 是否忽略 '\t'，用于计算缩进
-        bool input_end_ = false; // 记录是否读取完输入流
         bool scan_end_ = false;  // 记录是否解析完所有 token
 
         std::stack<Indent> indent_;  // 缩进状态栈
         std::stack<Flow_Type> flow_; // 流状态栈
 
         std::queue<Token> token_; // 暂存下一个 token
-        std::deque<char> chars_;  // 存放读取的字符
 
         std::string value_; // 当前读取的字面量
 
@@ -79,16 +77,6 @@ namespace cyaml
         Token lookahead() const;
 
         /**
-         * @brief   返回当前位置标记
-         * @return  Mark
-         * @retval  词法分析器当前读取输入的位置结构体
-         */
-        Mark mark() const
-        {
-            return mark_;
-        }
-
-        /**
          * @brief   返回当前 token 位置
          * @return  Mark
          * @retval  当前正在扫描（或最后一个）token 的位置
@@ -105,7 +93,7 @@ namespace cyaml
          */
         uint32_t get_cur_indent() const
         {
-            return mark_.column - tab_cnt_ - 1;
+            return input_.column() - tab_cnt_ - 1;
         }
 
         /**
@@ -126,16 +114,6 @@ namespace cyaml
          * @retval  输入流的下一个字符
          */
         char next_char();
-
-        /**
-         * @brief   查看下一个字符
-         * @return  char
-         */
-        const char next() const
-        {
-            assert(!chars_.empty());
-            return chars_.front();
-        }
 
         /**
          * @brief   添加 token
@@ -166,7 +144,7 @@ namespace cyaml
          */
         void skip_blank()
         {
-            while (!input_end_ && is_delimiter(next())) {
+            while (input_ && is_delimiter(input_.next())) {
                 next_char();
             }
         }
@@ -177,8 +155,8 @@ namespace cyaml
          */
         void skip_comment()
         {
-            if (next() == '#') {
-                while (!input_end_ && next() != '\n') {
+            if (input_.next() == '#') {
+                while (input_ && input_.next() != '\n') {
                     next_char();
                 }
             }
@@ -397,7 +375,7 @@ namespace cyaml
          */
         bool match_any_of(std::string pattern) const
         {
-            return pattern.find(next()) != -1;
+            return pattern.find(input_.next()) != -1;
         }
 
         /**
@@ -412,7 +390,7 @@ namespace cyaml
             if (in_block())
                 return false;
 
-            return can_be_json ? next() == ':'
+            return can_be_json ? input_.next() == ':'
                                : match(":", std::string("]},"));
         }
     };
