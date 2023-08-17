@@ -259,10 +259,10 @@ namespace cyaml
     std::vector<uint8_t> Unicode::encode_to_utf32(uint32_t code)
     {
         std::vector<uint8_t> bytes(4);
-        for (int i = 3; i >= 0; i++) {
-            bytes[i] = static_cast<uint8_t>(code & 0xFF);
+        std::for_each(bytes.rbegin(), bytes.rend(), [&](uint8_t &i) {
+            i = static_cast<uint8_t>(code & 0xFF);
             code >>= 8;
-        }
+        });
 
         return bytes;
     }
@@ -297,7 +297,7 @@ namespace cyaml
 
         uint32_t code = 0;
         if (ch >= 0xDC00 && ch < 0xE000)
-            return replace_code;
+            return REPLACE_CODE;
 
         if (ch < 0xD800 || ch >= 0xE000) {
             // 一次只能解码一个
@@ -306,7 +306,7 @@ namespace cyaml
         }
 
         if (bytes.size() == 2)
-            return replace_code;
+            return REPLACE_CODE;
 
         uint32_t low_ch = (static_cast<uint32_t>(bytes[2]) << 8) |
                           (static_cast<uint32_t>(bytes[3]));
@@ -321,9 +321,9 @@ namespace cyaml
     {
         assert(bytes.size() == 4);
         uint32_t code = 0;
-        for (auto byte : bytes) {
+        for (auto i : bytes) {
             code <<= 8;
-            code |= byte;
+            code |= i;
         }
 
         return code;
