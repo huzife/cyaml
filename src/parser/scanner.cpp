@@ -160,7 +160,7 @@ namespace cyaml
     {
         uint32_t len = after_anchor_ ? anchor_indent_ : cur_indent_;
         if (indent_.empty() || len > indent_.top().len) {
-            add_token(from_indent_type(type, true));
+            add_token(from_indent_type(type, Collection_Flag::START));
             indent_.push({type, len});
         }
     }
@@ -172,7 +172,8 @@ namespace cyaml
 
         uint32_t len = after_anchor_ ? anchor_indent_ : cur_indent_;
         while (!indent_.empty() && len < indent_.top().len) {
-            add_token(from_indent_type(indent_.top().type, false));
+            auto type = indent_.top().type;
+            add_token(from_indent_type(type, Collection_Flag::END));
             indent_.pop();
         }
 

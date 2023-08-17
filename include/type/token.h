@@ -43,16 +43,25 @@ namespace cyaml
     };
 
     /**
+     * @enum    Collection_Flag
+     * @brief   集合开始或结束标志
+     */
+    enum class Collection_Flag
+    {
+        START,
+        END
+    };
+
+    /**
      * @class   Token
      * @brief   存储 token 字面量、类型信息
      */
     class Token
     {
     private:
-        Token_Type token_type_;  // token 类型
-        std::string value_;      // 字面量
-        Mark mark_;              // 位置
-        bool has_value_ = false; // 是否有值
+        Token_Type token_type_; // token 类型
+        std::string value_;     // 字面量
+        Mark mark_;             // 位置
 
     public:
         /**
@@ -85,21 +94,11 @@ namespace cyaml
         }
 
         /**
-         * @brief   判断 token 是否拥有值
-         * @return  bool
-         */
-        bool has_value() const
-        {
-            return has_value_;
-        }
-
-        /**
          * @brief   获取 token 的标量值
          * @return  std::string
          */
         std::string value() const
         {
-            assert(has_value());
             return value_;
         }
 
@@ -137,7 +136,7 @@ namespace cyaml
      * @param   is_start    是否是一个集合的开始
      * @return  Token_Type
      */
-    Token_Type from_indent_type(Indent_Type type, bool is_start);
+    Token_Type from_indent_type(Indent_Type type, Collection_Flag flag);
 
     /**
      * @brief   流枚举类型转换为 Token 枚举类型
@@ -145,7 +144,7 @@ namespace cyaml
      * @param   is_start    是否是一个集合的开始
      * @return  Token_Type
      */
-    Token_Type from_flow_type(Flow_Type type, bool is_start);
+    Token_Type from_flow_type(Flow_Type type, Collection_Flag flag);
 
 } // namespace cyaml
 

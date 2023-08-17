@@ -35,7 +35,7 @@ namespace cyaml
             const std::string &msg,
             const Mark &mark)
     {
-        if (mark.is_null())
+        if (!mark)
             return msg;
 
         return "cyaml error at line " + std::to_string(mark.line) +

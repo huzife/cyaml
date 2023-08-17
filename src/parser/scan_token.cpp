@@ -155,7 +155,7 @@ namespace cyaml
         Flow_Type type = next_char() == '{' ? Flow_Type::MAP : Flow_Type::SEQ;
 
         flow_.push(type);
-        add_token(from_flow_type(type, true));
+        add_token(from_flow_type(type, Collection_Flag::START));
     }
 
     void Scanner::scan_flow_end()
@@ -168,7 +168,7 @@ namespace cyaml
             throw Parse_Exception(error_msgs::INVALID_FLOW_END, token_mark());
 
         flow_.pop();
-        add_token(from_flow_type(type, false));
+        add_token(from_flow_type(type, Collection_Flag::END));
         end_scalar();
     }
 

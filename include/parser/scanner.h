@@ -314,7 +314,8 @@ namespace cyaml
         void pop_all_indent()
         {
             while (!indent_.empty()) {
-                add_token(from_indent_type(indent_.top().type, false));
+                auto type = indent_.top().type;
+                add_token(from_indent_type(type, Collection_Flag::END));
                 indent_.pop();
             }
         }

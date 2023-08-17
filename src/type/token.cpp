@@ -17,15 +17,23 @@ namespace cyaml
     Token::Token(Token_Type type, std::string value, Mark mark)
         : token_type_(type),
           value_(value),
-          mark_(mark),
-          has_value_(true)
+          mark_(mark)
     {
     }
 
     std::string Token::to_string() const
     {
-        std::string ret = "(" + token_type_to_string(token_type_);
-        if (has_value()) {
+        bool has_value = token_type_ == Token_Type::SCALAR ||
+                         token_type_ == Token_Type::ANCHOR ||
+                         token_type_ == Token_Type::ALIAS;
+
+        int size = 20 + has_value ? value_.size() : 0;
+
+        std::string ret;
+        ret.reserve(size);
+
+        ret = "(" + token_type_to_string(token_type_);
+        if (has_value) {
             ret += (", " + value_);
         }
         ret += ")";
@@ -84,26 +92,36 @@ namespace cyaml
         return "";
     }
 
-    Token_Type from_indent_type(Indent_Type type, bool is_start)
+    Token_Type from_indent_type(Indent_Type type, Collection_Flag flag)
     {
         assert(type != Indent_Type::NONE);
-        if (type == Indent_Type::MAP)
-            return is_start ? Token_Type::BLOCK_MAP_START
-                            : Token_Type::BLOCK_MAP_END;
-        else
-            return is_start ? Token_Type::BLOCK_SEQ_START
-                            : Token_Type::BLOCK_SEQ_END;
+        if (type == Indent_Type::MAP) {
+            if (flag == Collection_Flag::START)
+                return Token_Type::BLOCK_MAP_START;
+            else
+                return Token_Type::BLOCK_MAP_END;
+        } else {
+            if (flag == Collection_Flag::START)
+                return Token_Type::BLOCK_SEQ_START;
+            else
+                return Token_Type::BLOCK_SEQ_END;
+        }
     }
 
-    Token_Type from_flow_type(Flow_Type type, bool is_start)
+    Token_Type from_flow_type(Flow_Type type, Collection_Flag flag)
     {
         assert(type != Flow_Type::NONE);
-        if (type == Flow_Type::MAP)
-            return is_start ? Token_Type::FLOW_MAP_START
-                            : Token_Type::FLOW_MAP_END;
-        else
-            return is_start ? Token_Type::FLOW_SEQ_START
-                            : Token_Type::FLOW_SEQ_END;
+        if (type == Flow_Type::MAP) {
+            if (flag == Collection_Flag::START)
+                return Token_Type::FLOW_MAP_START;
+            else
+                return Token_Type::FLOW_MAP_END;
+        } else {
+            if (flag == Collection_Flag::START)
+                return Token_Type::FLOW_SEQ_START;
+            else
+                return Token_Type::FLOW_SEQ_END;
+        }
     }
 
 } // namespace cyaml

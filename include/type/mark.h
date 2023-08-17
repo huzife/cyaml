@@ -18,12 +18,12 @@ namespace cyaml
         uint32_t column = 0;
 
         Mark() = default;
-        Mark(const Mark&) = default;
+        Mark(const Mark &) = default;
         Mark(uint32_t line, uint32_t column);
 
-        bool is_null() const
+        explicit operator bool() const
         {
-            return line == 0 && column == 0;
+            return line > 0 && column > 0;
         }
     };
 

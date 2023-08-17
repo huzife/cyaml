@@ -61,7 +61,6 @@ namespace cyaml
 
         void on_alias(const Mark &mark, std::string anchor) override;
 
-
         /**
          * @brief   返回根节点
          * @return  Node

@@ -86,7 +86,7 @@ namespace cyaml
          * @brief   检查文件 utf 编码类型
          * @param   input   输入流
          * @return  utf::Type
-        */
+         */
         static utf::Type check_type(std::istream &input);
 
         /**
@@ -94,7 +94,7 @@ namespace cyaml
          * @param   byte    utf8 首字节
          * @return  uint32_t
          * @retval  0:      长度错误，可能传入的 utf8 首字节不正确
-        */
+         */
         static uint32_t get_utf8_len(uint8_t byte);
 
         /**
