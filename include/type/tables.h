@@ -1,8 +1,8 @@
 /**
- * @file        tables.h
- * @brief       包含解析过程中使用的分析表
- * @details     定义了转义字符表、first 集查询表
- * @date        2023-8-23
+ * @file    tables.h
+ * @brief   包含解析过程中使用的分析表
+ * @details 定义了转义字符表、first 集查询表
+ * @date    2023-8-23
  */
 
 #ifndef CYAML_TABLES_H
@@ -14,14 +14,12 @@
 
 namespace cyaml
 {
-    static const std::unordered_map<char, char> escape_map = {
+    static const std::unordered_map<char, char> escape_map{
             {'a', '\a'},  {'b', '\b'},  {'f', '\f'},  {'n', '\n'},
             {'r', '\r'},  {'t', '\t'},  {'v', '\v'},  {'e', '\e'},
             {'\\', '\\'}, {'\"', '\"'}, {'\'', '\''}, {'0', '\0'}};
 
     using First_Set = std::unordered_set<Token_Type>;
-
-    static const First_Set stream_set = {Token_Type::STREAM_START};
 
     static const First_Set document_set = {
             Token_Type::ANCHOR,          Token_Type::ALIAS,

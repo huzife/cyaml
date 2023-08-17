@@ -31,18 +31,11 @@ namespace cyaml
         return ret;
     }
 
-    std::string duplicated_key_msg(std::string key)
-    {
-        std::string ret = error_msgs::DUPLICATED_KEY;
-        ret += (" '" + key + "'");
-        return ret;
-    }
-
     const std::string Exception::build_what(
             const std::string &msg,
             const Mark &mark)
     {
-        if (mark.is_null())
+        if (!mark)
             return msg;
 
         return "cyaml error at line " + std::to_string(mark.line) +

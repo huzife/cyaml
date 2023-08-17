@@ -23,12 +23,17 @@ namespace cyaml
 
     std::string Token::to_string() const
     {
+        bool has_value = token_type_ == Token_Type::SCALAR ||
+                         token_type_ == Token_Type::ANCHOR ||
+                         token_type_ == Token_Type::ALIAS;
+
+        int size = 20 + has_value ? value_.size() : 0;
+
         std::string ret;
-        int size = 20 + is_scalar() ? value_.size() : 0;
         ret.reserve(size);
 
         ret = "(" + token_type_to_string(token_type_);
-        if (is_scalar()) {
+        if (has_value) {
             ret += (", " + value_);
         }
         ret += ")";
@@ -46,10 +51,6 @@ namespace cyaml
         switch (type) {
         case Token_Type::NONE:
             return "NONE";
-        case Token_Type::STREAM_START:
-            return "STREAM_START";
-        case Token_Type::STREAM_END:
-            return "STREAM_END";
         case Token_Type::DOC_START:
             return "DOC_START";
         case Token_Type::DOC_END:
@@ -103,7 +104,7 @@ namespace cyaml
             if (flag == Collection_Flag::START)
                 return Token_Type::BLOCK_SEQ_START;
             else
-                return Token_Type::BLOCK_MAP_END;
+                return Token_Type::BLOCK_SEQ_END;
         }
     }
 
@@ -119,7 +120,7 @@ namespace cyaml
             if (flag == Collection_Flag::START)
                 return Token_Type::FLOW_SEQ_START;
             else
-                return Token_Type::FLOW_MAP_END;
+                return Token_Type::FLOW_SEQ_END;
         }
     }
 
