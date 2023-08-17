@@ -35,9 +35,8 @@ namespace cyaml
         /**
          * @brief   Stream 类构造函数
          * @param   input           标准输入流
-         * @param   default_type    默认编码
          */
-        Stream(std::istream &input, utf::Type default_type = utf::UTF_8);
+        Stream(std::istream &input);
 
         /**
          * @brief   判断输入流状态
@@ -96,8 +95,8 @@ namespace cyaml
          * @brief   字符队列补充到指定个数字符
          * @param   count   字符数
          * @return  bool
-         * @retval  true    能够获取足够字符
-         * @retval  false   没有足够字符
+         * @retval  true:   能够获取足够字符
+         * @retval  false:  没有足够字符
          */
         bool read_to(uint32_t count);
 
@@ -114,7 +113,7 @@ namespace cyaml
     private:
         /**
          * @brief   处理字符
-         * @param   ch  待处理字符
+         * @param   ch      待处理字符
          * @return  void
          */
         void check(char ch);

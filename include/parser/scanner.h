@@ -20,6 +20,16 @@
 namespace cyaml
 {
     /**
+     * @enum    Match_End
+     * @brief   匹配字符串结束字符
+     */
+    enum class Match_End
+    {
+        ANY,
+        BLANK
+    };
+
+    /**
      * @class   Scanner
      * @brief   YAML 词法分析器
      */
@@ -52,8 +62,7 @@ namespace cyaml
     public:
         /**
          * @brief   Scanner 类构造函数
-         * @param   std::istream    输入流
-         * @retval  Scanner 对象
+         * @param   in      输入流
          */
         Scanner(std::istream &in);
 
@@ -61,7 +70,7 @@ namespace cyaml
          * @brief   获取下一个 token
          * @details 从输入流扫描并解析出下一个 token
          * @return  Token
-         * @retval  下一个 token
+         * @retval  Token(NONE):    表示没有下一个 token
          */
         Token next_token();
 
@@ -70,14 +79,13 @@ namespace cyaml
          * @details 该解析器通过基于 YAML 的 LL(1)文法实现，
          *          需要向前查看一个符号而不消耗这个 token
          * @return  Token
-         * @retval  下一个 token
+         * @retval  Token(NONE):    表示没有下一个 token
          */
         Token lookahead() const;
 
         /**
-         * @brief   返回当前 token 位置
+         * @brief   返回当前正在扫描 token 位置
          * @return  Mark
-         * @retval  当前正在扫描（或最后一个）token 的位置
          */
         Mark token_mark() const
         {
@@ -87,7 +95,6 @@ namespace cyaml
         /**
          * @brief   获取当前缩进位置
          * @return  uint32_t
-         * @retval  当前输入流读取位置对应缩进值
          */
         uint32_t get_cur_indent() const
         {
@@ -98,7 +105,7 @@ namespace cyaml
          * @brief   返回 Scanner 扫描状态
          * @return  bool
          * @retval  true:   扫描结束，无后续 token
-         *          false:  扫描未结束，还有未解析 token
+         * @retval  false:  扫描未结束，还有未解析 token
          */
         bool end()
         {
@@ -109,12 +116,12 @@ namespace cyaml
         /**
          * @brief   读取下一个字符
          * @return  char
-         * @retval  输入流的下一个字符
          */
         char next_char();
 
         /**
          * @brief   添加 token
+         * @tparam  Args...     Token 构造参数
          * @return  void
          */
         template<typename... Args>
@@ -266,6 +273,7 @@ namespace cyaml
 
         /**
          * @brief   扫描到 KEY 或 '-' 后调用
+         * @return  void
          */
         void start_scalar()
         {
@@ -274,6 +282,7 @@ namespace cyaml
 
         /**
          * @brief   扫描标量结束后调用
+         * @return  void
          */
         void end_scalar()
         {
@@ -283,23 +292,24 @@ namespace cyaml
         /**
          * @brief   处理转义字符
          * @return  char
-         * @retval  解析得到的转义字符
          */
         char escape();
 
         /**
          * @brief   推入缩进值
-         * @param   Indent_Type     缩进类型
+         * @param   type    缩进类型
          */
         void push_indent(Indent_Type type);
 
         /**
          * @brief   弹出缩进值
+         * @return  void
          */
         void pop_indent();
 
         /**
          * @brief   匹配剩余所有缩进
+         * @return  void
          */
         void pop_all_indent()
         {
@@ -348,27 +358,33 @@ namespace cyaml
 
         /**
          * @brief   判断字符是否属于分隔符
+         * @param   ch      判断字符
          * @return  bool
          */
         bool is_delimiter(char ch) const
         {
-            return ch == ' ' || ch == '\t' || ch == '\n' || ch == -1;
+            return ch == ' ' || ch == '\t' || ch == '\n' || ch == Stream::eof;
         }
 
         /**
          * @brief   匹配字符串
+         * @param   pattern     目标字符串
+         * @param   end         结尾字符
          * @return  bool
          */
-        bool match(std::string pattern, bool end_with_delimiter = false);
+        bool match(std::string pattern, Match_End end);
 
         /**
          * @brief   匹配字符串+任意字符
+         * @param   pattern     目标字符串
+         * @param   end         结尾字符
          * @return  bool
          */
-        bool match(std::string str, std::string chars);
+        bool match(std::string pattern, std::string end);
 
         /**
          * @brief   匹配其中一个字符
+         * @param   pattern     目标字符集
          * @return  bool
          */
         bool match_any_of(std::string pattern) const
@@ -382,7 +398,7 @@ namespace cyaml
          */
         bool match_value()
         {
-            if (match(":", true))
+            if (match(":", Match_End::BLANK))
                 return true;
 
             if (in_block())

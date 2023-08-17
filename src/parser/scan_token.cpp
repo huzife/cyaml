@@ -95,7 +95,7 @@ namespace cyaml
         }
 
         skip_blank();
-        if (match(":", true)) {
+        if (match(":", Match_End::BLANK)) {
             push_indent(Indent_Type::MAP);
             pop_indent();
             start_scalar();
@@ -302,7 +302,7 @@ namespace cyaml
             // 扫描字符串直到换行
             while (input_ && input_.peek() != '\n') {
                 // 遇到注释停止
-                if (!in_special() && match(" #")) {
+                if (!in_special() && match(" #", Match_End::ANY)) {
                     hit_comment = true;
                     break;
                 }
@@ -341,7 +341,8 @@ namespace cyaml
             }
 
             // 检查 DOCUMENT INDICATOR
-            if (match("...", true) || match("---", true))
+            if (match("...", Match_End::BLANK) ||
+                match("---", Match_End::BLANK))
                 break;
 
             // 消耗下一行的空格

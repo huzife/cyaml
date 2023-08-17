@@ -18,18 +18,16 @@ namespace cyaml
 {
     /**
      * @brief   生成 UNEXPECTED TOKEN 错误信息
-     * @param   Token       错误 token
+     * @param   wrong_token     错误 token
      * @return  std::string
-     * @retval  生成的错误信息
      */
     std::string unexpected_token_msg(Token wrong_token);
 
     /**
      * @brief   生成 UNEXPECTED TOKEN 错误信息
-     * @param   Token_type  期望的 token 类型
-     * @param   Token       错误 token
+     * @param   expected_type   期望的 token 类型
+     * @param   wrong_token     错误 token
      * @return  std::string
-     * @retval  生成的错误信息
      */
     std::string unexpected_token_msg(
             Token_Type expected_type,

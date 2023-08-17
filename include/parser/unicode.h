@@ -81,10 +81,36 @@ namespace cyaml
 
     public:
         static utf::Intro_Byte get_intro_byte(int ch);
-        static utf::Type get_type(std::istream &input, utf::Type default_type);
 
+        /**
+         * @brief   检查文件 utf 编码类型
+         * @param   input   输入流
+         * @return  utf::Type
+        */
+        static utf::Type check_type(std::istream &input);
+
+        /**
+         * @brief   计算 utf8 字符长度
+         * @param   byte    utf8 首字节
+         * @return  uint32_t
+         * @retval  0:      长度错误，可能传入的 utf8 首字节不正确
+        */
         static uint32_t get_utf8_len(uint8_t byte);
+
+        /**
+         * @brief   将 Unicode 编码为 utf
+         * @param   code    Unicode 字符编码
+         * @param   type    utf 编码类型
+         * @return  std::vector<uint8_t>
+         */
         static std::vector<uint8_t> encode(uint32_t code, utf::Type type);
+
+        /**
+         * @brief   将 utf 解码为 Unicode
+         * @param   bytes   utf 编码字节数组
+         * @param   type    utf 编码类型
+         * @return  uint32_t
+         */
         static uint32_t decode(std::vector<uint8_t> bytes, utf::Type type);
 
     private:

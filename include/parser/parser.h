@@ -36,7 +36,6 @@ namespace cyaml
          * @brief   Parser 类构造函数
          * @param   in          标准输入流
          * @param   handler     事件处理器
-         * @retval  Parser 对象
          */
         Parser(std::istream &in, Event_Handler &handler);
 
@@ -83,13 +82,12 @@ namespace cyaml
          * @brief   尝试接收一个目标 token
          * @details 从 Scanner 中获取一个 token，并判断其类型是否符合传入类型
          * @return  Token
-         * @retval  类型匹配时，返回接收到的 token
          */
         Token expect(Token_Type type);
 
         /**
          * @brief   判断下一个 token 是否属于某一个 first 集
-         * @param   const First_Set &
+         * @param   first_set       first 集
          * @return  bool
          */
         bool belong(const First_Set &first_set) const
@@ -132,15 +130,15 @@ namespace cyaml
 
         /**
          * @brief   抛出错误 token 异常
-         * @param   Token_Type      期望的 token 类型
+         * @param   expected_type   期望的 token 类型
          */
         void throw_unexpected_token(Token_Type expected_type);
 
         /**
          * @brief   插入键值对
-         * @param   Node_Ptr &      当前节点
-         * @param   Node_Ptr &      KEY 节点
-         * @param   Node_Ptr &      VALUE 节点
+         * @param   node        当前节点
+         * @param   key_node    KEY 节点
+         * @param   value_node  VALUE 节点
          * @return  void
          */
         void insert_key_value(
@@ -148,6 +146,7 @@ namespace cyaml
                 Node_Ptr &key_node,
                 Node_Ptr &value_node);
 
+        // 递归下降解析函数
         void parse_document();
         void parse_block_node_or_indentless_seq();
         void parse_block_node();

@@ -86,10 +86,10 @@ namespace cyaml
         }
 
         // DOC
-        if (input_.column() == 1 && match("---"))
+        if (input_.column() == 1 && match("---", Match_End::ANY))
             return scan_doc_start();
 
-        if (input_.column() == 1 && match("...", true))
+        if (input_.column() == 1 && match("...", Match_End::BLANK))
             return scan_doc_end();
 
         // ANCHOR, ALIAS
@@ -100,7 +100,7 @@ namespace cyaml
             return scan_alias();
 
         // BLOCK_ENTRY
-        if (match("-", true))
+        if (match("-", Match_End::BLANK))
             return scan_block_entry();
 
         // FLOW START AND END
@@ -115,7 +115,7 @@ namespace cyaml
             return scan_flow_entry();
 
         // KEY
-        if (in_block() && match("?", true))
+        if (in_block() && match("?", Match_End::BLANK))
             return scan_key();
 
         // VALUE
@@ -180,9 +180,10 @@ namespace cyaml
             throw Parse_Exception(error_msgs::INVALID_INDENT, token_mark());
     }
 
-    bool Scanner::match(std::string pattern, bool end_with_delimiter)
+    bool Scanner::match(std::string pattern, Match_End end)
     {
-        int size = pattern.size() + (end_with_delimiter ? 1 : 0);
+        bool need_blank = (end == Match_End::BLANK);
+        int size = pattern.size() + (need_blank ? 1 : 0);
         if (!input_.read_to(size))
             return false;
 
@@ -191,7 +192,7 @@ namespace cyaml
                 return false;
         }
 
-        if (end_with_delimiter && !is_delimiter(input_.at(size - 1)))
+        if (need_blank && !is_delimiter(input_.at(size - 1)))
             return false;
 
         return true;

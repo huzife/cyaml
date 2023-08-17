@@ -31,11 +31,14 @@ namespace cyaml
 
         /**
          * @brief   输出 node
+         * @param   node    输出节点
+         * @return  Serializer &
          */
         Serializer &operator<<(const Node &node);
 
         /**
          * @brief   获取当前行
+         * @return  uint32_t
          */
         uint32_t line() const
         {
@@ -44,6 +47,7 @@ namespace cyaml
 
         /**
          * @brief   获取当前列
+         * @return  uint32_t
          */
         uint32_t column() const
         {
@@ -53,7 +57,7 @@ namespace cyaml
     private:
         /**
          * @brief   计算下一级缩进
-         * @param   uint32_t        当前缩进
+         * @param   indent      当前缩进
          * @return  uint32_t
          */
         uint32_t increase(uint32_t indent) const
@@ -63,14 +67,14 @@ namespace cyaml
 
         /**
          * @brief   填充空白字符到目标位置
-         * @param   uint32_t    缩进位置
+         * @param   indent      缩进位置
          * @return  void
          */
         void fill_blank(uint32_t indent);
 
         /**
          * @brief   判断节点是否只需要输出一行
-         * @param   const Node &    节点
+         * @param   node    节点
          * @return  bool
          */
         bool line_style(const Node &node) const
@@ -80,21 +84,21 @@ namespace cyaml
 
         /**
          * @brief   写入字符串
-         * @param   std::string     写入内容
+         * @param   str     写入内容
          * @return  void
          */
         void write(std::string str);
 
         /**
          * @brief   写入指定个数空格
-         * @param   int     个数
+         * @param   count   空格个数
          * @return  void
          */
         void write_space(int count = 1);
 
         /**
          * @brief   写入指定个数换行
-         * @param   int     个数
+         * @param   count   换行个数
          * @return  void
          */
         void write_new_line(int count = 1);

@@ -62,7 +62,6 @@ namespace cyaml
         /**
          * @brief   获取值的类型
          * @return  Node_Type
-         * @retval  该 Node 对应节点数据类型枚举值
          */
         Node_Type type() const
         {
@@ -80,7 +79,7 @@ namespace cyaml
 
         /**
          * @brief   设置节点样式
-         * @param   Node_Style
+         * @param   style   节点样式
          * @return  void
          */
         void set_style(Node_Style style)
@@ -91,7 +90,6 @@ namespace cyaml
         /**
          * @brief   获取数据长度
          * @return  uint32_t
-         * @retval  自动判断数据类型，返回相应长度
          */
         uint32_t size() const;
 
@@ -142,6 +140,7 @@ namespace cyaml
 
         /**
          * @brief   获取标量
+         * @return  std::string
          */
         std::string scalar() const
         {
@@ -151,47 +150,46 @@ namespace cyaml
 
         /**
          * @brief   获取所有 key
+         * @return  std::vector<Node>
          */
         std::vector<Node> keys() const;
 
         /**
          * @brief   获取序列(数组)元素
-         * @param   uint32_t    元素索引值
-         * @retval  由传入索引对应元素封装的 Node
+         * @param   index   元素索引值
+         * @return  Node &
          */
         Node &operator[](uint32_t index);
         const Node &operator[](uint32_t index) const;
 
         /**
-         * @brief   查找映射值
-         * @param   std::string     键
-         * @return  Node
-         * @retval  对应元素的 Node
+         * @brief   查找映射节点
+         * @param   key     字符串键
+         * @return  Node &
          */
         Node &operator[](const std::string &key);
         const Node &operator[](const std::string &key) const;
 
         /**
-         * @brief   查找映射值
-         * @param   const Node &   键
-         * @return  Node
-         * @retval  对应元素的 Node
+         * @brief   查找映射节点
+         * @param   key     节点键
+         * @return  Node &
          */
         Node &operator[](const Node &key);
         const Node &operator[](const Node &key) const;
 
         /**
-         * @brief   Node 绑定引用
-         * @param   const Node &
+         * @brief   Node 赋值并绑定绑定引用
+         * @param   rhs     目标值
          * @return  Node &
          */
         Node &operator=(const Node &rhs);
 
         /**
          * @brief   Node 赋值
-         * @tparam  T           值类型
-         * @param   const T &   值
-         * @return  void
+         * @tparam  T       值类型
+         * @param   rhs     目标值
+         * @return  Node &
          */
         template<typename T>
         Node &operator=(const T &rhs);
@@ -200,59 +198,64 @@ namespace cyaml
          * @brief   获取标量值
          * @tparam  T   转换类型
          * @return  T
-         * @retval  转换后的标量值
          */
         template<typename T>
         T as() const;
 
         /**
          * @brief   根据字符串查找 key
-         * @param   std::string     键
+         * @param   key     键
          * @return  bool
-         * @retval  该键是否存在
+         * @retval  true:   键存在
+         * @retval  false:  键不存在
          */
         bool contain(std::string key) const;
 
         /**
          * @brief   根据 Node 查找 key
-         * @param   const Node &    键
+         * @param   key     键
          * @return  bool
-         * @retval  该键是否存在
+         * @retval  true:   键存在
+         * @retval  false:  键不存在
          */
         bool contain(const Node &key) const;
 
         /**
          * @brief   插入键值对
-         * @param   const Node &    键
-         * @param   const Node &    值
+         * @param   key     键节点
+         * @param   value   值节点
          * @return  bool
-         * @retval  是否插入成功
+         * @retval  true:   插入成功
+         * @retval  false:  节点无法转换为 map，插入失败
          */
         bool insert(const Node &key, const Node &value);
 
         /**
-         * @brief   添加数组元素
-         * @param   const Node &
+         * @brief   数组添加节点
+         * @param   node    添加的节点
          * @return  bool
-         * @retval  是否添加成功
+         * @retval  true:   添加成功
+         * @retval  false:  节点无法转换为 seq，添加失败
          */
         bool push_back(const Node &node);
 
         /**
-         * @brief   添加数组元素
-         * @tparam  T           值类型
-         * @param   const T &   值
+         * @brief   数组添加节点
+         * @tparam  T       值类型
+         * @param   rhs     值
          * @return  bool
-         * @retval  是否添加成功
+         * @retval  true:   添加成功
+         * @retval  false:  节点无法转换为 seq，添加失败
          */
         template<typename T>
         bool push_back(const T &rhs);
 
         /**
          * @brief   删除元素
-         * @param   const Node &    键
+         * @param   key     键
          * @return  bool
-         * @retval  是否删除成功
+         * @retval  true:   删除成功
+         * @retval  false:  节点不是 map，或此键不存在
          */
         bool erase(const Node &key);
 
@@ -280,7 +283,7 @@ namespace cyaml
     private:
         /**
          * @brief   重置节点
-         * @param   Node_Type   重置节点类型
+         * @param   type    重置节点类型
          * @return  void
          */
         void reset(Node_Type type = Node_Type::NULL_NODE)
@@ -294,24 +297,23 @@ namespace cyaml
 
         /**
          * @brief   克隆节点内部实现
-         * @param   Node_Ptr &  节点指针
+         * @param   node    节点指针
          * @return  void
          */
         void clone(Node_Ptr &node) const;
 
         /**
          * @brief   查找 map
-         * @param   const Node_Ptr &    键
+         * @param   key     键
          * @return  Map::iterator
-         * @retval  查找成功： 对应元素节点的迭代器
-         *          查找失败： map.end()
+         * @retval  map.end():  查找失败
          */
         Map::iterator find(const Node_Ptr &key) const;
 
         /**
          * @brief   插入键值对
-         * @param   const Node_Ptr &    键
-         * @param   const Node_Ptr &    值
+         * @param   key     键节点指针
+         * @param   value   值节点指针
          * @return  void
          */
         void insert(const Node_Ptr &key, const Node_Ptr &value)
@@ -322,6 +324,7 @@ namespace cyaml
 
         /**
          * @brief   重置节点指向数据
+         * @param   data    节点数据指针
          * @return  void
          */
         void assign(Node_Data_Ptr data);

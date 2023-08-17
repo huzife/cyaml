@@ -30,6 +30,7 @@ namespace cyaml
         Node_Builder();
         ~Node_Builder() = default;
 
+        // events derived from Event_Handler
         void on_document_start(const Mark &mark) override
         {
             mark_ = mark;
@@ -60,6 +61,11 @@ namespace cyaml
 
         void on_alias(const Mark &mark, std::string anchor) override;
 
+
+        /**
+         * @brief   返回根节点
+         * @return  Node
+         */
         Node root();
 
     private:

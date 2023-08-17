@@ -11,9 +11,9 @@
 
 namespace cyaml
 {
-    Stream::Stream(std::istream &input, utf::Type default_type)
+    Stream::Stream(std::istream &input)
         : input_(input),
-          type_(Unicode::get_type(input, default_type))
+          type_(Unicode::check_type(input))
     {
         read_to(1);
     }

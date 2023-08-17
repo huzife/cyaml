@@ -112,7 +112,7 @@ namespace cyaml
         return B_OTHER;
     }
 
-    utf::Type Unicode::get_type(std::istream &input, utf::Type default_type)
+    utf::Type Unicode::check_type(std::istream &input)
     {
         int intro[4]{};
         int intro_used = 0;
@@ -148,7 +148,7 @@ namespace cyaml
             return UTF_32_BE;
         }
 
-        return default_type;
+        return UTF_8;
     }
 
     uint32_t Unicode::get_utf8_len(uint8_t byte)
@@ -162,6 +162,8 @@ namespace cyaml
 
         if (len == 0) {
             len = 1;
+        } else if (len == 1 || len > 4) {
+            len = 0;
         }
 
         return len;
