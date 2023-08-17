@@ -125,9 +125,11 @@ namespace cyaml
     std::vector<Node> Node::keys() const
     {
         std::vector<Node> ret;
-        for (auto &i : data_->map) {
-            ret.emplace_back(*(i.first));
-        }
+        std::transform(
+                data_->map.begin(), data_->map.end(), std::back_inserter(ret),
+                [](KV_Pair &i) {
+                    return *(i.first);
+                });
 
         return ret;
     }
@@ -200,11 +202,11 @@ namespace cyaml
     Node &Node::operator=(const Node &rhs)
     {
         auto refs = data_->refs;
-        for (auto *ref : refs) {
-            ref->type_ = rhs.type_;
-            ref->style_ = rhs.style_;
-            ref->data_ = rhs.data_;
-            rhs.data_->insert_ref(ref);
+        for (auto *i : refs) {
+            i->type_ = rhs.type_;
+            i->style_ = rhs.style_;
+            i->data_ = rhs.data_;
+            rhs.data_->insert_ref(i);
         }
         refs.clear();
 

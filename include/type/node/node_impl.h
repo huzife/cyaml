@@ -20,11 +20,11 @@ namespace cyaml
         Node node = Convert<T>::encode(rhs);
 
         auto refs = data_->refs;
-        for (auto *ref : refs) {
-            ref->type_ = node.type_;
-            ref->style_ = node.style_;
-            ref->data_ = node.data_;
-            node.data_->insert_ref(ref);
+        for (auto *i : refs) {
+            i->type_ = node.type_;
+            i->style_ = node.style_;
+            i->data_ = node.data_;
+            node.data_->insert_ref(i);
         }
         refs.clear();
 

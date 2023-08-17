@@ -364,7 +364,8 @@ namespace cyaml
          */
         bool is_delimiter(char ch) const
         {
-            return ch == ' ' || ch == '\t' || ch == '\n' || ch == Stream::eof;
+            return ch == ' ' || ch == '\t' || ch == '\n' ||
+                   ch == Stream::eof();
         }
 
         /**

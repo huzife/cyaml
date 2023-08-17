@@ -21,12 +21,9 @@ namespace cyaml
      */
     class Stream
     {
-    public:
-        static constexpr char eof = -1;
-
     private:
         std::istream &input_;
-        std::deque<char> chars_;
+        std::deque<char> read_buf_;
         utf::Type type_;
 
         Mark mark_{1, 1};
@@ -34,9 +31,18 @@ namespace cyaml
     public:
         /**
          * @brief   Stream 类构造函数
-         * @param   input           标准输入流
+         * @param   input   标准输入流
          */
         Stream(std::istream &input);
+
+        /**
+         * @brief   返回结束标志
+         * @return  char
+         */
+        static constexpr char eof()
+        {
+            return -1;
+        }
 
         /**
          * @brief   判断输入流状态
@@ -44,7 +50,7 @@ namespace cyaml
          */
         operator bool() const
         {
-            return input_.good() || !chars_.empty();
+            return input_.good() || !read_buf_.empty();
         }
 
         bool operator!() const
@@ -107,7 +113,7 @@ namespace cyaml
          */
         char at(uint32_t index) const
         {
-            return chars_[index];
+            return read_buf_[index];
         }
 
     private:

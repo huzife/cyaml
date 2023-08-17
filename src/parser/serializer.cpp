@@ -102,10 +102,9 @@ namespace cyaml
 
     void Serializer::write_block_map(const Node &node, uint32_t indent)
     {
-        auto keys = node.keys();
-        for (int i = 0; i < keys.size(); i++) {
-            write_key(keys[i], indent);
-            write_value(node[keys[i]], indent);
+        for (auto &i : node.keys()) {
+            write_key(i, indent);
+            write_value(node[i], indent);
         }
     }
 
@@ -127,14 +126,16 @@ namespace cyaml
     void Serializer::write_flow_map(const Node &node)
     {
         write("{");
-        auto keys = node.keys();
-        for (int i = 0; i < keys.size(); i++) {
-            if (i > 0) {
+        bool first = true;
+        for (auto &i : node.keys()) {
+            if (first) {
+                first = false;
+            } else {
                 write(", ");
             }
-            write_flow_node(keys[i]);
+            write_flow_node(i);
             write(": ");
-            write_flow_node(node[keys[i]]);
+            write_flow_node(i);
         }
         write("}");
     }

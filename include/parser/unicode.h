@@ -77,7 +77,7 @@ namespace cyaml
     class Unicode
     {
     public:
-        static constexpr uint32_t replace_code = 0xFFFD;
+        static constexpr uint32_t REPLACE_CODE = 0xFFFD;
 
     public:
         static utf::Intro_Byte get_intro_byte(int ch);

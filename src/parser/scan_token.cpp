@@ -196,7 +196,7 @@ namespace cyaml
         if (next == '-') {
             append_ = false;
             next_char();
-        } else if (is_delimiter(next) && next != Stream::eof) {
+        } else if (is_delimiter(next) && next != Stream::eof()) {
             append_ = true;
         } else {
             // 报错：
@@ -219,7 +219,7 @@ namespace cyaml
 
         // 循环读取字符，直到 ' 或 "
         while (input_.peek() != end_char) {
-            if (input_.peek() == Stream::eof) {
+            if (input_.peek() == Stream::eof()) {
                 throw Parse_Exception(
                         error_msgs::EOF_IN_SCALAR, input_.mark());
             } else if (input_.peek() == '\\' && end_char == '\"') {

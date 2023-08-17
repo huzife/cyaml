@@ -7,7 +7,7 @@
 
 #include "parser/stream.h"
 #include <assert.h>
-#include <iostream>
+#include <algorithm>
 
 namespace cyaml
 {
@@ -22,30 +22,30 @@ namespace cyaml
     {
         read_to(2);
 
-        if (chars_.size() == 0)
-            return eof;
+        if (read_buf_.size() == 0)
+            return eof();
 
-        char ret = chars_.front();
-        chars_.pop_front();
+        char ret = read_buf_.front();
+        read_buf_.pop_front();
         check(ret);
         return ret;
     }
 
     char Stream::peek() const
     {
-        if (chars_.empty())
-            return eof;
+        if (read_buf_.empty())
+            return eof();
 
-        return chars_.front();
+        return read_buf_.front();
     }
 
     bool Stream::read_to(uint32_t count)
     {
-        while (input_.good() && chars_.size() < count) {
+        while (input_.good() && read_buf_.size() < count) {
             read();
         }
 
-        return chars_.size() >= count;
+        return read_buf_.size() >= count;
     }
 
     void Stream::check(char ch)
@@ -62,11 +62,13 @@ namespace cyaml
         }
     }
 
-    void Stream::push(std::vector<uint8_t> chars)
+    void Stream::push(std::vector<uint8_t> bytes)
     {
-        for (auto byte : chars) {
-            chars_.push_back(static_cast<char>(byte));
-        }
+        std::transform(
+                bytes.begin(), bytes.end(), std::back_inserter(read_buf_),
+                [](uint8_t i) {
+                    return static_cast<char>(i);
+                });
     }
 
     void Stream::read()
@@ -89,7 +91,7 @@ namespace cyaml
     void Stream::read_utf8()
     {
         uint8_t byte = input_.get();
-        chars_.push_back(static_cast<char>(byte));
+        read_buf_.push_back(static_cast<char>(byte));
     }
 
     void Stream::read_utf16()
@@ -119,7 +121,7 @@ namespace cyaml
                 low_bytes[1] = input_.get();
 
                 if (!input_.good()) {
-                    push(Unicode::encode(Unicode::replace_code, utf::UTF_8));
+                    push(Unicode::encode(Unicode::REPLACE_CODE, utf::UTF_8));
                     return;
                 }
 
@@ -139,7 +141,7 @@ namespace cyaml
                 }
 
                 // 不是后尾代理，前两个字节替换为错误码
-                push(Unicode::encode(Unicode::replace_code, utf::UTF_8));
+                push(Unicode::encode(Unicode::REPLACE_CODE, utf::UTF_8));
 
                 // 后两个字节是一个完整 UTF16 编码
                 if (low_ch < 0xD800 || low_ch >= 0xE000) {
@@ -162,8 +164,8 @@ namespace cyaml
     void Stream::read_utf32()
     {
         std::vector<uint8_t> bytes(4);
-        for (int i = 0; i < 4; i++) {
-            bytes[i] = input_.get();
+        for (auto &i : bytes) {
+            i = input_.get();
         }
 
         if (!input_.good())
