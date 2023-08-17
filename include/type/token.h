@@ -23,8 +23,6 @@ namespace cyaml
     enum class Token_Type
     {
         NONE,
-        STREAM_START,    // 输入流开始
-        STREAM_END,      // 输入流结束
         DOC_START,       // ---
         DOC_END,         // ...
         BLOCK_ENTRY,     // -
@@ -61,38 +59,34 @@ namespace cyaml
     class Token
     {
     private:
-        Token_Type token_type_;  // token 类型
-        std::string value_;      // 字面量
-        Mark mark_;              // 位置
+        Token_Type token_type_; // token 类型
+        std::string value_;     // 字面量
+        Mark mark_;             // 位置
 
     public:
         /**
          * @brief   Token 类默认构造函数
-         * @retval  Token 对象
          */
         Token();
 
         /**
          * @brief   Token 类构造函数
-         * @param   Token_Type      token 类型
-         * @param   Mark            token 位置
-         * @retval  Token 对象
+         * @param   type    token 类型
+         * @param   mark    token 位置
          */
         Token(Token_Type type, Mark mark);
 
         /**
          * @brief   Token 类构造函数
-         * @param   Token_Type      token 类型
-         * @param   std::string     token 字面量
-         * @param   Mark            token 位置
-         * @retval  Token 对象
+         * @param   type    token 类型
+         * @param   value   token 字面量
+         * @param   mark    token 位置
          */
         Token(Token_Type type, std::string value, Mark mark);
 
         /**
          * @brief   获取 token 类型
          * @return  Token_Type
-         * @retval  该 token 的类型
          */
         Token_Type token_type() const
         {
@@ -100,30 +94,17 @@ namespace cyaml
         }
 
         /**
-         * @brief   判断 token 是否拥有值
-         * @details 目前只有 KEY 和 SCALAR 有值
-         * @return  bool
-         */
-        bool is_scalar() const
-        {
-            return token_type_ == Token_Type::SCALAR;
-        }
-
-        /**
          * @brief   获取 token 的标量值
          * @return  std::string
-         * @retval  token 的标量值
          */
         std::string value() const
         {
-            assert(is_scalar());
             return value_;
         }
 
         /**
          * @brief   获取 token 位置
          * @return  Mark
-         * @retval  token 在输入流中的位置
          */
         Mark mark() const
         {
@@ -133,7 +114,6 @@ namespace cyaml
         /**
          * @brief   将 token 转化为 string
          * @return  std::string
-         * @retval  (token_type, value)
          */
         std::string to_string() const;
 
@@ -145,24 +125,23 @@ namespace cyaml
 
     /**
      * @brief   Token 枚举类型转换为字符串
-     * @param   Token_Type  token类型
+     * @param   type    token类型
      * @return  std::string
-     * @retval  Token 类型名
      */
     std::string token_type_to_string(Token_Type type);
 
     /**
      * @brief   缩进枚举类型转换为 Token 枚举类型
-     * @param   Indent_Type     Indnet 枚举类型
-     * @param   bool            是否是一个集合的开始
+     * @param   type        Indnet 枚举类型
+     * @param   is_start    是否是一个集合的开始
      * @return  Token_Type
      */
     Token_Type from_indent_type(Indent_Type type, Collection_Flag flag);
 
     /**
      * @brief   流枚举类型转换为 Token 枚举类型
-     * @param   Flow_Type       Indnet 枚举类型
-     * @param   bool            是否是一个集合的开始
+     * @param   type        Indnet 枚举类型
+     * @param   is_start    是否是一个集合的开始
      * @return  Token_Type
      */
     Token_Type from_flow_type(Flow_Type type, Collection_Flag flag);
