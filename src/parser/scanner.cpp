@@ -6,318 +6,140 @@
  */
 
 #include "parser/scanner.h"
+#include "type/tables.h"
+#include "error/exceptions.h"
 #include <assert.h>
+#include <algorithm>
 #include <iostream>
 
 namespace cyaml
 {
-    Scanner::Scanner(std::istream &in): input_stream_(in)
+    Scanner::Scanner(std::istream &in): input_(in)
     {
-        next_char_ = input_stream_.get();
         scan();
     }
 
     Token Scanner::next_token()
     {
-        Token ret = next_token_;
-        scan();
+        while (!scan_end_ && token_.size() < 2) {
+            scan();
+        }
+
+        if (token_.empty())
+            return Token();
+
+        Token ret = token_.front();
+        token_.pop();
         return ret;
     }
 
-    Token Scanner::lookahead()
+    Token Scanner::lookahead() const
     {
-        assert(next_token_.token_type() != Token_Type::NONE);
-        return next_token_;
+        if (token_.empty())
+            return Token();
+        else
+            return token_.front();
     }
 
     char Scanner::next_char()
     {
-        if (next2_valid_) {
-            next2_valid_ = false;
-            char ret = next_char_;
-            next_char_ = next2_char_;
-            return ret;
-        }
+        assert(input_);
 
-        assert(!input_end_);
-
-        char ret = next_char_;
-        next_char_ = input_stream_.get();
+        char ret = input_.get();
 
         switch (ret) {
         // 换行
         case '\n':
-            line_++;
-            col_ = 1;
             tab_cnt_ = 0;
             ignore_tab_ = true;
+            after_anchor_ = false;
             break;
 
         // yaml 不允许制表符缩进，需要记录
         case '\t':
-            col_++;
             if (ignore_tab_)
                 tab_cnt_++;
-            break;
-
-        // 文件结束符
-        case -1:
-            input_end_ = true;
-            break;
-
-        default:
-            col_++;
             break;
         }
 
         return ret;
     }
 
+    void Scanner::skip_to_next_token()
+    {
+        while (input_ &&
+               (is_delimiter(input_.peek()) || input_.peek() == '#')) {
+            skip_blank();
+            skip_comment();
+        }
+        update_indent();
+    }
+
     void Scanner::scan()
     {
-        value_.clear();
+        skip_to_next_token();
 
-        // 跳过\t和\n，暂时跳过空格
-        while (!input_end_ && is_delimiter(next_char_)) {
-            next_char();
-        }
-
-        update_indent();
-
-        if (next_char_ == -1) {
+        // STREAM_END
+        if (!input_) {
             scan_end_ = true;
-        } else if (normal_) {
-            normal_ = false;
-            scan_normal_string();
-        } else if (is_number(next_char_) || is_string_begin(next_char_)) {
-            scan_scalar();
-        } else if (is_operator(next_char_)) {
-            scan_operator();
-        } else {
-            // TODO: 报错或其他
+            return stream_end();
         }
 
-        // 解析出一个 key 或 '-'，更新对标量的缩进限制
-        Token_Type type = next_token_.token_type();
-        if (type == Token_Type::SERIES_ENTRY || type == Token_Type::KEY) {
-            min_indent_ = next_token_.indent() + 1;
-        } else if (type == Token_Type::SCALAR) {
-            min_indent_ = 0;
-        }
+        // DOC
+        if (input_.column() == 1 && match("---", Match_End::ANY))
+            return scan_doc_start();
+
+        if (input_.column() == 1 && match("...", Match_End::BLANK))
+            return scan_doc_end();
+
+        // ANCHOR, ALIAS
+        if (input_.peek() == '&')
+            return scan_anchor();
+
+        if (input_.peek() == '*')
+            return scan_alias();
+
+        // BLOCK_ENTRY
+        if (match("-", Match_End::BLANK))
+            return scan_block_entry();
+
+        // FLOW START AND END
+        if (input_.peek() == '{' || input_.peek() == '[')
+            return scan_flow_start();
+
+        if (input_.peek() == '}' || input_.peek() == ']')
+            return scan_flow_end();
+
+        // FLOW_ENTRY
+        if (input_.peek() == ',')
+            return scan_flow_entry();
+
+        // KEY
+        if (in_block() && match("?", Match_End::BLANK))
+            return scan_key();
+
+        // VALUE
+        if (match_value())
+            return scan_value();
+
+        if (in_block() && (input_.peek() == '|' || input_.peek() == '>'))
+            return scan_special_scalar();
+
+        if (input_.peek() == '\'' || input_.peek() == '\"')
+            return scan_quote_scalar();
+
+        if (!is_delimiter(input_.peek()) &&
+            !match_any_of(",[]{}#&*!|>\'\"%@`"))
+            return scan_normal_scalar();
+
+        throw Parse_Exception(error_msgs::UNKNOWN_TOKEN, token_mark());
     }
 
     void Scanner::update_indent()
     {
         ignore_tab_ = false;
-        indent_ = col_ - tab_cnt_ - 1;
-        if (next2_valid_) {
-            indent_--;
-        }
-    }
-
-    // 字符类型判断函数
-
-#if 0
-    // token解析函数
-    // 解析数字类型，目前实现10进制int和real类型
-    void Scanner::scan_number()
-    {
-        Token_Type token_type;
-
-        while (is_number(next_char_)) {
-            value_ += next_char();
-        }
-
-        // 判断是否为real
-        if (next_char_ == '.') {
-            token_type = Token_Type::REAL;
-            value_ += next_char();
-            while (is_number(next_char_)) {
-                value_ += next_char();
-            }
-        } else {
-            token_type = Token_Type::INT;
-        }
-
-        next_token_ = Token(token_type, value_);
-    }
-#endif
-
-    void Scanner::scan_scalar()
-    {
-        if (!normal_ && (next_char_ == '|' || next_char_ == '>')) {
-            scan_special_string();
-        } else if (!normal_ && (next_char_ == '\'' || next_char_ == '\"')) {
-            scan_quote_string();
-        } else {
-            scan_normal_string();
-        }
-    }
-
-    void Scanner::scan_operator()
-    {
-        Token_Type token_type;
-        char ch = next_char();
-        value_ += ch;
-
-        switch (ch) {
-        case '-':
-            if (next_char_ != '-') {
-                token_type = Token_Type::SERIES_ENTRY;
-            } else {
-                // 读取后两个字符，判断是否匹配'---'
-                value_ += next_char();
-                ch = next_char();
-                value_ += ch;
-                if (ch == '-') {
-                    token_type = Token_Type::START;
-                } else {
-                    scan_scalar();
-                    return;
-                }
-            }
-            break;
-        case ':':
-            token_type = Token_Type::COLON;
-            break;
-        case '{':
-            token_type = Token_Type::LBRACE;
-            break;
-        case '}':
-            token_type = Token_Type::RBRACE;
-            break;
-        case '[':
-            token_type = Token_Type::LBRACKET;
-            break;
-        case ']':
-            token_type = Token_Type::RBRACKET;
-            break;
-        }
-
-        if (is_delimiter(next_char_))
-            next_token_ = Token(token_type, value_, indent_);
-        else
-            scan_scalar();
-    }
-
-    void Scanner::scan_special_string()
-    {
-        assert(next_char_ == '|' || next_char_ == '>');
-
-        Token_Type type = Token_Type::FOLD;
-        // 换行替换字符
-        if (next_char_ == '|') {
-            type = Token_Type::PRESERVE;
-            replace_ = '\n';
-        }
-
-        value_ += next_char();
-
-        // 字符串末尾是否添加换行
-        if (next_char_ == '-') {
-            append_ = false;
-            value_ += next_char();
-        } else if (is_delimiter(next_char_) && next_char_ != -1) {
-            append_ = true;
-        } else {
-            // 报错：
-        }
-
-        next_token_ = Token(type, value_, indent_);
-    }
-
-    void Scanner::scan_quote_string()
-    {
-        assert(next_char_ == '\'' || next_char_ == '\"');
-        char end_char = next_char();
-        String_Type string_type = end_char == '\''
-                                          ? String_Type::SQUOTE_STRING
-                                          : String_Type::DQUOTE_STRING;
-
-        // 循环读取字符，直到 ’ 或 "
-        while (next_char_ != end_char) {
-            if (next_char_ == -1) {
-                // TODO: 报错
-            } else if (next_char_ == '\\' && end_char == '\"') {
-                // 转义字符处理
-                value_ += escape();
-            } else if (next_char_ == '\n') {
-                // 换行处理
-                value_ += ' ';
-                next_char();
-
-                // 连续多个换行时不替换为空格
-                while (next_char_ == '\n') {
-                    value_ += '\n';
-                    next_char();
-                }
-                while (next_char_ == ' ') {
-                    next_char();
-                }
-            } else {
-                value_ += next_char();
-            }
-        }
-
-        // 消耗多出的引号
-        next_char();
-
-        next_token_ = Token(string_type, value_, indent_);
-    }
-
-    void Scanner::scan_normal_string(char replace, bool append_newline)
-    {
-        bool is_key = false;
-        while (!input_end_ && col_ - tab_cnt_ - 1 >= min_indent_) {
-            while (!input_end_ && next_char_ != '\n') {
-                char ch = next_char();
-
-                // 判断当前字符串属于 key 还是 value，如果是 key 则跳出
-                if (ch == ':' && is_delimiter(next_char_)) {
-                    next2_char_ = next_char_;
-                    next_char_ = ch;
-                    next2_valid_ = true;
-                    is_key = true;
-                    break;
-                } else {
-                    value_ += ch;
-                }
-            }
-
-            if (is_key)
-                break;
-
-            // 消耗换行符
-            if (next_char_ == '\n') {
-                value_ += replace_;
-                next_char();
-                // 连续多个换行符不替换为空格
-                while (next_char_ == '\n') {
-                    value_ += '\n';
-                    next_char();
-                }
-            }
-
-            // 消耗下一行的空格
-            while (!input_end_ && next_char_ == ' ') {
-                next_char();
-            }
-        }
-
-        value_ = value_.substr(0, value_.find_last_not_of(" \t\n\xFF") + 1);
-        if (!value_.empty() && append_ && !is_key)
-            value_ += '\n';
-
-        replace_ = ' ';
-        append_ = false;
-
-        if (is_key)
-            next_token_ = Token(Token_Type::KEY, value_, indent_);
-        else {
-            uint32_t temp_indent = value_.empty() ? indent_ + 2 : indent_;
-            next_token_ =
-                    Token(String_Type::NORMAL_STRING, value_, temp_indent);
-        }
+        cur_indent_ = get_cur_indent();
+        token_mark_ = input_.mark();
     }
 
     char Scanner::escape()
@@ -325,35 +147,70 @@ namespace cyaml
         char slash = next_char();
         assert(slash == '\\');
 
-        switch (next_char()) {
-        case 'a':
-            return '\a';
-        case 'b':
-            return '\b';
-        case 'f':
-            return '\f';
-        case 'n':
-            return '\n';
-        case 'r':
-            return '\r';
-        case 't':
-            return '\t';
-        case 'v':
-            return '\v';
-        case '\\':
-            return '\\';
-        case '\'':
-            return '\'';
-        case '\"':
-            return '\"';
-        case '0':
-            return '\0';
-        default:
-            break;
+        if (auto iter = escape_map.find(input_.peek());
+            iter != escape_map.end()) {
+            next_char();
+            return iter->second;
         }
 
-        // TODO: 报错 unknown escape sequence ...
-        return -1;
+        throw Parse_Exception(error_msgs::UNKNOWN_ESCAPE, input_.mark());
+    }
+
+    void Scanner::push_indent(Indent_Type type)
+    {
+        uint32_t len = after_anchor_ ? anchor_indent_ : cur_indent_;
+        if (indent_.empty() || len > indent_.top().len) {
+            add_token(from_indent_type(type, Collection_Flag::START));
+            indent_.push({type, len});
+        }
+    }
+
+    void Scanner::pop_indent()
+    {
+        if (indent_.empty())
+            return;
+
+        uint32_t len = after_anchor_ ? anchor_indent_ : cur_indent_;
+        while (!indent_.empty() && len < indent_.top().len) {
+            auto type = indent_.top().type;
+            add_token(from_indent_type(type, Collection_Flag::END));
+            indent_.pop();
+        }
+
+        if (indent_.empty() || len != indent_.top().len)
+            throw Parse_Exception(error_msgs::INVALID_INDENT, token_mark());
+    }
+
+    bool Scanner::match(std::string pattern, Match_End end)
+    {
+        bool need_blank = (end == Match_End::BLANK);
+        int size = pattern.size() + (need_blank ? 1 : 0);
+        if (!input_.read_to(size))
+            return false;
+
+        for (int i = 0; i < pattern.size(); i++) {
+            if (input_.at(i) != pattern[i])
+                return false;
+        }
+
+        if (need_blank && !is_delimiter(input_.at(size - 1)))
+            return false;
+
+        return true;
+    }
+
+    bool Scanner::match(std::string pattern1, std::string pattern2)
+    {
+        int size = pattern1.size() + 1;
+        if (!input_.read_to(size))
+            return false;
+
+        for (int i = 0; i < pattern1.size(); i++) {
+            if (input_.at(i) != pattern1[i])
+                return false;
+        }
+
+        return pattern2.find(input_.at(size - 1)) != -1;
     }
 
 } // namespace cyaml
