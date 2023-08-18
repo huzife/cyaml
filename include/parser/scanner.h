@@ -57,7 +57,7 @@ namespace cyaml
         uint32_t anchor_indent_ = 0; // 锚点缩进
         bool after_anchor_ = false;  // 是否位于同一行的锚点后
 
-        bool can_be_json = false; // 判断能否作为 json
+        bool can_be_json_ = false; // 判断能否作为 json
 
     public:
         /**
@@ -406,8 +406,8 @@ namespace cyaml
             if (in_block())
                 return false;
 
-            return can_be_json ? input_.peek() == ':'
-                               : match(":", std::string("]},"));
+            return can_be_json_ ? input_.peek() == ':'
+                                : match(":", std::string("]},"));
         }
     };
 

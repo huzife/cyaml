@@ -13,7 +13,7 @@ namespace cyaml
 {
     void Scanner::stream_end()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         // 匹配剩下的缩进
         pop_all_indent();
@@ -21,7 +21,7 @@ namespace cyaml
 
     void Scanner::scan_doc_start()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         for (auto i = 0; i < 3; i++) {
             next_char();
@@ -32,7 +32,7 @@ namespace cyaml
 
     void Scanner::scan_doc_end()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         pop_all_indent();
 
@@ -46,7 +46,7 @@ namespace cyaml
     void Scanner::scan_anchor()
     {
         std::string value;
-        can_be_json = false;
+        can_be_json_ = false;
 
         // '&'
         next_char();
@@ -75,7 +75,7 @@ namespace cyaml
     void Scanner::scan_alias()
     {
         std::string value;
-        can_be_json = false;
+        can_be_json_ = false;
 
         // '*'
         next_char();
@@ -107,7 +107,7 @@ namespace cyaml
 
     void Scanner::scan_block_entry()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         next_char();
         push_indent(Indent_Type::SEQ);
@@ -118,7 +118,7 @@ namespace cyaml
 
     void Scanner::scan_key()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         next_char();
         push_indent(Indent_Type::MAP);
@@ -129,7 +129,7 @@ namespace cyaml
 
     void Scanner::scan_value()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         next_char();
 
@@ -150,7 +150,7 @@ namespace cyaml
 
     void Scanner::scan_flow_start()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         Flow_Type type = next_char() == '{' ? Flow_Type::MAP : Flow_Type::SEQ;
 
@@ -160,7 +160,7 @@ namespace cyaml
 
     void Scanner::scan_flow_end()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         Flow_Type type = next_char() == '}' ? Flow_Type::MAP : Flow_Type::SEQ;
 
@@ -174,7 +174,7 @@ namespace cyaml
 
     void Scanner::scan_flow_entry()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         next_char();
         add_token(Token_Type::FLOW_ENTRY);
@@ -182,7 +182,7 @@ namespace cyaml
 
     void Scanner::scan_special_scalar()
     {
-        can_be_json = false;
+        can_be_json_ = false;
 
         assert(input_.peek() == '|' || input_.peek() == '>');
 
@@ -212,7 +212,7 @@ namespace cyaml
     void Scanner::scan_quote_scalar()
     {
         std::string value;
-        can_be_json = true;
+        can_be_json_ = true;
 
         assert(input_.peek() == '\'' || input_.peek() == '\"');
         char end_char = next_char();
@@ -280,7 +280,7 @@ namespace cyaml
     void Scanner::scan_normal_scalar()
     {
         std::string value;
-        can_be_json = false;
+        can_be_json_ = false;
 
         bool can_be_key = false;
         bool hit_comment = false;
