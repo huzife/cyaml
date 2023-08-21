@@ -32,10 +32,9 @@ namespace cyaml
             return rhs;
         }
 
-        static bool decode(const Node &node, Node &rhs)
+        static Node decode(const Node &node)
         {
-            rhs = node;
-            return true;
+            return node;
         }
     };
 
@@ -48,18 +47,15 @@ namespace cyaml
             return Node(rhs);
         }
 
-        static bool decode(const Node &node, std::string &rhs)
+        static std::string decode(const Node &node)
         {
-            if (node.is_null()) {
-                rhs = "null";
-                return true;
-            }
+            if (node.is_null())
+                return "null";
 
             if (!node.is_scalar())
-                return false;
+                throw Convertion_Exception();
 
-            rhs = node.scalar();
-            return true;
+            return node.scalar();
         }
     };
 
@@ -102,10 +98,9 @@ namespace cyaml
             return Node(std::to_string(rhs));
         }
 
-        static bool decode(const Node &node, int &rhs)
+        static int decode(const Node &node)
         {
-            rhs = std::stoi(node.scalar());
-            return true;
+            return std::stoi(node.scalar());
         }
     };
 
@@ -118,10 +113,9 @@ namespace cyaml
             return Node(std::to_string(rhs));
         }
 
-        static bool decode(const Node &node, float &rhs)
+        static float decode(const Node &node)
         {
-            rhs = std::stof(node.scalar());
-            return true;
+            return std::stof(node.scalar());
         }
     };
 
@@ -136,17 +130,16 @@ namespace cyaml
                 return Node("false");
         }
 
-        static bool decode(const Node &node, bool &rhs)
+        static bool decode(const Node &node)
         {
             if (!node.is_scalar())
-                return false;
+                throw Convertion_Exception();
 
             std::string value = node.scalar();
             if (value != "true" && value != "false")
-                return false;
+                throw Convertion_Exception();
 
-            rhs = value == "true" ? true : false;
-            return true;
+            return value == "true";
         }
     };
 

@@ -34,11 +34,7 @@ namespace cyaml
     template<typename T>
     T Node::as() const
     {
-        T ret;
-        if (Converter<T>::decode(*this, ret))
-            return ret;
-
-        throw Convertion_Exception();
+        return Converter<T>::decode(*this);
     }
 
     template<typename T>
