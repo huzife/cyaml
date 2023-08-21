@@ -17,7 +17,7 @@ namespace cyaml
     template<typename T>
     Node &Node::operator=(const T &rhs)
     {
-        Node node = Convert<T>::encode(rhs);
+        Node node = Converter<T>::encode(rhs);
 
         auto refs = data_->refs;
         for (auto *i : refs) {
@@ -35,7 +35,7 @@ namespace cyaml
     T Node::as() const
     {
         T ret;
-        if (Convert<T>::decode(*this, ret))
+        if (Converter<T>::decode(*this, ret))
             return ret;
 
         throw Convertion_Exception();
@@ -44,7 +44,7 @@ namespace cyaml
     template<typename T>
     bool Node::push_back(const T &rhs)
     {
-        Node node = Convert<T>::encode(rhs);
+        Node node = Converter<T>::encode(rhs);
         return push_back(node);
     }
 } // namespace cyaml

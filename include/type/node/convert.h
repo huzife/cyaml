@@ -16,16 +16,16 @@
 namespace cyaml
 {
     /**
-     * @struct  Convert
+     * @struct  Converter
      * @brief   Node 与指定类型的转换模板类
      * @tparam  T   转换类型
      */
     template<typename T>
-    struct Convert;
+    struct Converter;
 
     // Node
     template<>
-    struct Convert<Node>
+    struct Converter<Node>
     {
         static Node encode(const Node &rhs)
         {
@@ -41,7 +41,7 @@ namespace cyaml
 
     // string
     template<>
-    struct Convert<std::string>
+    struct Converter<std::string>
     {
         static Node encode(const std::string &rhs)
         {
@@ -65,7 +65,7 @@ namespace cyaml
 
     // const char *
     template<>
-    struct Convert<const char *>
+    struct Converter<const char *>
     {
         static Node encode(const char *rhs)
         {
@@ -75,7 +75,7 @@ namespace cyaml
 
     // char *
     template<>
-    struct Convert<char *>
+    struct Converter<char *>
     {
         static Node encode(const char *rhs)
         {
@@ -85,7 +85,7 @@ namespace cyaml
 
     // char[]
     template<std::size_t N>
-    struct Convert<char[N]>
+    struct Converter<char[N]>
     {
         static Node encode(const char *rhs)
         {
@@ -95,7 +95,7 @@ namespace cyaml
 
     // int
     template<>
-    struct Convert<int>
+    struct Converter<int>
     {
         static Node encode(const int &rhs)
         {
@@ -111,7 +111,7 @@ namespace cyaml
 
     // float
     template<>
-    struct Convert<float>
+    struct Converter<float>
     {
         static Node encode(const float &rhs)
         {
@@ -126,7 +126,7 @@ namespace cyaml
     };
 
     template<>
-    struct Convert<bool>
+    struct Converter<bool>
     {
         static Node encode(const bool &rhs)
         {

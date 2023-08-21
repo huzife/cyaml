@@ -19,7 +19,7 @@ namespace cyaml
      */
     enum class Node_Type
     {
-        NULL_NODE,
+        NONE, // null
         MAP,
         SEQ,
         SCALAR
@@ -48,7 +48,7 @@ namespace cyaml
         Node_Style style_ = Node_Style::BLOCK; // 节点样式
 
     public:
-        Node(Node_Type type = Node_Type::NULL_NODE);
+        Node(Node_Type type = Node_Type::NONE);
         Node(const Node &node);
         Node(const Node_Ptr &node);
         Node(const std::string &scalar);
@@ -99,7 +99,7 @@ namespace cyaml
          */
         bool is_null() const
         {
-            return type_ == Node_Type::NULL_NODE;
+            return type_ == Node_Type::NONE;
         }
 
         /**
@@ -286,7 +286,7 @@ namespace cyaml
          * @param   type    重置节点类型
          * @return  void
          */
-        void reset(Node_Type type = Node_Type::NULL_NODE)
+        void reset(Node_Type type = Node_Type::NONE)
         {
             type_ = type;
             if (!is_null()) {

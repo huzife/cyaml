@@ -109,7 +109,7 @@ namespace cyaml
     uint32_t Node::size() const
     {
         switch (type_) {
-        case Node_Type::NULL_NODE:
+        case Node_Type::NONE:
             return 0;
         case Node_Type::MAP:
             return data_->map.size();
