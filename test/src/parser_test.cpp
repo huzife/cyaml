@@ -96,6 +96,21 @@ TEST_F(Parser_Test, complex_key)
     EXPECT_EQ(s.size(), 0);
 }
 
+TEST_F(Parser_Test, nested_key)
+{
+    cyaml::Node node;
+    parse("nested_key", node);
+
+    auto key1 = cyaml::load("{c: 3, d: 4}");
+    auto key2 = cyaml::load("{a: 1, b: 2}");
+    key2[key1] = 5;
+    cyaml::Node key3;
+    key3[key2] = 6;
+
+    ASSERT_TRUE(node.contain(key3));
+    EXPECT_EQ(node[key3].as<int>(), 7);
+}
+
 TEST_F(Parser_Test, empty_document1)
 {
     cyaml::Node node;

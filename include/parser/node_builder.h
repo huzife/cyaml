@@ -18,13 +18,10 @@ namespace cyaml
     {
     private:
         Node_Ptr root_;
-        std::stack<Node_Ptr> node_;
-        std::stack<Node_Ptr> key_;
+        std::stack<Node_Ptr> nodes_;
+        std::unordered_set<Node_Ptr> keys_;
         std::unordered_map<std::string, Node_Ptr> anchor_map_;
         Mark mark_;
-
-        uint32_t map_depth_ = 0;
-        uint32_t complex_key_depth_ = 0;
 
     public:
         Node_Builder();
@@ -69,16 +66,10 @@ namespace cyaml
 
     private:
         /**
-         * @brief   新节点入栈，同时返回该节点
-         * @return  Node_Ptr &
-         */
-        Node_Ptr &push();
-
-        /**
          * @brief   弹出一个节点，建立节点关系
          * @return  void
          */
-        void pop();
+        void pop_node();
 
         /**
          * @brief   插入键值对

@@ -6,7 +6,6 @@
  */
 
 #include "parser/node_builder.h"
-#include "parser/api.h"
 #include <assert.h>
 
 namespace cyaml
@@ -24,28 +23,18 @@ namespace cyaml
             Node_Style style)
     {
         mark_ = mark;
-        auto &node = push();
-        node = std::make_shared<Node>(Node_Type::MAP);
+        auto node = std::make_shared<Node>(Node_Type::MAP);
+        nodes_.push(node);
         node->set_style(style);
 
         if (!anchor.empty()) {
             anchor_map_[anchor] = node;
         }
-
-        if (map_depth_ > key_.size()) {
-            complex_key_depth_++;
-        }
-        map_depth_++;
     }
 
     void Node_Builder::on_map_end()
     {
-        assert(map_depth_ > 0);
-        if (complex_key_depth_ > 0) {
-            complex_key_depth_--;
-        }
-        map_depth_--;
-        pop();
+        pop_node();
     }
 
     void Node_Builder::on_seq_start(
@@ -54,8 +43,8 @@ namespace cyaml
             Node_Style style)
     {
         mark_ = mark;
-        auto &node = push();
-        node = std::make_shared<Node>(Node_Type::SEQ);
+        auto node = std::make_shared<Node>(Node_Type::SEQ);
+        nodes_.push(node);
         node->set_style(style);
 
         if (!anchor.empty()) {
@@ -65,7 +54,7 @@ namespace cyaml
 
     void Node_Builder::on_seq_end()
     {
-        pop();
+        pop_node();
     }
 
     void Node_Builder::on_scalar(
@@ -74,40 +63,41 @@ namespace cyaml
             std::string value)
     {
         mark_ = mark;
-        auto &node = push();
-        node = std::make_shared<Node>(value);
+        auto node = std::make_shared<Node>(value);
+        nodes_.push(node);
 
         if (!anchor.empty()) {
             anchor_map_[anchor] = node;
         }
 
-        pop();
+        pop_node();
     }
 
     void Node_Builder::on_null(const Mark &mark, std::string anchor)
     {
         mark_ = mark;
-        auto &node = push();
-        node = std::make_shared<Node>();
+        auto node = std::make_shared<Node>();
+        nodes_.push(node);
 
         if (!anchor.empty()) {
             anchor_map_[anchor] = node;
         }
 
-        pop();
+        pop_node();
     }
 
     void Node_Builder::on_alias(const Mark &mark, std::string anchor)
     {
         mark_ = mark;
-        auto &node = push();
+        auto node = std::make_shared<Node>();
+        nodes_.push(node);
         auto iter = anchor_map_.find(anchor);
         if (iter == anchor_map_.end()) {
             throw Parse_Exception(error_msgs::UNKNOWN_ANCHOR, mark_);
         }
         *node = *(iter->second);
 
-        pop();
+        pop_node();
     }
 
     Node Node_Builder::root()
@@ -115,58 +105,44 @@ namespace cyaml
         return *root_;
     }
 
-    Node_Ptr &Node_Builder::push()
+    void Node_Builder::pop_node()
     {
-        node_.push(std::make_shared<Node>());
-        return node_.top();
-    }
+        assert(!nodes_.empty());
 
-    void Node_Builder::pop()
-    {
-        assert(!node_.empty());
-
-        auto node = node_.top();
-        node_.pop();
+        auto node = nodes_.top();
+        nodes_.pop();
 
         // 根节点
-        if (node_.empty()) {
+        if (nodes_.empty()) {
             root_ = node;
             return;
         }
 
         // 其他节点
-        auto &top = node_.top();
+        auto top = nodes_.top();
 
-        if (top->is_map()) {
-            uint32_t depth = map_depth_ - complex_key_depth_;
-            assert(key_.size() <= depth);
-            if (key_.size() == depth) {
-                insert(key_.top(), node);
-                key_.pop();
-            } else {
-                key_.push(node);
-            }
+        if (keys_.find(top) != keys_.end()) {
+            nodes_.pop();
+            keys_.erase(top);
+            insert(top, node);
+        } else if (top->is_map()) {
+            keys_.insert(node);
+            nodes_.push(node);
         } else if (top->is_seq()) {
             top->push_back(*node);
         } else {
-            while (!key_.empty()) {
-                key_.pop();
-            }
-            while (!node_.empty()) {
-                node_.pop();
-            }
             assert(false);
         }
     }
 
     void Node_Builder::insert(Node_Ptr &key, Node_Ptr &value)
     {
-        assert(!node_.empty());
-        if (node_.top()->contain(key)) {
+        assert(!nodes_.empty());
+        if (nodes_.top()->contain(key)) {
             throw Representation_Exception(error_msgs::DUPLICATED_KEY, mark_);
         }
 
-        node_.top()->insert(*key, *value);
+        nodes_.top()->insert(*key, *value);
     }
 
 } // namespace cyaml

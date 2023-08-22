@@ -16,18 +16,35 @@ namespace cyaml
     class Event_Handler
     {
     public:
+        Event_Handler() = default;
         virtual ~Event_Handler() = default;
 
-        virtual void on_document_start(const Mark &) = 0;
+        virtual void on_document_start(const Mark &mark) = 0;
+
         virtual void on_document_end() = 0;
-        virtual void on_map_start(const Mark &, std::string, Node_Style) = 0;
+
+        virtual void on_map_start(
+                const Mark &mark,
+                std::string anchor,
+                Node_Style style) = 0;
+
         virtual void on_map_end() = 0;
-        virtual void on_seq_start(const Mark &, std::string, Node_Style) = 0;
+
+        virtual void on_seq_start(
+                const Mark &mark,
+                std::string anchor,
+                Node_Style style) = 0;
+
         virtual void on_seq_end() = 0;
-        virtual void on_scalar(const Mark &, std::string, std::string) = 0;
-        virtual void on_null(const Mark &, std::string) = 0;
-        virtual void on_anchor(const Mark &, std::string) = 0;
-        virtual void on_alias(const Mark &, std::string) = 0;
+
+        virtual void
+        on_scalar(const Mark &mark, std::string anchor, std::string value) = 0;
+
+        virtual void on_null(const Mark &mark, std::string anchor) = 0;
+
+        virtual void on_anchor(const Mark &mark, std::string anchor) = 0;
+
+        virtual void on_alias(const Mark &mark, std::string anchor) = 0;
     };
 
 } // namespace cyaml
