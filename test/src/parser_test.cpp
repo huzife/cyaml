@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <exception>
-#include "cyaml.h"
+#include "cyaml/cyaml.h"
 #include "gtest/gtest.h"
 
 class Parser_Test: public testing::Test
@@ -29,7 +29,6 @@ public:
     }
 };
 
-#ifdef CYAML_TEST
 TEST_F(Parser_Test, anchor_alias)
 {
     cyaml::Node node;
@@ -222,7 +221,6 @@ TEST_F(Parser_Test, multi_documents)
     EXPECT_TRUE(nodes[2].is_null());
     EXPECT_EQ(nodes[3].as<std::string>(), "forth document");
 }
-#endif
 
 int main(int argc, char *argv[])
 {

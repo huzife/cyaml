@@ -5,7 +5,7 @@
  * @date    2023-8-16
  */
 
-#include "parser/stream.h"
+#include "cyaml/parser/stream.h"
 #include <assert.h>
 #include <algorithm>
 

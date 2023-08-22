@@ -8,8 +8,8 @@
 #ifndef CYAML_VALUE_H
 #define CYAML_VALUE_H
 
-#include "type/node/node_data.h"
-#include "error/exceptions.h"
+#include "cyaml/type/node/node_data.h"
+#include "cyaml/error/exceptions.h"
 
 namespace cyaml
 {

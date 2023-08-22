@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "cyaml.h"
+#include "cyaml/cyaml.h"
 #include "gtest/gtest.h"
 
 using namespace cyaml;
@@ -85,9 +85,6 @@ TEST(sax_test, sax_test)
 
     ASSERT_EQ(handler.output, out_str.substr(0, out_str.size() - 1));
 }
-
-#ifdef CYAML_TEST
-#endif
 
 int main(int argc, char *argv[])
 {

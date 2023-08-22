@@ -8,10 +8,10 @@
 #ifndef CYAML_SCANNER_H
 #define CYAML_SCANNER_H
 
-#include "type/token.h"
-#include "type/mark.h"
-#include "type/indent.h"
-#include "parser/stream.h"
+#include "cyaml/type/token.h"
+#include "cyaml/type/mark.h"
+#include "cyaml/type/indent.h"
+#include "cyaml/parser/stream.h"
 #include <istream>
 #include <stack>
 #include <queue>

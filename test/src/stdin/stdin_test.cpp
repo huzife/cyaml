@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <exception>
-#include "cyaml.h"
+#include "cyaml/cyaml.h"
 #include "gtest/gtest.h"
 
 class Stdin_Test: public testing::Test
@@ -24,7 +24,6 @@ public:
     }
 };
 
-#ifdef CYAML_TEST
 TEST_F(Stdin_Test, empty_document1)
 {
     cyaml::Node node;
@@ -104,7 +103,6 @@ TEST_F(Stdin_Test, node)
     EXPECT_TRUE(node["seq"][2][1].as<bool>());
     EXPECT_TRUE(node["seq"][2][2].is_null());
 }
-#endif
 
 int main(int argc, char *argv[])
 {

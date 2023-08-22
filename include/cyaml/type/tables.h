@@ -8,7 +8,7 @@
 #ifndef CYAML_TABLES_H
 #define CYAML_TABLES_H
 
-#include "type/token.h"
+#include "cyaml/type/token.h"
 #include <unordered_map>
 #include <unordered_set>
 

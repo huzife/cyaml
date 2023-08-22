@@ -8,7 +8,7 @@
 #ifndef CYAML_API_H
 #define CYAML_API_H
 
-#include "type/node/node.h"
+#include "cyaml/type/node/node.h"
 
 namespace cyaml
 {

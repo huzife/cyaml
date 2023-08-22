@@ -8,8 +8,8 @@
 #ifndef CYAML_STREAM_H
 #define CYAML_STREAM_H
 
-#include "type/mark.h"
-#include "parser/unicode.h"
+#include "cyaml/type/mark.h"
+#include "cyaml/parser/unicode.h"
 #include <istream>
 #include <deque>
 

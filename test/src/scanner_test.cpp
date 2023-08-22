@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "cyaml.h"
+#include "cyaml/cyaml.h"
 #include "gtest/gtest.h"
 
 class Scanner_Test: public testing::Test
@@ -57,7 +57,6 @@ public:
     }
 };
 
-#ifdef CYAML_TEST
 // 锚点和引用测试
 TEST_F(Scanner_Test, anchor_alias)
 {
@@ -116,10 +115,6 @@ TEST_F(Scanner_Test, flow_style)
 {
     scan_test("flow_style");
 }
-#endif
-
-#ifdef CYAML_DEBUG
-#endif
 
 int main(int argc, char *argv[])
 {

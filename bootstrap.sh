@@ -10,7 +10,7 @@ if [ $(ldconfig -p | grep gtest | wc -l) -eq 0 ]; then
         sudo $root_path/install_gtest.sh
     fi;
 fi;
-    
+
 # build
 echo "building project..."
 if [ ! -d $root_path/build ]; then
@@ -18,7 +18,7 @@ if [ ! -d $root_path/build ]; then
 fi;
 
 cd $root_path/build
-cmake $root_path
+cmake $root_path -DBUILD_TEST=ON
 make
 
 # run test

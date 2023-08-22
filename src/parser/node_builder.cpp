@@ -5,7 +5,7 @@
  * @date        2023-8-15
  */
 
-#include "parser/node_builder.h"
+#include "cyaml/parser/node_builder.h"
 #include <assert.h>
 
 namespace cyaml

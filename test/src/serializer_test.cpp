@@ -2,7 +2,7 @@
 #include <fstream>
 #include <string>
 #include <exception>
-#include "cyaml.h"
+#include "cyaml/cyaml.h"
 #include "gtest/gtest.h"
 
 class Serializer_Test: public testing::Test
@@ -21,7 +21,6 @@ public:
     }
 };
 
-#ifdef CYAML_TEST
 TEST_F(Serializer_Test, temp)
 {
     cyaml::Node node;
@@ -49,7 +48,6 @@ TEST_F(Serializer_Test, temp)
     std::cout << node << std::endl;
     cyaml::dump("test.yaml", node);
 }
-#endif
 
 int main(int argc, char *argv[])
 {

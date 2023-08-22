@@ -5,11 +5,11 @@
  * @date        2023-8-13
  */
 
-#include "parser/api.h"
-#include "parser/node_builder.h"
-#include "parser/parser.h"
-#include "parser/serializer.h"
-#include "error/exceptions.h"
+#include "cyaml/parser/api.h"
+#include "cyaml/parser/node_builder.h"
+#include "cyaml/parser/parser.h"
+#include "cyaml/parser/serializer.h"
+#include "cyaml/error/exceptions.h"
 #include <fstream>
 #include <sstream>
 

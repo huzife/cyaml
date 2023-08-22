@@ -8,12 +8,12 @@
 #ifndef CYAML_PARSER_H
 #define CYAML_PARSER_H
 
-#include "event/event.h"
-#include "parser/scanner.h"
-#include "type/mark.h"
-#include "type/node/node.h"
-#include "type/node/node_impl.h"
-#include "type/tables.h"
+#include "cyaml/event/event.h"
+#include "cyaml/parser/scanner.h"
+#include "cyaml/type/mark.h"
+#include "cyaml/type/node/node.h"
+#include "cyaml/type/node/node_impl.h"
+#include "cyaml/type/tables.h"
 #include <unordered_map>
 #include <unordered_set>
 

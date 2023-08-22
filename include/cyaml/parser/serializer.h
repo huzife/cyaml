@@ -8,8 +8,8 @@
 #ifndef CYAML_SERIALIZER_H
 #define CYAML_SERIALIZER_H
 
-#include "type/node/node.h"
-#include "type/mark.h"
+#include "cyaml/type/node/node.h"
+#include "cyaml/type/mark.h"
 #include <ostream>
 #include <string>
 

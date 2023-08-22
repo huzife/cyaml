@@ -8,8 +8,8 @@
 #ifndef CYAML_NODE_BUILDER_H
 #define CYAML_NODE_BUILDER_H
 
-#include "event/event.h"
-#include "type/node/node.h"
+#include "cyaml/event/event.h"
+#include "cyaml/type/node/node.h"
 #include <stack>
 
 namespace cyaml

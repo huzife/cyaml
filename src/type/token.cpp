@@ -5,7 +5,7 @@
  * @date        2023-7-20
  */
 
-#include "type/token.h"
+#include "cyaml/type/token.h"
 #include <assert.h>
 
 namespace cyaml
