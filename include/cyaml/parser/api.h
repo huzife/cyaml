@@ -24,7 +24,7 @@ namespace cyaml
      * @param   input   输入字符串
      * @return  Node
      */
-    Node load(std::string input);
+    Node load(const std::string &input);
 
     /**
      * @brief   从字符串加载
@@ -38,7 +38,7 @@ namespace cyaml
      * @param   file    文件路径
      * @return  Node
      */
-    Node load_file(std::string file);
+    Node load_file(const std::string &file);
 
     /**
      * @brief   从输入流加载全部节点
@@ -52,7 +52,7 @@ namespace cyaml
      * @param   input   输入字符串
      * @return  std::vector<Node>
      */
-    std::vector<Node> load_all(std::string input);
+    std::vector<Node> load_all(const std::string &input);
 
     /**
      * @brief   从字符串加载全部节点
@@ -66,7 +66,7 @@ namespace cyaml
      * @param   file    文件路径
      * @return  std::vector<Node>
      */
-    std::vector<Node> load_file_all(std::string file);
+    std::vector<Node> load_file_all(const std::string &file);
 
     /**
      * @brief   输出到文件
@@ -74,7 +74,7 @@ namespace cyaml
      * @param   node    节点
      * @return  void
      */
-    void dump(std::string file, const Node &node);
+    void dump(const std::string &file, const Node &node);
 
     /**
      * @brief   转换为字符串

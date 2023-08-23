@@ -22,7 +22,7 @@ namespace cyaml
         return builder.root();
     }
 
-    Node load(std::string input)
+    Node load(const std::string &input)
     {
         std::stringstream ss(input);
         Node_Builder builder;
@@ -38,7 +38,7 @@ namespace cyaml
         return builder.root();
     }
 
-    Node load_file(std::string file)
+    Node load_file(const std::string &file)
     {
         std::ifstream ifs(file);
 
@@ -66,7 +66,7 @@ namespace cyaml
         return nodes;
     }
 
-    std::vector<Node> load_all(std::string input)
+    std::vector<Node> load_all(const std::string &input)
     {
         std::vector<Node> nodes;
         Node_Builder builder;
@@ -92,7 +92,7 @@ namespace cyaml
         return nodes;
     }
 
-    std::vector<Node> load_file_all(std::string file)
+    std::vector<Node> load_file_all(const std::string &file)
     {
         std::ifstream ifs(file);
 
@@ -111,7 +111,7 @@ namespace cyaml
         return nodes;
     }
 
-    void dump(std::string file, const Node &node)
+    void dump(const std::string &file, const Node &node)
     {
         std::ofstream ofs(file);
 
