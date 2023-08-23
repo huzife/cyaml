@@ -30,11 +30,11 @@ namespace cyaml
         Serializer(std::ostream &out);
 
         /**
-         * @brief   输出 node
-         * @param   node    输出节点
-         * @return  Serializer &
+         * @brief   序列化并输出 node
+         * @param   node    节点
+         * @return  void
          */
-        Serializer &operator<<(const Node &node);
+        void serialize(const Node &node);
 
         /**
          * @brief   获取当前行

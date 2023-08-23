@@ -13,10 +13,9 @@ namespace cyaml
 {
     Serializer::Serializer(std::ostream &out): output_stream_(out) {}
 
-    Serializer &Serializer::operator<<(const Node &node)
+    void Serializer::serialize(const Node &node)
     {
         write_node(node, 0);
-        return *this;
     }
 
     void Serializer::fill_blank(uint32_t indent)

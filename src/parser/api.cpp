@@ -111,11 +111,6 @@ namespace cyaml
         return nodes;
     }
 
-    void dump(std::ostream &out, const Node &node)
-    {
-        out << node;
-    }
-
     void dump(std::string file, const Node &node)
     {
         std::ofstream ofs(file);
@@ -137,7 +132,7 @@ namespace cyaml
 
     std::ostream &operator<<(std::ostream &out, const Node &node)
     {
-        Serializer(out) << node;
+        Serializer(out).serialize(node);
         return out;
     }
 

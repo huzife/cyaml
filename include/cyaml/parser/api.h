@@ -69,14 +69,6 @@ namespace cyaml
     std::vector<Node> load_file_all(std::string file);
 
     /**
-     * @brief   输出到输出流
-     * @param   out     输出流
-     * @param   node    节点
-     * @return  void
-     */
-    void dump(std::ostream &out, const Node &node);
-
-    /**
      * @brief   输出到文件
      * @param   file    文件路径
      * @param   node    节点
