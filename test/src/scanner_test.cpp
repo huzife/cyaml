@@ -1,7 +1,7 @@
-#include "parser/scanner.h"
 #include <iostream>
 #include <fstream>
 #include <string>
+#include "cyaml/cyaml.h"
 #include "gtest/gtest.h"
 
 class Scanner_Test: public testing::Test
@@ -19,10 +19,10 @@ public:
         std::cout << "scanner test finish" << std::endl;
     }
 
-    void scan_test(std::string in, std::string out)
+    void scan_test(std::string test_name)
     {
-        std::ifstream input_in(test_case_dirname + in);
-        std::ifstream input_out(test_case_dirname + out);
+        std::ifstream input_in(test_case_dirname + test_name + ".in");
+        std::ifstream input_out(test_case_dirname + test_name + ".out");
         ASSERT_TRUE(input_in.is_open());
         ASSERT_TRUE(input_out.is_open());
 
@@ -57,50 +57,64 @@ public:
     }
 };
 
-#ifdef CYAML_TEST
+// 锚点和引用测试
+TEST_F(Scanner_Test, anchor_alias)
+{
+    scan_test("anchor_alias");
+}
+
 // 基本 token 解析测试
 TEST_F(Scanner_Test, token1)
 {
-    scan_test("token1.in", "token1.out");
+    scan_test("token1");
 }
 
 TEST_F(Scanner_Test, token2)
 {
-    scan_test("token2.in", "token2.out");
+    scan_test("token2");
 }
 
 // 带单引号的字符串测试
 TEST_F(Scanner_Test, quote_string)
 {
-    scan_test("quote_string.in", "quote_string.out");
+    scan_test("quote_string");
 }
 
 // 转义字符测试
 TEST_F(Scanner_Test, escape)
 {
-    scan_test("escape.in", "escape.out");
+    scan_test("escape");
 }
 
 // 多行字符串缩进边界情况测试
 TEST_F(Scanner_Test, indent)
 {
-    scan_test("indent.in", "indent.out");
+    scan_test("indent");
 }
 
 // 保留换行和折叠换行测试
 TEST_F(Scanner_Test, special_str)
 {
-    scan_test("special_str.in", "special_str.out");
+    scan_test("special_str");
 }
-#endif
 
-#ifdef CYAML_DEBUG
-// 临时测试用例
-TEST_F(Scanner_Test, temp)
+// 注释测试
+TEST_F(Scanner_Test, comment)
 {
-    scan_test("temp.in", "temp.out");
+    scan_test("comment");
 }
-#endif
+
+// 带引号 KEY 测试
+TEST_F(Scanner_Test, quote_key)
+{
+    scan_test("quote_key");
+}
+
+// 流样式测试
+TEST_F(Scanner_Test, flow_style)
+{
+    scan_test("flow_style");
+}
 
 int main(int argc, char *argv[])
 {

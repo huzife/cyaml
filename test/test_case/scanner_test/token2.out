@@ -1,44 +1,68 @@
-(START, ---, 0)#
-(KEY, json, 0)#
-(COLON, :, 4)#
-(SERIES_ENTRY, -, 2)#
-(SCALAR, rigid, 4)#
-(SERIES_ENTRY, -, 2)#
-(SCALAR, better for data interchange, 4)#
-(KEY, yaml, 0)#
-(COLON, :, 4)#
-(SERIES_ENTRY, -, 2)#
-(SCALAR, slim and flexible, 4)#
-(SERIES_ENTRY, -, 2)#
-(SCALAR, better for configuration, 4)#
-(KEY, object, 0)#
-(COLON, :, 6)#
-(KEY, key, 2)#
-(COLON, :, 5)#
-(SCALAR, value, 7)#
-(KEY, array, 2)#
-(COLON, :, 7)#
-(SERIES_ENTRY, -, 4)#
-(KEY, null_value, 6)#
-(COLON, :, 16)#
-(SERIES_ENTRY, -, 4)#
-(KEY, boolean, 6)#
-(COLON, :, 13)#
-(SCALAR, true, 15)#
-(SERIES_ENTRY, -, 4)#
-(KEY, integer, 6)#
-(COLON, :, 13)#
-(SCALAR, 1, 15)#
-(KEY, paragraph, 0)#
-(COLON, :, 9)#
-(PRESERVE, |, 11)#
+(DOC_START)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, json)#
+(VALUE)#
+(BLOCK_SEQ_START)#
+(BLOCK_ENTRY)#
+(SCALAR, rigid)#
+(BLOCK_ENTRY)#
+(SCALAR, better for data interchange)#
+(BLOCK_SEQ_END)#
+(KEY)#
+(SCALAR, yaml)#
+(VALUE)#
+(BLOCK_SEQ_START)#
+(BLOCK_ENTRY)#
+(SCALAR, slim and flexible)#
+(BLOCK_ENTRY)#
+(SCALAR, better for configuration)#
+(BLOCK_SEQ_END)#
+(KEY)#
+(SCALAR, object)#
+(VALUE)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, key)#
+(VALUE)#
+(SCALAR, value)#
+(KEY)#
+(SCALAR, array)#
+(VALUE)#
+(BLOCK_SEQ_START)#
+(BLOCK_ENTRY)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, null_value)#
+(VALUE)#
+(BLOCK_MAP_END)#
+(BLOCK_ENTRY)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, boolean)#
+(VALUE)#
+(SCALAR, true)#
+(BLOCK_MAP_END)#
+(BLOCK_ENTRY)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, integer)#
+(VALUE)#
+(SCALAR, 1)#
+(BLOCK_MAP_END)#
+(BLOCK_SEQ_END)#
+(BLOCK_MAP_END)#
+(KEY)#
+(SCALAR, paragraph)#
+(VALUE)#
 (SCALAR, Blank lines denote
 paragraph breaks
-, 2)#
-(KEY, content, 0)#
-(COLON, :, 7)#
-(PRESERVE, |-, 9)#
+)#
+(KEY)#
+(SCALAR, content)#
+(VALUE)#
 (SCALAR, Or we
 can auto
 convert line breaks
-to save space, 2)#
+to save space)#
+(BLOCK_MAP_END)#

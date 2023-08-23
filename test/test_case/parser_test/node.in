@@ -1,0 +1,16 @@
+---
+scalar: a
+map:
+  map_scalar: aa
+  map_map:
+    map_map_scalar: aaa
+  map_seq: 
+  - aaa
+  - bbb
+seq:
+  - aa
+  - seq_map: 123
+  -
+    - 
+    - true
+    - 

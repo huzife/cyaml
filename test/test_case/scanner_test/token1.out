@@ -1,10 +1,14 @@
-(START, ---, 0)#
-(SERIES_ENTRY, -, 0)#
-(SCALAR, 123456, 2)#
-(SERIES_ENTRY, -, 0)#
-(SCALAR, test, 2)#
-(SERIES_ENTRY, -, 0)#
-(KEY, string, 2)#
-(COLON, :, 8)#
-(FOLD, >-, 10)#
-(SCALAR, this is a test string, 4)#
+(DOC_START)#
+(BLOCK_SEQ_START)#
+(BLOCK_ENTRY)#
+(SCALAR, 123456)#
+(BLOCK_ENTRY)#
+(SCALAR, test)#
+(BLOCK_ENTRY)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, string)#
+(VALUE)#
+(SCALAR, this is a test string)#
+(BLOCK_MAP_END)#
+(BLOCK_SEQ_END)#

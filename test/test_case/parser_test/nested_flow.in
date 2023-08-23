@@ -1,0 +1,13 @@
+---
+{
+    a: hello,
+    b: world,
+    ,
+    c: [
+        1,
+        2,
+        ,
+        3: map in flow_seq
+    ],
+    key
+}

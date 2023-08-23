@@ -1,0 +1,26 @@
+(DOC_START)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, a)#
+(VALUE)#
+(ANCHOR, a)#
+(SCALAR, 1)#
+(KEY)#
+(SCALAR, b)#
+(VALUE)#
+(ANCHOR, b)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, b1)#
+(VALUE)#
+(SCALAR, 2)#
+(KEY)#
+(SCALAR, b2)#
+(VALUE)#
+(ALIAS, a)#
+(BLOCK_MAP_END)#
+(KEY)#
+(ALIAS, b)#
+(VALUE)#
+(SCALAR, 3)#
+(BLOCK_MAP_END)#
