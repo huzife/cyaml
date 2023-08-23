@@ -8,10 +8,10 @@
 #ifndef CYAML_SCANNER_H
 #define CYAML_SCANNER_H
 
-#include "type/token.h"
-#include "type/mark.h"
-#include "type/indent.h"
-#include "parser/stream.h"
+#include "cyaml/type/token.h"
+#include "cyaml/type/mark.h"
+#include "cyaml/type/indent.h"
+#include "cyaml/parser/stream.h"
 #include <istream>
 #include <stack>
 #include <queue>
@@ -121,13 +121,13 @@ namespace cyaml
 
         /**
          * @brief   添加 token
-         * @tparam  Args...     Token 构造参数
+         * @tparam  Args &&...  Token 构造参数
          * @return  void
          */
         template<typename... Args>
-        void add_token(Args... args)
+        void add_token(Args &&... args)
         {
-            Token t(args..., token_mark_);
+            Token t(std::forward<Args>(args)..., token_mark_);
             token_.push(t);
         }
 
