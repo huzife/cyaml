@@ -277,7 +277,13 @@ namespace cyaml
          */
         void clear()
         {
-            reset(type_);
+            if (is_scalar()) {
+                data_->scalar.clear();
+            } else if (is_map()) {
+                data_->map.clear();
+            } else if (is_seq()) {
+                data_->seq.clear();
+            }
         }
 
     private:

@@ -66,11 +66,14 @@ namespace cyaml
             if (n1.size() != n2.size())
                 return false;
 
-            for (int i = 0; i < n1.size(); i++) {
-                auto &m1 = n1.data_->map;
-                auto &m2 = n2.data_->map;
-                if (m1[i].first != m2[i].first || m1[i].second != m2[i].second)
+            auto it1 = n1.data_->map.begin();
+            auto it2 = n2.data_->map.begin();
+            while (it1 != n1.data_->map.end()) {
+                if (it1->first != it2->first || it1->second != it2->second)
                     return false;
+
+                it1++;
+                it2++;
             }
 
             return true;
