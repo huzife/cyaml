@@ -1,4 +1,7 @@
-(KEY, escape, 0)#
-(COLON, :, 6)#
-(SCALAR, this\ is a	 
- string'", 8)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, escape)#
+(VALUE)#
+(SCALAR, this\ is 	 a
+ string'")#
+(BLOCK_MAP_END)#

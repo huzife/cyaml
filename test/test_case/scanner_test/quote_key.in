@@ -1,0 +1,6 @@
+---
+"first_key" :
+  "second_\n\tkey":
+  "third_key" : hello
+'\""\': test
+...

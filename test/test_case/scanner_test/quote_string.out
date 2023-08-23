@@ -1,6 +1,13 @@
-(START, ---, 0)#
-(KEY, quote_str, 0)#
-(COLON, :, 9)#
-(SCALAR, this     is a test string, 11)#
-(KEY, next, 0)#
-(COLON, :, 4)#
+(DOC_START)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, quote_str)#
+(VALUE)#
+(SCALAR, this     is a test string)#
+(KEY)#
+(SCALAR, next)#
+(VALUE)#
+(KEY)#
+(SCALAR, last)#
+(VALUE)#
+(BLOCK_MAP_END)#

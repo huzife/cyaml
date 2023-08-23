@@ -1,0 +1,30 @@
+(DOC_START)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, flow_map)#
+(VALUE)#
+(FLOW_MAP_START)#
+(KEY)#
+(SCALAR, key1)#
+(VALUE)#
+(SCALAR, value1)#
+(FLOW_ENTRY)#
+(FLOW_ENTRY)#
+(KEY)#
+(SCALAR, key2)#
+(VALUE)#
+(SCALAR, value2)#
+(FLOW_MAP_END)#
+(KEY)#
+(SCALAR, flow_seq)#
+(VALUE)#
+(FLOW_SEQ_START)#
+(SCALAR, 1)#
+(FLOW_ENTRY)#
+(SCALAR, 2)#
+(FLOW_ENTRY)#
+(FLOW_ENTRY)#
+(SCALAR, 3)#
+(FLOW_SEQ_END)#
+(BLOCK_MAP_END)#
+(DOC_END)#

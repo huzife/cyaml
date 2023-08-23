@@ -1,12 +1,19 @@
-(SERIES_ENTRY, -, 0)#
-(KEY, key1, 2)#
-(COLON, :, 6)#
-(SCALAR, string1, 8)#
-(KEY, key2, 2)#
-(COLON, :, 6)#
-(SCALAR, string2 string3 string4, 8)#
-(KEY, key3, 2)#
-(COLON, :, 6)#
-(SCALAR, string5 string6, 16)#
-(SERIES_ENTRY, -, 0)#
-(SCALAR, end, 2)#
+(BLOCK_SEQ_START)#
+(BLOCK_ENTRY)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, key1)#
+(VALUE)#
+(SCALAR, string1)#
+(KEY)#
+(SCALAR, key2)#
+(VALUE)#
+(SCALAR, string2 string3 string4)#
+(KEY)#
+(SCALAR, key3)#
+(VALUE)#
+(SCALAR, string5 string6)#
+(BLOCK_MAP_END)#
+(BLOCK_ENTRY)#
+(SCALAR, end)#
+(BLOCK_SEQ_END)#

@@ -1,0 +1,21 @@
+(DOC_START)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, first_key)#
+(VALUE)#
+(BLOCK_MAP_START)#
+(KEY)#
+(SCALAR, second_
+	key)#
+(VALUE)#
+(KEY)#
+(SCALAR, third_key)#
+(VALUE)#
+(SCALAR, hello)#
+(BLOCK_MAP_END)#
+(KEY)#
+(SCALAR, \""\)#
+(VALUE)#
+(SCALAR, test)#
+(BLOCK_MAP_END)#
+(DOC_END)#
