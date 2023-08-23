@@ -121,13 +121,13 @@ namespace cyaml
 
         /**
          * @brief   添加 token
-         * @tparam  Args...     Token 构造参数
+         * @tparam  Args &&...  Token 构造参数
          * @return  void
          */
         template<typename... Args>
-        void add_token(Args... args)
+        void add_token(Args &&... args)
         {
-            Token t(args..., token_mark_);
+            Token t(std::forward<Args>(args)..., token_mark_);
             token_.push(t);
         }
 

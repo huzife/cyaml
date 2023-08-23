@@ -109,9 +109,9 @@ namespace cyaml
          * @return  bool
          */
         template<typename... Args>
-        bool belong(const First_Set &first_set, Args... sets) const
+        bool belong(const First_Set &first_set, Args &&... sets) const
         {
-            return belong(first_set) || belong(sets...);
+            return belong(first_set) || belong(std::forward<Args>(sets)...);
         }
 
         /**
