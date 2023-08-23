@@ -27,6 +27,7 @@ namespace cyaml
         utf::Type type_;
 
         Mark mark_{1, 1};
+        int byte_count_ = 0;
 
     public:
         /**
