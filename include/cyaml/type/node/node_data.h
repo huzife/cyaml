@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include <list>
 #include <memory>
 #include <string>
 #include <iostream>
@@ -27,7 +28,7 @@ namespace cyaml
     using Node_Data_Ptr = std::shared_ptr<Node_Data>;
 
     using KV_Pair = std::pair<Node_Ptr, Node_Ptr>;
-    using Map = std::vector<KV_Pair>;
+    using Map = std::list<KV_Pair>;
     using Sequence = std::vector<Node_Ptr>;
 
     class Ref_Hash

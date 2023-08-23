@@ -8,8 +8,8 @@
 #ifndef CYAML_VALUE_H
 #define CYAML_VALUE_H
 
-#include "type/node/node_data.h"
-#include "error/exceptions.h"
+#include "cyaml/type/node/node_data.h"
+#include "cyaml/error/exceptions.h"
 
 namespace cyaml
 {
@@ -277,7 +277,13 @@ namespace cyaml
          */
         void clear()
         {
-            reset(type_);
+            if (is_scalar()) {
+                data_->scalar.clear();
+            } else if (is_map()) {
+                data_->map.clear();
+            } else if (is_seq()) {
+                data_->seq.clear();
+            }
         }
 
     private:

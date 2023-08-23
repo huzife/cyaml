@@ -5,9 +5,9 @@
  * @date        2023-7-25
  */
 
-#include "parser/parser.h"
-#include "type/tables.h"
-#include "error/exceptions.h"
+#include "cyaml/parser/parser.h"
+#include "cyaml/type/tables.h"
+#include "cyaml/error/exceptions.h"
 #include <assert.h>
 #include <iostream>
 

@@ -8,7 +8,7 @@
 #ifndef CYAML_CONVERT_H
 #define CYAML_CONVERT_H
 
-#include "type/node/node.h"
+#include "cyaml/type/node/node.h"
 #include <string>
 #include <iostream>
 #include <assert.h>

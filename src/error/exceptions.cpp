@@ -5,7 +5,7 @@
  * @date        2023-7-27
  */
 
-#include "error/exceptions.h"
+#include "cyaml/error/exceptions.h"
 
 namespace cyaml
 {

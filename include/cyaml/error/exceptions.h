@@ -8,9 +8,9 @@
 #ifndef CYAML_EXCEPTIONS_H
 #define CYAML_EXCEPTIONS_H
 
-#include "error/error_msgs.h"
-#include "type/token.h"
-#include "type/mark.h"
+#include "cyaml/error/error_msgs.h"
+#include "cyaml/type/token.h"
+#include "cyaml/type/mark.h"
 #include <stdexcept>
 #include <string>
 

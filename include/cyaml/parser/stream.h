@@ -8,8 +8,8 @@
 #ifndef CYAML_STREAM_H
 #define CYAML_STREAM_H
 
-#include "type/mark.h"
-#include "parser/unicode.h"
+#include "cyaml/type/mark.h"
+#include "cyaml/parser/unicode.h"
 #include <istream>
 #include <deque>
 
@@ -27,6 +27,7 @@ namespace cyaml
         utf::Type type_;
 
         Mark mark_{1, 1};
+        int byte_count_ = 0;
 
     public:
         /**

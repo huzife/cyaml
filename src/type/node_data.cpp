@@ -5,8 +5,8 @@
  * @date        2023-7-26
  */
 
-#include "type/node/node_data.h"
-#include "type/node/node.h"
+#include "cyaml/type/node/node_data.h"
+#include "cyaml/type/node/node.h"
 
 namespace cyaml
 {

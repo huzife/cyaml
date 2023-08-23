@@ -8,7 +8,7 @@
 #ifndef CYAML_EVENT_H
 #define CYAML_EVENT_H
 
-#include "type/node/node.h"
+#include "cyaml/type/node/node.h"
 #include <string>
 
 namespace cyaml
