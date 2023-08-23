@@ -5,8 +5,8 @@
  * @date        2023-7-31
  */
 
-#include "parser/scanner.h"
-#include "error/exceptions.h"
+#include "cyaml/parser/scanner.h"
+#include "cyaml/error/exceptions.h"
 #include <iostream>
 
 namespace cyaml

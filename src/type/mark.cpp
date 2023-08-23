@@ -5,7 +5,7 @@
  * @date        2023-7-27
  */
 
-#include "type/mark.h"
+#include "cyaml/type/mark.h"
 
 namespace cyaml
 {

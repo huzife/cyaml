@@ -8,8 +8,8 @@
 #ifndef CYAML_TOKEN_H
 #define CYAML_TOKEN_H
 
-#include "type/indent.h"
-#include "type/mark.h"
+#include "cyaml/type/indent.h"
+#include "cyaml/type/mark.h"
 #include <string>
 #include <ostream>
 #include <assert.h>

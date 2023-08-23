@@ -5,7 +5,7 @@
  * @date    2023-8-16
  */
 
-#include "parser/stream.h"
+#include "cyaml/parser/stream.h"
 #include <assert.h>
 #include <algorithm>
 
@@ -57,7 +57,12 @@ namespace cyaml
             break;
 
         default:
-            mark_.column++;
+            if (byte_count_ == 0) {
+                byte_count_ = Unicode::get_utf8_len(ch);
+            }
+            if (--byte_count_ == 0) {
+                mark_.column++;
+            }
             break;
         }
     }
